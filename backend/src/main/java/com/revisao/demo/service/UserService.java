@@ -14,8 +14,8 @@ public class UserService extends BaseServiceImpl<UserDTO, User, Integer>{
         super(repository, mapper);
     }
     
-    public UserDTO saveUser(UserDTO user) {
-    	return save(user);
-    }
+
+    
+    
 	
 }

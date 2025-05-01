@@ -10,28 +10,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.revisao.demo.dto.UserDTO;
-import com.revisao.demo.service.UserService;
+import com.revisao.demo.dto.ModeloDTO;
+import com.revisao.demo.service.ModeloService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("modelo")
 @RequiredArgsConstructor
-public class UserController {
-
-	private final UserService userService;
+public class ModeloController {
+	
+	private final ModeloService modeloService;
 	
 	@GetMapping
-	public List<UserDTO> getAll(){
-		return userService.findAll();
+	public List<ModeloDTO> getAllModelos(){
+		return modeloService.findAll();
 	}
 	
 	@PostMapping
-	public ResponseEntity<Void> saveUser(@Valid @RequestBody UserDTO user){
-		userService.save(user);
+	public ResponseEntity<Void> postModelo(@Valid @RequestBody ModeloDTO modelo){
+		modeloService.save(modelo);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-	
+
 }
