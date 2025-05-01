@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,9 +34,13 @@ public class Revisao {
 	
 	private Double kmAtual;
 	
-	private Integer idUser;
+	@ManyToOne
+	@JoinColumn(name="user_id")
+	private User idUser;
 	
-	private Integer idCarro;
+	@ManyToOne
+	@JoinColumn(name="carro_id")
+	private Carro idCarro;
 	
 	
 	
