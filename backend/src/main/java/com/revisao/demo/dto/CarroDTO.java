@@ -2,6 +2,9 @@ package com.revisao.demo.dto;
 
 import java.sql.Timestamp;
 
+import com.revisao.demo.models.Marca;
+import com.revisao.demo.models.Modelo;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +26,9 @@ public class CarroDTO {
 	private Integer idModelo;
 	@NotNull
 	private Integer idMarca;
+	
+	private Marca marca;
+	
+	private Modelo modelo;
 	
 }

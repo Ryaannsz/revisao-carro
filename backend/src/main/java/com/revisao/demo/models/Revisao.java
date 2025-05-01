@@ -34,13 +34,17 @@ public class Revisao {
 	
 	private Double kmAtual;
 	
+	
+	private Integer idUser;
 	@ManyToOne
 	@JoinColumn(name="user_id")
-	private User idUser;
+	private User user;
 	
+	
+	private Integer idCarro;
 	@ManyToOne
 	@JoinColumn(name="carro_id")
-	private Carro idCarro;
+	private Carro carro;
 	
 	
 	

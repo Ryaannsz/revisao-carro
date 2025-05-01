@@ -11,11 +11,13 @@ import com.revisao.demo.models.Revisao;
 @Mapper(componentModel = "spring")
 public interface CarroMapper extends BaseMapper<CarroDTO, Carro>{
 
-	@Mapping(source = "marca.idMarca", target = "idMarca")
-	@Mapping(source = "modelo.idModelo", target = "idModelo")
-	CarroDTO toDTO(Carro carro);
-	
-	@Mapping(source = "idMarca", target = "marca.idMarca")
-	@Mapping(source = "idModelo", target = "modelo.idModelo")
-	Revisao toEntity(RevisaoDTO revisao);
+	@Mapping(source = "idMarca",       target = "marca.idMarca")
+    @Mapping(source = "idModelo", target = "modelo.idModelo")
+    CarroDTO toDTO(Carro carro);
+
+   
+    @Mapping(source = "idModelo", target = "modelo.idModelo")
+    @Mapping(source = "idMarca", target = "marca.idMarca")
+    Carro toEntity(CarroDTO dto);
+
 }

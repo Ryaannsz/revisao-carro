@@ -29,13 +29,17 @@ public class Carro {
 	
 	private Double kmAdicionado;
 	
+	
+	private Integer idModelo;
 	@ManyToOne
 	@JoinColumn(name="modelo_id")
-	private Modelo idModelo;
+	private Modelo modelo;
 	
+	
+	private Integer idMarca;
 	@ManyToOne
 	@JoinColumn(name="marca_id")
-	private Marca idMarca;
+	private Marca marca;
 	
 
 }
