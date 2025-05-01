@@ -1,9 +1,10 @@
 package com.revisao.demo.service;
 
 import java.util.List;
+
 import java.util.Optional;
 
-import com.revisao.demo.Mapper.BaseMapper;
+import com.revisao.demo.mapper.BaseMapper;
 import com.revisao.demo.repository.BaseRepository;
 
 public abstract class BaseServiceImpl<D, E, ID> implements BaseService<D, ID> {

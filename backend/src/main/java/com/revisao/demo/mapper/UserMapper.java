@@ -1,4 +1,4 @@
-package com.revisao.demo.Mapper;
+package com.revisao.demo.mapper;
 
 import org.mapstruct.Mapper;
 
