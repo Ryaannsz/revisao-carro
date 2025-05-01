@@ -1,5 +1,35 @@
 package com.revisao.demo.models;
 
+import java.sql.Timestamp;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "TB_CARRO")
+
+
 public class Carro {
+	
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer idCarro;
+	
+	private Timestamp dtAdicionado;
+	
+	private Double kmAdicionado;
+	
+	private Integer idModelo;
+	
+	private Integer idMarca;
+	
 
 }

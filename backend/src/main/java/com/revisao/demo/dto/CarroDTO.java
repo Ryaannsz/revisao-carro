@@ -8,26 +8,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class RevisaoDTO {
+@NoArgsConstructor
 
-	private Integer idRevisao;
-	@NotNull
-	private Timestamp dtRevisao;
-	@NotNull
-	private Double litroComb;
-	@NotNull
-	private Double valorComb;
-	@NotNull
-	private Double kmAtual;
-	@NotNull
-	private Integer idUser;
-	@NotNull
+
+public class CarroDTO {
+
 	private Integer idCarro;
-	
-	
-	
-	
+	@NotNull
+	private Timestamp dtAdicionado;
+	@NotNull
+	private Double kmAdicionado;
+	@NotNull
+	private Integer idModelo;
+	@NotNull
+	private Integer idMarca;
 	
 }
