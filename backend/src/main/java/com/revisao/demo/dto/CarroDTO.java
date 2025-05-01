@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class CarroDTO {
 
 	private Integer idCarro;
-	@NotNull
+
 	private Timestamp dtAdicionado;
 	@NotNull
 	private Double kmAdicionado;

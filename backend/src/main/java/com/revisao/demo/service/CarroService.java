@@ -1,7 +1,5 @@
 package com.revisao.demo.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.revisao.demo.dto.CarroDTO;
@@ -16,8 +14,5 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer>{
 		super(carroRepository, carroMapper);
 	}
 
-	public List<CarroDTO> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }
