@@ -2,6 +2,7 @@ package com.revisao.demo.dto;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revisao.demo.models.Marca;
 import com.revisao.demo.models.Modelo;
 
@@ -22,9 +23,9 @@ public class CarroDTO {
 	private Timestamp dtAdicionado;
 	@NotNull
 	private Double kmAdicionado;
-	@NotNull
+	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Integer idModelo;
-	@NotNull
+	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Integer idMarca;
 	
 	private Marca marca;
