@@ -32,7 +32,7 @@ public class RevisaoController {
 
 	@PostMapping
 	public ResponseEntity<Void> postRevisao(@Valid @RequestBody RevisaoDTO revisao) {
-		revisaoService.save(revisao);
+		revisaoService.saveRevisao(revisao);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
@@ -41,6 +41,11 @@ public class RevisaoController {
 	    return revisaoService.findById(idRevisao)
 	            .map(ResponseEntity::ok)
 	            .orElseGet(() -> ResponseEntity.notFound().build());
+	}
+	
+	@GetMapping("/carro/{idCarro}/km/recente")
+	public Double getKmRecente(@PathVariable Integer idCarro) {
+		return revisaoService.getKmRecente(idCarro);
 	}
 
 
