@@ -5,7 +5,7 @@ export interface Carro {
     idCarro: number,
     marca: Marca,
     modelo: Modelo,
-    kilometragem: number,
+    kmAdicionado: number,
     placa: string,
     dtAdicionado: number
   }

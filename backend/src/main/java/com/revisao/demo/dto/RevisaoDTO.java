@@ -19,11 +19,7 @@ public class RevisaoDTO {
 	private Integer idRevisao;
 
 	private Timestamp dtRevisao;
-	@NotNull
-	private Double litroComb;
-	@NotNull
-	private Double valorComb;
-	@NotNull
+	
 	private Double kmAtual;
 	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Integer idUser;

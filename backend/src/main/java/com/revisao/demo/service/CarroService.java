@@ -10,8 +10,17 @@ import com.revisao.demo.repository.CarroRepository;
 @Service
 public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer>{
 
+	private final CarroRepository carroRepository;
+	
 	public CarroService(CarroRepository carroRepository, CarroMapper carroMapper) {
 		super(carroRepository, carroMapper);
+		this.carroRepository=carroRepository;
+	}
+	
+	public Double getKmRecente(Integer idCarro) {
+		return carroRepository
+	            .findLatestKmAtualNative(idCarro)
+	            .orElse(null);
 	}
 
 

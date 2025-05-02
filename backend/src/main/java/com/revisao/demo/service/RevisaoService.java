@@ -14,14 +14,16 @@ import com.revisao.demo.repository.RevisaoRepository;
 @Service
 public class RevisaoService
      extends BaseServiceImpl<RevisaoDTO, Revisao, Integer> {
+	
+	
 
-    private final RevisaoRepository revisaoRepository;
+
 
     @Autowired
     public RevisaoService(RevisaoRepository revisaoRepository,  
                           RevisaoMapper revisaoMapper) {
         super(revisaoRepository, revisaoMapper);
-        this.revisaoRepository = revisaoRepository;             
+            
     }
     
 
@@ -32,9 +34,4 @@ public class RevisaoService
     	
     }
 
-    public Double getKmRecente(Integer idCarro) {
-        return revisaoRepository
-            .findLatestKmAtualNative(idCarro)
-            .orElse(null);
-    }
 }

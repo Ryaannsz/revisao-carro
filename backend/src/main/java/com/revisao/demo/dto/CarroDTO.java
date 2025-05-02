@@ -32,4 +32,6 @@ public class CarroDTO {
 	
 	private Modelo modelo;
 	
+	private String placa;
+	
 }

@@ -28,10 +28,6 @@ public class Revisao {
 	
 	private Timestamp dtRevisao;
 	
-	private Double litroComb;
-	
-	private Double valorComb;
-	
 	private Double kmAtual;
 	
 	

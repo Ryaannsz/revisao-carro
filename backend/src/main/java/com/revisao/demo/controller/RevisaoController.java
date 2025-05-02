@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import com.revisao.demo.service.RevisaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("revisao")
 @RequiredArgsConstructor
@@ -43,10 +45,4 @@ public class RevisaoController {
 	            .orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	
-	@GetMapping("/carro/{idCarro}/km/recente")
-	public Double getKmRecente(@PathVariable Integer idCarro) {
-		return revisaoService.getKmRecente(idCarro);
-	}
-
-
 }

@@ -1,0 +1,114 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-gray-50">
+  <!-- Form Container -->
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg transition-all duration-300 hover:shadow-2xl">
+    <h2 class="text-3xl font-bold mb-8 text-center text-green-600 animate-fade-in-down">
+      <i class="fas fa-gas-pump mr-3"></i>Registrar Abastecimento
+    </h2>
+    
+    <form [formGroup]="abastForm" (ngSubmit)="cadastrarAbastecimento()" class="space-y-6">
+      <!-- Campos do Formulário -->
+      <div class="space-y-4">
+        <div class="form-group animate-fade-in-up delay-100">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-water mr-2 text-green-500"></i>Litros Abastecidos
+          </label>
+          <input type="number" formControlName="litroComb" 
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-200">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-coins mr-2 text-green-500"></i>Valor Combustível (R$)
+          </label>
+          <input type="number" formControlName="valorComb" 
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-300">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-tachometer-alt mr-2 text-green-500"></i>KM Atual
+          </label>
+          <input type="number" formControlName="kmAtual" 
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-400">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-user-tag mr-2 text-green-500"></i>ID do Usuário
+          </label>
+          <input type="number" formControlName="idUser" 
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-500">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-calendar-day mr-2 text-green-500"></i>Data do Abastecimento
+          </label>
+          <input type="date" formControlName="dtAbast" 
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-600">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <i class="fas fa-car mr-2 text-green-500"></i>Carro
+          </label>
+          <button type="button" 
+                  (click)="openModal()"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-left focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all hover:border-green-300 group flex justify-between items-center">
+            <span class="truncate">
+              {{ selectedCar ? selectedCar.marca.marca + ' ' + selectedCar.modelo.modelo + ' - ' + selectedCar.placa : 'Selecione um carro' }}
+            </span>
+            <i class="fas fa-chevron-down text-gray-400 group-hover:text-green-500 transition-transform"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" 
+              class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-green-200/50">
+        <i class="fas fa-save mr-2"></i>Registrar Abastecimento
+      </button>
+    </form>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" 
+       class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all duration-300">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-2xl font-bold text-gray-800">
+          <i class="fas fa-car-side mr-2 text-green-500"></i>Selecionar Carro
+        </h3>
+        <button type="button" 
+                (click)="showModal = false"
+                class="p-2 rounded-full hover:bg-gray-50 transition-colors">
+          <i class="fas fa-times text-gray-400 hover:text-gray-600 text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <div class="relative mb-6">
+          <input type="text" 
+                 [(ngModel)]="searchTerm"
+                 (ngModelChange)="filterCars()"
+                 placeholder="Pesquisar carro..."
+                 class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+
+        <div class="flex-1 overflow-y-auto pr-2 -mr-2">
+          <div *ngFor="let car of filteredCars" 
+               (click)="selectCar(car)"
+               class="p-4 mb-2 rounded-lg border border-gray-100 hover:border-green-200 cursor-pointer transition-all hover:bg-green-50/50 group relative">
+            <div class="font-medium text-gray-800 group-hover:text-green-600 transition-colors">
+              {{ car.marca.marca }} {{ car.modelo.modelo }}
+            </div>
+            <div class="text-sm text-gray-500">{{ car.placa }}</div>
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="fas fa-check-circle text-green-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

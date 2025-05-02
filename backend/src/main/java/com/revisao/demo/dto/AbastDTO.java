@@ -1,5 +1,8 @@
 package com.revisao.demo.dto;
 
+import java.sql.Timestamp;
+
+import com.revisao.demo.models.Carro;
 import com.revisao.demo.models.User;
 
 import jakarta.validation.constraints.NotNull;
@@ -20,9 +23,20 @@ public class AbastDTO {
 	private Double valorComb;
 	@NotNull
 	private Double kmAtual;
+	
+	private Timestamp dtAbast;
+	
 	@NotNull
 	private Integer idUser;
-
+	
 	private User user;
+	
+	@NotNull
+	private Integer idCarro;
+	
+	private Carro carro;
+	
+
+
 
 }

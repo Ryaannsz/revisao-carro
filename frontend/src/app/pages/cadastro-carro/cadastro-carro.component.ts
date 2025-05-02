@@ -1,35 +1,69 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MarcaService } from '../../core/services/marca.service';
+import { ModeloService } from '../../core/services/modelo.service'; 
+import { CarroService } from '../../core/services/carro.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Marca } from '../../core/models/marca.model';
+import { Modelo } from '../../core/models/modelo.model';
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  selector: 'app-cadastro-carro',
-  templateUrl: './cadastro-carro.component.html'
+  selector: 'app-cadastrar-carro',
+  templateUrl: './cadastro-carro.component.html',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule] 
 })
-export class CadastroCarroComponent implements OnInit {
-  marcas: any[] = [];
-  modelos: any[] = [];
-  carro = {
-    marcaId: '',
-    modeloId: '',
-    km: '',
-    placa: ''
-  };
+export class CadastrarCarroComponent implements OnInit {
 
-  constructor(private http: HttpClient) {}
+  carroForm: FormGroup;
+  marcas: Marca[] = [];
+  modelos: Modelo[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private marcaService: MarcaService,
+    private modeloService: ModeloService,
+    private carroService: CarroService
+  ) {
+    this.carroForm = this.fb.group({
+      idMarca: ['', Validators.required],
+      idModelo: ['', Validators.required],
+      kmAdicionado: ['', [Validators.required, Validators.min(0)]],
+      placa: ['', Validators.required]
+    });
+  }
 
   ngOnInit() {
-    this.http.get<any[]>('/marca').subscribe(data => this.marcas = data);
-    this.http.get<any[]>('/modelo').subscribe(data => this.modelos = data);
+    this.carregarMarcas();
+    this.carregarModelos();
+  }
+
+
+
+  carregarMarcas() {
+    this.marcaService.listarMarcas().subscribe({
+      next: (data) => this.marcas = data,
+      error: (err) => console.error('Erro ao carregar marcas', err)
+    });
+  }
+
+  carregarModelos() {
+    this.modeloService.listarModelos().subscribe({
+      next: (data) => this.modelos = data,
+      error: (err) => console.error('Erro ao carregar modelos', err)
+    });
   }
 
   cadastrarCarro() {
-    this.http.post('/carro', this.carro).subscribe(() => {
-      alert('Carro cadastrado com sucesso!');
-      this.carro = { marcaId: '', modeloId: '', km: '', placa: '' };
-    });
+    if (this.carroForm.valid) {
+      this.carroService.cadastrarCarro(this.carroForm.value).subscribe({
+        next: (res) => {
+          console.log('Carro cadastrado:', res);
+          this.carroForm.reset();
+        },
+        error: (err) => {
+          console.error('Erro ao cadastrar carro', err);
+        }
+      });
+    }
   }
 }
