@@ -1,0 +1,31 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
+      <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">Cadastrar Carro</h2>
+      <form (ngSubmit)="cadastrarCarro()">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Marca</label>
+          <select [(ngModel)]="carro.marcaId" name="marcaId" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+            <option *ngFor="let marca of marcas" [value]="marca.id">{{ marca.nome }}</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Modelo</label>
+          <select [(ngModel)]="carro.modeloId" name="modeloId" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+            <option *ngFor="let modelo of modelos" [value]="modelo.id">{{ modelo.nome }}</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Kilometragem</label>
+          <input [(ngModel)]="carro.km" name="km" type="number" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+        </div>
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">Placa</label>
+          <input [(ngModel)]="carro.placa" name="placa" type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg">
+          Cadastrar
+        </button>
+      </form>
+    </div>
+  </div>
+  
