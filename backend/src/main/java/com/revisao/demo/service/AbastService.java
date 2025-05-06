@@ -16,15 +16,24 @@ public class AbastService extends BaseServiceImpl<AbastDTO, Abast, Integer>{
 	private final AbastRepository abastRepository;
 	private final AbastMapper abastMapper;
 	
-	public AbastService(AbastRepository abastRepository, AbastMapper abastMapper) {
+	private final CarroService carroService;
+	
+	public AbastService(AbastRepository abastRepository,
+			AbastMapper abastMapper,
+			CarroService carroService) {
 		super(abastRepository, abastMapper);
 		this.abastMapper=abastMapper;
 		this.abastRepository=abastRepository;
+		this.carroService=carroService;
 		
 	}
 	
 	public AbastDTO saveAbast(AbastDTO abast) {
-		System.out.println(abast);
+		
+		if(carroService.getKmRecente(abast.getIdCarro())<=abast.getKmAtual()) {
+			throw new IllegalArgumentException("Quilometragem inferior a atual.");
+		}
+		
 		if(abast.getDtAbast()==null) {
 			Timestamp agora = new Timestamp(System.currentTimeMillis());
 			abast.setDtAbast(agora);

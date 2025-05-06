@@ -19,8 +19,7 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer>{
 	
 	public Double getKmRecente(Integer idCarro) {
 		return carroRepository
-	            .findLatestKmAtualNative(idCarro)
-	            .orElse(null);
+	            .findKmMaisRecenteByIdCarro(idCarro);
 	}
 
 

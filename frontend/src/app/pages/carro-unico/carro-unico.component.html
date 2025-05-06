@@ -76,7 +76,7 @@
           <ng-container *ngFor="let r of revisoes">
             <tr>
               <td class="px-4 py-2">{{ r.dtRevisao | date:'short' }}</td>
-              <td class="px-4 py-2">{{ r.kilometragemAtual }}</td>
+              <td class="px-4 py-2">{{ r.kmAtual }}</td>
               <td class="px-4 py-2">
                 <button
                   (click)="toggleRevisao(r.idRevisao)"

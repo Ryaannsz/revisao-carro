@@ -21,8 +21,10 @@ public class RevisaoDTO {
 	private Timestamp dtRevisao;
 	
 	private Double kmAtual;
+	
 	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Integer idUser;
+	
 	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Integer idCarro;
 	

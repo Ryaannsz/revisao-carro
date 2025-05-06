@@ -3,7 +3,7 @@ import { User } from "./user.model";
 
 export interface Revisao{
     idRevisao: number,
-    kilometragemAtual: number,
+    kmAtual: number,
     user: User,
     carro: Carro,
     dtRevisao: Date

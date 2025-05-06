@@ -19,21 +19,33 @@ public class RevisaoService
 	
 	private final RevisaoRepository revisaoRepository;
 	private final RevisaoMapper revisaoMapper;
+	
+	private final CarroService carroService;
+
 
 
     @Autowired
     public RevisaoService(RevisaoRepository revisaoRepository,  
-                          RevisaoMapper revisaoMapper) {
+                          RevisaoMapper revisaoMapper,
+                          CarroService carroService) {
         super(revisaoRepository, revisaoMapper);
         this.revisaoRepository=revisaoRepository;
         this.revisaoMapper=revisaoMapper;
-            
+        this.carroService=carroService;            
     }
     
 
     public RevisaoDTO saveRevisao(RevisaoDTO revisao) {
-    	Timestamp agora = new Timestamp(System.currentTimeMillis());
-    	revisao.setDtRevisao(agora);
+    	
+		if(carroService.getKmRecente(revisao.getIdCarro())<=revisao.getKmAtual()) {
+			throw new IllegalArgumentException("Quilometragem inferior a atual.");
+		}
+		
+		if(revisao.getDtRevisao()==null) {
+	    	Timestamp agora = new Timestamp(System.currentTimeMillis());
+	    	revisao.setDtRevisao(agora);
+		}
+
     	return save(revisao);
     	
     }
