@@ -33,10 +33,14 @@ export class BaseService {
   }
 
   getWithId<T>(id:number, endpoint: string = ''): Observable<T>{
-    return this.http.post<T>(`${this.path}${endpoint}`, id);
+    return this.http.get<T>(`${this.path}${endpoint}/${id}`);
   }
 
   getList<T>(endpoint: string = ''): Observable<T[]> {
     return this.http.get<T[]>(`${this.path}${endpoint}`);
+  }
+
+  getListWithId<T>(id:number, endpoint: string = ''): Observable<T[]> {
+    return this.http.get<T[]>(`${this.path}${endpoint}/${id}`);
   }
 }

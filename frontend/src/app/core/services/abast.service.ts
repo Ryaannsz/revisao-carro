@@ -16,4 +16,8 @@ export class AbastService extends BaseService{
     this.path=AppConstants.ABAST_URL;
   }
 
+  abastecimentoCarro(id: number){
+    return this.getListWithId(id, '/carro')
+  }
+
 }

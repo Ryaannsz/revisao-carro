@@ -5,6 +5,7 @@ export interface Revisao{
     idRevisao: number,
     kilometragemAtual: number,
     user: User,
-    carro: Carro
+    carro: Carro,
+    dtRevisao: Date
 
 }

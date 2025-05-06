@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
-import { Carro } from '../../core/models/carro.model';
-import { OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CarroService } from '../../core/services/carro.service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute }  from '@angular/router';
+import { CarroService }    from '../../core/services/carro.service';
+import { AbastService }    from '../../core/services/abast.service';
+import { RevisaoService }  from '../../core/services/revisao.service';
+import { Carro }           from '../../core/models/carro.model';
+import { Abast }           from '../../core/models/abast.model';
+import { Revisao }         from '../../core/models/revisao.model';
 
 @Component({
   selector: 'app-carro-unico',
@@ -12,21 +15,28 @@ import { CarroService } from '../../core/services/carro.service';
 })
 export class CarroUnicoComponent implements OnInit {
 
+  carro: Carro | null           = null;
+  abastecimentos: Abast[]       = [];
+  revisoes: Revisao[]           = [];
+  expAbastId: number | null     = null;
+  expRevisaoId: number | null   = null;
   id!: number;
-  carro: Carro = {idCarro: 0, marca: {idMarca: 0, marca: ""}, modelo: {idModelo: 0, modelo: ""}, kmAdicionado: 0, placa: "", dtAdicionado: 0}
-  constructor(private route: ActivatedRoute, private carroService: CarroService) {}
+  
+
+
+  constructor(private route: ActivatedRoute,
+     private carroService: CarroService,
+     private abastService: AbastService,
+     private revisaoService: RevisaoService) {}
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.findCarro(this.id);  
+    this.carroService.getWithId<Carro>(this.id).subscribe(c => this.carro = c);
+    this.abastService.getListWithId<Abast>(this.id, '/carro').subscribe(a => this.abastecimentos = a);
+    this.revisaoService.getListWithId<Revisao>(this.id, '/carro').subscribe(r => this.revisoes = r);
   }
 
-  findCarro(id: number){
-    this.carroService.getWithId<Carro>(id).subscribe({
-      next: (res) => {
-        this.carro=res;
-      }
-    })
-  }
+  toggleAbast(id: number)   { this.expAbastId   = this.expAbastId   === id ? null : id; }
+  toggleRevisao(id: number) { this.expRevisaoId = this.expRevisaoId === id ? null : id; }
 
 }
