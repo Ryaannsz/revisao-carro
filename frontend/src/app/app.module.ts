@@ -9,11 +9,14 @@ import { CadastrarModeloComponent } from './pages/cadastro-modelo/cadastro-model
 import { CadastrarCarroComponent } from './pages/cadastro-carro/cadastro-carro.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
+import { CarroUnicoComponent } from './pages/carro-unico/carro-unico.component';
 
 
 @NgModule({
   declarations: [
     
+  
+    CarroUnicoComponent
   ],
   imports: [
     BrowserModule,

@@ -5,6 +5,7 @@ import { CadastrarCarroComponent } from './pages/cadastro-carro/cadastro-carro.c
 import { CadastrarModeloComponent } from './pages/cadastro-modelo/cadastro-modelo.component';
 import { ListaCarrosComponent } from './pages/lista-carros/lista-carros.component';
 import { CadastroAbastecimentoComponent } from './pages/cadastro-abastecimento/cadastro-abastecimento.component';
+import { CarroUnicoComponent } from './pages/carro-unico/carro-unico.component';
 
 const routes: Routes = [
   { path: 'marca', component: CadastroMarcaComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'carros', component: ListaCarrosComponent },
   { path: 'abast', component: CadastroAbastecimentoComponent},
   { path: '', redirectTo: 'carros', pathMatch: 'full' },
+  {path: 'carros/unico/:id', component: CarroUnicoComponent}
 ];
 
 @NgModule({

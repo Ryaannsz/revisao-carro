@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Carro } from '../../core/models/carro.model';
 import { CarroService } from '../../core/services/carro.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -14,7 +15,8 @@ export class ListaCarrosComponent implements OnInit {
   carros: Carro[] = [];
 
   constructor(
-    private carroService: CarroService
+    private carroService: CarroService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -30,5 +32,9 @@ export class ListaCarrosComponent implements OnInit {
         console.error('Erro ao carregar carros:', err);
       }
     });
+  }
+
+  irParaCarro(id: number){
+    this.router.navigate(['/carros/unico', id]);
   }
 }

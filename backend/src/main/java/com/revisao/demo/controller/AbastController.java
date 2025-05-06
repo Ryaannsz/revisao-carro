@@ -45,5 +45,10 @@ public class AbastController {
 	            .map(ResponseEntity::ok)
 	            .orElseGet(() -> ResponseEntity.notFound().build());
 	}
+	
+	@GetMapping("/carro/{idCarro}")
+	public List<AbastDTO> getAllByCarroId(@PathVariable Integer idCarro){
+		return abastService.findAllByCarroId(idCarro);
+	}
 
 }

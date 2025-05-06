@@ -45,4 +45,9 @@ public class RevisaoController {
 	            .orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	
+	@GetMapping("/carro/{idRevisao}")
+	public List<RevisaoDTO> getRevisaoByCarroId(@PathVariable Integer idRevisao){
+		return revisaoService.listRevisaoByCarroId(idRevisao);
+	}
+	
 }

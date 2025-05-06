@@ -1,6 +1,7 @@
 package com.revisao.demo.service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,16 @@ public class RevisaoService
      extends BaseServiceImpl<RevisaoDTO, Revisao, Integer> {
 	
 	
-
+	private final RevisaoRepository revisaoRepository;
+	private final RevisaoMapper revisaoMapper;
 
 
     @Autowired
     public RevisaoService(RevisaoRepository revisaoRepository,  
                           RevisaoMapper revisaoMapper) {
         super(revisaoRepository, revisaoMapper);
+        this.revisaoRepository=revisaoRepository;
+        this.revisaoMapper=revisaoMapper;
             
     }
     
@@ -32,6 +36,10 @@ public class RevisaoService
     	revisao.setDtRevisao(agora);
     	return save(revisao);
     	
+    }
+    
+    public List<RevisaoDTO> listRevisaoByCarroId(Integer idCarro){
+    	return revisaoMapper.toDTOList(revisaoRepository.findByCarroIdCarro(idCarro));
     }
 
 }
