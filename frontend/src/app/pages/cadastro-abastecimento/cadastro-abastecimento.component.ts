@@ -25,7 +25,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private abastService: AbastService,
-    private carroService: CarroService // Injete o serviço de carros
+    private carroService: CarroService 
   ) {
     this.abastForm = this.fb.group({
       litroComb: ['', [Validators.required, Validators.min(0.1)]],
@@ -33,7 +33,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
       kmAtual: ['', [Validators.required, Validators.min(1)]],
       idUser: ['', Validators.required],
       dtAbast: [''],
-      idCarro: ['', Validators.required] // Corrigido o nome do campo
+      idCarro: ['', Validators.required] 
     });
   }
 

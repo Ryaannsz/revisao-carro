@@ -29,8 +29,9 @@
           <tr>
             <th class="px-4 py-2 text-left">Data</th>
             <th class="px-4 py-2 text-left">Litros</th>
-            <th class="px-4 py-2 text-left">Valor</th>
+            <th class="px-4 py-2 text-left">Valor do combustível</th>
             <th class="px-4 py-2 text-left">KM Atual</th>
+            <th class="px-4 py-2 text-left">Valor do abastecimento</th>
             <th class="px-4 py-2 text-left">Ações</th>
           </tr>
         </thead>
@@ -40,6 +41,7 @@
               <td class="px-4 py-2">{{ a.dtAbast | date:'short' }}</td>
               <td class="px-4 py-2">{{ a.litroComb }}</td>
               <td class="px-4 py-2">{{ a.valorComb | currency }}</td>
+              <td class="px-4 py-2">{{ a.litroComb * a.valorComb | currency }}</td>
               <td class="px-4 py-2">{{ a.kmAtual }}</td>
               <td class="px-4 py-2">
                 <button

@@ -24,6 +24,7 @@ public class AbastService extends BaseServiceImpl<AbastDTO, Abast, Integer>{
 	}
 	
 	public AbastDTO saveAbast(AbastDTO abast) {
+		System.out.println(abast);
 		if(abast.getDtAbast()==null) {
 			Timestamp agora = new Timestamp(System.currentTimeMillis());
 			abast.setDtAbast(agora);
