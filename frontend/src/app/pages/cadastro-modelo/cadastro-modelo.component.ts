@@ -28,7 +28,7 @@ export class CadastrarModeloComponent implements OnInit {
     if (this.modeloForm.valid) {
       const novoModelo = { modelo: this.modeloForm.value.modelo };
 
-      this.modeloService.cadastrarModelo(novoModelo).subscribe({
+      this.modeloService.post(novoModelo).subscribe({
         next: (res) => {
           console.log('Modelo cadastrado:', res);
           this.modeloForm.reset();

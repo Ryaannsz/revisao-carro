@@ -29,7 +29,7 @@ export class CadastroMarcaComponent {
 
       console.log(novaMarca);
 
-      this.marcaService.cadastrarMarca(novaMarca).subscribe({
+      this.marcaService.post(novaMarca).subscribe({
         next: () => {
           alert('Marca cadastrada com sucesso!');
           this.marcaForm.reset();

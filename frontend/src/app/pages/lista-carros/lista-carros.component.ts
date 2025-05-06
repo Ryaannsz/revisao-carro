@@ -24,8 +24,8 @@ export class ListaCarrosComponent implements OnInit {
   }
 
   carregarCarros() {
-    this.carroService.listarCarros().subscribe({
-      next: (data: Carro[]) => {
+    this.carroService.getList<Carro>().subscribe({
+      next: (data) => {
         this.carros = data;
       },
       error: (err) => {

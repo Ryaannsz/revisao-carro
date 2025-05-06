@@ -1,31 +1,42 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AppConstants } from '../constants/app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BaseService {
 
+  protected path: string = ''
+
   constructor(private http: HttpClient) {}
 
   
-  get<T>(url: string): Observable<T> {
-    return this.http.get<T>(url);
+  get<T>(endpoint: string = ''): Observable<T> {
+    return this.http.get<T>(`${this.path}${endpoint}`);
   }
 
 
-  post<T>(url: string, data: any): Observable<T> {
-    return this.http.post<T>(url, data);
+  post<T>(data: any, endpoint: string = ''): Observable<T> {
+    return this.http.post<T>(`${this.path}${endpoint}`, data);
   }
 
 
-  put<T>(url: string, data: any): Observable<T> {
-    return this.http.put<T>(url, data);
+  put<T>(data: any, endpoint: string = ''): Observable<T> {
+    return this.http.put<T>(`${this.path}${endpoint}`, data);
   }
 
 
-  delete<T>(url: string): Observable<T> {
-    return this.http.delete<T>(url);
+  delete<T>(endpoint: string = ''): Observable<T> {
+    return this.http.delete<T>(`${this.path}${endpoint}`);
+  }
+
+  getWithId<T>(id:number, endpoint: string = ''): Observable<T>{
+    return this.http.post<T>(`${this.path}${endpoint}`, id);
+  }
+
+  getList<T>(endpoint: string = ''): Observable<T[]> {
+    return this.http.get<T[]>(`${this.path}${endpoint}`);
   }
 }

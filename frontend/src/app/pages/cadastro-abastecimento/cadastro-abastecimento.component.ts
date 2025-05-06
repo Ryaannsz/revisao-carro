@@ -38,7 +38,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.carroService.listarCarros().subscribe({
+    this.carroService.getList<Carro>().subscribe({
       next: (cars) => {
         this.cars = cars;
         this.filteredCars = [...cars];
@@ -71,7 +71,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
   cadastrarAbastecimento() {
     if (this.abastForm.valid) {
       console.log(this.abastForm.value)
-      this.abastService.cadastrarAbast(this.abastForm.value).subscribe({
+      this.abastService.post(this.abastForm.value).subscribe({
         next: () => {
           alert('Abastecimento registrado com sucesso!');
           this.abastForm.reset();

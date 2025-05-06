@@ -40,14 +40,14 @@ export class CadastrarCarroComponent implements OnInit {
 
 
   carregarMarcas() {
-    this.marcaService.listarMarcas().subscribe({
+    this.marcaService.getList<Marca>().subscribe({
       next: (data) => this.marcas = data,
       error: (err) => console.error('Erro ao carregar marcas', err)
     });
   }
 
   carregarModelos() {
-    this.modeloService.listarModelos().subscribe({
+    this.modeloService.getList<Modelo>().subscribe({
       next: (data) => this.modelos = data,
       error: (err) => console.error('Erro ao carregar modelos', err)
     });
@@ -55,7 +55,7 @@ export class CadastrarCarroComponent implements OnInit {
 
   cadastrarCarro() {
     if (this.carroForm.valid) {
-      this.carroService.cadastrarCarro(this.carroForm.value).subscribe({
+      this.carroService.post(this.carroForm.value).subscribe({
         next: (res) => {
           console.log('Carro cadastrado:', res);
           this.carroForm.reset();

@@ -4,15 +4,16 @@ import { HttpClient } from '@angular/common/http';
 import { Abast } from '../models/abast.model';
 import { Observable } from 'rxjs';
 import { AppConstants } from '../constants/app.constants';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AbastService {
+export class AbastService extends BaseService{
 
-  constructor(private http: HttpClient) {}
-
-  cadastrarAbast(abast: Partial<Abast>): Observable<Abast> {
-    return this.http.post<Abast>(AppConstants.ABAST_URL, abast);
+  constructor(http: HttpClient){
+    super(http);
+    this.path=AppConstants.ABAST_URL;
   }
+
 }
