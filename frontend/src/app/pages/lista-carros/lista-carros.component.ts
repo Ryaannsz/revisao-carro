@@ -21,6 +21,7 @@ export class ListaCarrosComponent implements OnInit {
 
   ngOnInit() {
     this.carregarCarros();
+    this.getKm();
   }
 
   carregarCarros() {
@@ -33,6 +34,17 @@ export class ListaCarrosComponent implements OnInit {
       }
     });
   }
+
+  getKm(){
+    this.carros.map((car) => {
+      this.carroService.getKmRecente(car.idCarro).subscribe({
+        next: (res) => {
+          car.kmAdicionado=res;
+        }
+      })
+    })   
+  }
+
 
   irParaCarro(id: number){
     this.router.navigate(['/carros/unico', id]);

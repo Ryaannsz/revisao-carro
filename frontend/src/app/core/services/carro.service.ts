@@ -15,4 +15,8 @@ export class CarroService extends BaseService{
     this.path=AppConstants.CARRO_URL;
   }
 
+  getKmRecente(id: number){
+    return this.getWithId<number>(id, '/km/recente')
+  }
+
 }
