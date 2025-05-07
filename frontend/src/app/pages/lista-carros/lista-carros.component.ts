@@ -20,14 +20,14 @@ export class ListaCarrosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.carregarCarros();
-    this.getKm();
+    this.carregarCarros();    
   }
 
   carregarCarros() {
     this.carroService.getList<Carro>().subscribe({
       next: (data) => {
         this.carros = data;
+        this.getKm()
       },
       error: (err) => {
         console.error('Erro ao carregar carros:', err);
@@ -44,7 +44,6 @@ export class ListaCarrosComponent implements OnInit {
       })
     })   
   }
-
 
   irParaCarro(id: number){
     this.router.navigate(['/carros/unico', id]);

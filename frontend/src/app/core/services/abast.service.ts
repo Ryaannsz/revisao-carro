@@ -16,7 +16,7 @@ export class AbastService extends BaseService{
     this.path=AppConstants.ABAST_URL;
   }
 
-  abastecimentoCarro(id: number){
+  abastecimentoCarro(id: number): Observable<Abast[]>{
     return this.getListWithId(id, '/carro')
   }
 

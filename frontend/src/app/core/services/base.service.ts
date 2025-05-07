@@ -10,7 +10,7 @@ export class BaseService {
 
   protected path: string = ''
 
-  constructor(private http: HttpClient) {}
+  constructor(protected http: HttpClient) {}
 
   
   get<T>(endpoint: string = ''): Observable<T> {

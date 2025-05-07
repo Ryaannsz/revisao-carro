@@ -15,8 +15,9 @@ export class CarroService extends BaseService{
     this.path=AppConstants.CARRO_URL;
   }
 
-  getKmRecente(id: number){
-    return this.getWithId<number>(id, '/km/recente')
+  getKmRecente(id: number): Observable<number>{
+    const url = `${AppConstants.CARRO_URL}/${id}/km/recente`;
+    return this.http.get<number>(url)
   }
 
 }
