@@ -1,0 +1,58 @@
+import { Component } from '@angular/core';
+import { Revisao } from '../../core/models/revisao.model';
+import { RevisaoService } from '../../core/services/revisao.service';
+
+@Component({
+  selector: 'app-registro-revisao',
+  standalone: false,
+  templateUrl: './registro-revisao.component.html',
+  styleUrl: './registro-revisao.component.css'
+})
+export class RegistroRevisaoComponent {
+  revisoes: Revisao[] = [];
+  filteredRevisoes: Revisao[] = [];
+  searchQuery: string = '';
+  selectedRevisao: Revisao | null = null;
+
+  constructor(private revisaoService: RevisaoService) {}
+
+  ngOnInit(): void {
+    this.revisaoService.getList<Revisao>().subscribe(list => {
+      this.revisoes = list;
+      this.filteredRevisoes = list;
+    });
+  }
+
+  onSearch(): void {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) {
+      this.filteredRevisoes = [...this.revisoes];
+      return;
+    }
+    this.filteredRevisoes = this.revisoes.filter(r =>
+      r.carro.marca.marca.toLowerCase().includes(q) ||
+      r.carro.modelo.modelo.toLowerCase().includes(q) ||
+      r.carro.placa.toLowerCase().includes(q)
+    );
+  }
+
+  openModal(r: Revisao): void {
+    this.selectedRevisao = r;
+  }
+
+  closeModal(): void {
+    this.selectedRevisao = null;
+  }
+
+  removeRevisao(id: number): void {
+    this.revisaoService.delete(`/${id}`).subscribe(() => {
+      this.revisoes = this.revisoes.filter(r => r.idRevisao !== id);
+      this.onSearch();
+      this.closeModal();
+    });
+  }
+
+  editRevisao(id: number): void {
+  
+  }
+}

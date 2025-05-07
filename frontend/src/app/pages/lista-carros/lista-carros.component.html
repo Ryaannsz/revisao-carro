@@ -1,25 +1,77 @@
-<div class="min-h-screen p-8 bg-gray-50">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Lista de Carros</h1>
+<div class="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-50">
+  <!-- Cabeçalho mantido igual -->
+  <div class="flex justify-between items-center mb-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white/90">
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+      Lista de Carros
+    </h1>
     <button 
       (click)="carregarCarros()" 
-      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+      class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-all hover:scale-105 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+      </svg>
       Atualizar Lista
     </button>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div *ngFor="let carro of carros" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition" (click)="irParaCarro(carro.idCarro)">
-      <h2 class="text-xl font-bold text-blue-600 mb-2">
-        {{ carro.marca.marca }} - {{ carro.modelo.modelo }}
-      </h2>
-      <p class="text-gray-700 mb-1">
-        <strong>Placa:</strong> {{ carro.placa }}
-      </p>
-      <p class="text-gray-700">
-        <strong>KM:</strong> {{ carro.kmAdicionado }} km
-      </p>
+  <!-- Lista de Carros Corrigida -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div 
+      *ngFor="let carro of carros; let i = index" 
+      class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] cursor-pointer border border-gray-100/60
+             animate-fade-in-up opacity-0"
+      (click)="irParaCarro(carro.idCarro)"
+      [style.animation-delay]="i * 0.1 + 's'"
+    >
+      <!-- Conteúdo do card mantido igual -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+          {{ carro.marca.marca }} - {{ carro.modelo.modelo }}
+        </h2>
+      </div>
+      
+      <div class="space-y-2">
+        <p class="text-gray-600 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2H4a1 1 0 110-2V4zm3 1h2v2H7V5zm4 0h2v2h-2V5zM7 9h2v2H7V9zm4 0h2v2h-2V9zm-4 4h2v2H7v-2zm4 0h2v2h-2v-2z" clip-rule="evenodd"/>
+          </svg>
+          Placa: {{ carro.placa }}
+        </p>
+        <p class="text-gray-600 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
+          </svg>
+          KM: {{ carro.kmAdicionado }} km
+        </p>
+      </div>
     </div>
   </div>
+
+  <!-- Mensagem para lista vazia -->
+  <div *ngIf="carros?.length === 0" class="text-center py-12">
+    <p class="text-gray-500 text-lg">Nenhum carro encontrado. Tente atualizar a lista!</p>
+  </div>
 </div>
+
+<style>
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+</style>

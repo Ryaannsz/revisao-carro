@@ -11,6 +11,8 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { CarroUnicoComponent } from './pages/carro-unico/carro-unico.component';
 import { CadastroRevisaoComponent } from './pages/cadastro-revisao/cadastro-revisao.component';
+import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revisao.component';
+import { RegistroAbastecimentoComponent } from './pages/registro-abastecimento/registro-abastecimento.component';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { CadastroRevisaoComponent } from './pages/cadastro-revisao/cadastro-revi
     
   
     CarroUnicoComponent,
-              CadastroRevisaoComponent
+              CadastroRevisaoComponent,
+              RegistroRevisaoComponent,
+              RegistroAbastecimentoComponent
   ],
   imports: [
     BrowserModule,
