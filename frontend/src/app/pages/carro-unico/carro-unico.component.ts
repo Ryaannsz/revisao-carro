@@ -31,12 +31,23 @@ export class CarroUnicoComponent implements OnInit {
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.carroService.getWithId<Carro>(this.id).subscribe(c => this.carro = c);
+    this.carroService.getWithId<Carro>(this.id).subscribe(c => {this.carro = c; this.getKm()});
     this.abastService.getListWithId<Abast>(this.id, '/carro').subscribe(a => this.abastecimentos = a);
     this.revisaoService.getListWithId<Revisao>(this.id, '/carro').subscribe(r => this.revisoes = r);
   }
 
   toggleAbast(id: number)   { this.expAbastId   = this.expAbastId   === id ? null : id; }
   toggleRevisao(id: number) { this.expRevisaoId = this.expRevisaoId === id ? null : id; }
+
+  getKm() {
+    this.carroService.getKmRecente(this.carro?.idCarro ?? 0).subscribe({
+      next: (res) => {
+        if (this.carro) {
+          this.carro.kmAdicionado = res;
+        }
+      }
+    });
+  }
+
 
 }
