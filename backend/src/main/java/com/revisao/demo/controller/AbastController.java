@@ -51,4 +51,10 @@ public class AbastController {
 		return abastService.findAllByCarroId(idCarro);
 	}
 
+	@DeleteMapping("/{idAbast}")
+	public ResponseEntity<Void> deleteAbast(@PathVariable Integer idAbast){
+		abastService.delete(idAbast);
+		return ResponseEntity.ok().build()
+	}
+
 }

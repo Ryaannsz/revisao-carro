@@ -49,5 +49,11 @@ public class RevisaoController {
 	public List<RevisaoDTO> getRevisaoByCarroId(@PathVariable Integer idRevisao){
 		return revisaoService.listRevisaoByCarroId(idRevisao);
 	}
+
+	@DeleteMapping("/{idRevisao}")
+	public ResponseEntity<Void> deleteRevisao(@PathVariable Integer idRevisao){
+		revisaoService.delete(idRevisao);
+		return ResponseEntity.ok().build()
+	}
 	
 }
