@@ -50,10 +50,4 @@ public class RevisaoController {
 		return revisaoService.listRevisaoByCarroId(idRevisao);
 	}
 
-	@DeleteMapping("/{idRevisao}")
-	public ResponseEntity<Void> deleteRevisao(@PathVariable Integer idRevisao){
-		revisaoService.delete(idRevisao);
-		return ResponseEntity.ok().build()
-	}
-	
 }
