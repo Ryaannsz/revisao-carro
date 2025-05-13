@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MarcaService } from '../../core/services/marca.service';
-import { ModeloService } from '../../core/services/modelo.service'; 
+import { ModeloService } from '../../core/services/modelo.service';
 import { CarroService } from '../../core/services/carro.service';
 import { CommonModule } from '@angular/common';
 import { Marca } from '../../core/models/marca.model';
@@ -10,7 +10,7 @@ import { Modelo } from '../../core/models/modelo.model';
 @Component({
   selector: 'app-cadastrar-carro',
   templateUrl: './cadastro-carro.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule] 
+  imports: [CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class CadastrarCarroComponent implements OnInit {
 
@@ -54,14 +54,18 @@ export class CadastrarCarroComponent implements OnInit {
   }
 
   cadastrarCarro() {
+
+    //Formatar padrão placa
+  const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
+  this.carroForm.get('placa')?.setValue(placaFormatada);
+
     if (this.carroForm.valid) {
       this.carroService.post(this.carroForm.value).subscribe({
         next: (res) => {
-          console.log('Carro cadastrado:', res);
           this.carroForm.reset();
         },
         error: (err) => {
-          if (err.status==409){
+          if (err.status == 409) {
             alert('Placa já cadastrado!')
           }
           console.error('Erro ao cadastrar carro', err);
@@ -69,4 +73,24 @@ export class CadastrarCarroComponent implements OnInit {
       });
     }
   }
+
+  sanitizePlaca() {
+    const placaControl = this.carroForm.get('placa');
+    const rawValue = placaControl?.value || '';
+
+    let sanitized = rawValue.replace(/[^a-zA-Z0-9]/g, '');
+
+    sanitized = sanitized.substring(0, 7);
+
+    placaControl?.setValue(sanitized, { emitEvent: false });
+  }
+
+  formatarPlaca(placa: string): string {
+  if (placa.length !== 7) throw new Error("Caracter insuficiente"); // ou lançar erro
+
+  const parte1 = placa.substring(0, 3).toUpperCase();
+  const parte2 = placa.substring(3).toUpperCase();
+
+  return `${parte1}-${parte2}`;
+}
 }

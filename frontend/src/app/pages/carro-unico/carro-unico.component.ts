@@ -45,6 +45,7 @@ export class CarroUnicoComponent implements OnInit {
       next: (res) => {
         if (this.carro) {
           this.carro.kmAdicionado = res;
+          console.log(res)
         }
       }
     });

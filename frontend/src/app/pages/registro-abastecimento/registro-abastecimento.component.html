@@ -25,7 +25,7 @@
         <tbody class="bg-white divide-y divide-gray-100">
           <tr *ngFor="let a of filteredAbastecimentos">
             <td class="px-6 py-4 whitespace-nowrap">
-              {{ a.carro.marca.marca }} {{ a.carro.modelo.modelo }} — {{ a.carro.placa }}
+              {{ a.carro.marca.marca | uppercase}} {{ a.carro.modelo.modelo | uppercase}} — {{ a.carro.placa | uppercase}}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">{{ a.dtAbast | date:'short' }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ a.litroComb }}</td>
@@ -54,8 +54,8 @@
           ✕
         </button>
         <h2 class="text-2xl font-bold mb-4">Detalhes do Abastecimento</h2>
-        <p><strong>Carro:</strong> {{ selectedAbast.carro.marca.marca }}
-          {{ selectedAbast.carro.modelo.modelo }} — {{ selectedAbast.carro.placa }}</p>
+        <p><strong>Carro:</strong> {{ selectedAbast.carro.marca.marca | uppercase}}
+          {{ selectedAbast.carro.modelo.modelo | uppercase}} — {{ selectedAbast.carro.placa | uppercase}}</p>
         <p><strong>Data:</strong> {{ selectedAbast.dtAbast | date:'medium' }}</p>
         <p><strong>Litros:</strong> {{ selectedAbast.litroComb }}</p>
         <p><strong>Valor:</strong> {{ selectedAbast.valorComb | currency }}</p>

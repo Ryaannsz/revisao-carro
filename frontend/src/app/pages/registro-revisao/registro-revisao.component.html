@@ -23,7 +23,7 @@
         <tbody class="bg-white divide-y divide-gray-100">
           <tr *ngFor="let r of filteredRevisoes">
             <td class="px-6 py-4 whitespace-nowrap">
-              {{ r.carro.marca.marca }} {{ r.carro.modelo.modelo }} — {{ r.carro.placa }}
+              {{ r.carro.marca.marca | uppercase}} {{ r.carro.modelo.modelo | uppercase}} — {{ r.carro.placa | uppercase}}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">{{ r.dtRevisao | date:'short' }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ r.kmAtual }}</td>
@@ -50,8 +50,8 @@
           ✕
         </button>
         <h2 class="text-2xl font-bold mb-4">Detalhes da Revisão</h2>
-        <p><strong>Carro:</strong> {{ selectedRevisao.carro.marca.marca }}
-          {{ selectedRevisao.carro.modelo.modelo }} — {{ selectedRevisao.carro.placa }}</p>
+        <p><strong>Carro:</strong> {{ selectedRevisao.carro.marca.marca | uppercase}}
+          {{ selectedRevisao.carro.modelo.modelo | uppercase}} — {{ selectedRevisao.carro.placa | uppercase}}</p>
         <p><strong>Data:</strong> {{ selectedRevisao.dtRevisao | date:'medium' }}</p>
         <p><strong>KM Atual:</strong> {{ selectedRevisao.kmAtual }}</p>
         <div class="mt-6 flex justify-end space-x-2">
