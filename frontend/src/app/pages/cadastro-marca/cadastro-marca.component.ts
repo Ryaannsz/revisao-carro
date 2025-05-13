@@ -27,7 +27,6 @@ export class CadastroMarcaComponent {
     if (this.marcaForm.valid) {
       const novaMarca = { marca: this.marcaForm.value.marca };  
 
-      console.log(novaMarca);
 
       this.marcaService.post(novaMarca).subscribe({
         next: () => {
