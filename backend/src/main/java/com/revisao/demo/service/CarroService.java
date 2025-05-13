@@ -1,5 +1,7 @@
 package com.revisao.demo.service;
 
+import java.sql.Timestamp;
+
 import org.springframework.stereotype.Service;
 
 import com.revisao.demo.dto.CarroDTO;
@@ -20,6 +22,11 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer>{
 	public Double getKmRecente(Integer idCarro) {
 		return carroRepository
 	            .findKmMaisRecenteByIdCarro(idCarro);
+	}
+	
+	public void salvarCarro(CarroDTO carro) {
+		carro.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
+		save(carro);
 	}
 
 

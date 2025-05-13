@@ -29,6 +29,7 @@ public class Carro {
 	
 	private Double kmAdicionado;
 	
+	private String placa;
 	
 	
 	@ManyToOne

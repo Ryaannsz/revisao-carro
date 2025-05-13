@@ -34,7 +34,7 @@ public class CarroController {
 	
 	@PostMapping
 	public ResponseEntity<Void> postCarro(@Valid @RequestBody CarroDTO carro){
-		carroService.save(carro);
+		carroService.salvarCarro(carro);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
