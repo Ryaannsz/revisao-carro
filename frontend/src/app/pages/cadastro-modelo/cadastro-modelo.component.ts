@@ -34,6 +34,9 @@ export class CadastrarModeloComponent implements OnInit {
           this.modeloForm.reset();
         },
         error: (err) => {
+          if (err.status==409){
+            alert('Modelo já cadastrado!')
+          }
           console.error('Erro ao cadastrar modelo', err);
         }
       });

@@ -35,6 +35,10 @@ export class CadastroMarcaComponent {
           this.marcaForm.reset();
         },
         error: (err) => {
+          if (err.status==409){
+            alert('Marca já cadastrado!')
+          }
+
           console.error('Erro ao cadastrar marca:', err);
         }
       });

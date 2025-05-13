@@ -61,6 +61,9 @@ export class CadastrarCarroComponent implements OnInit {
           this.carroForm.reset();
         },
         error: (err) => {
+          if (err.status==409){
+            alert('Placa já cadastrado!')
+          }
           console.error('Erro ao cadastrar carro', err);
         }
       });
