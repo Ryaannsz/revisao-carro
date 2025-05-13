@@ -5,7 +5,7 @@
   "projects": {
     "frontend": {
       "projectType": "application",
-     "schematics": {
+      "schematics": {
         "@schematics/angular:component": {
           "standalone": false
         },
@@ -31,7 +31,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [
@@ -56,7 +57,9 @@
               "outputHashing": "all"
             },
             "development": {
+              "buildOptimizer": false,
               "optimization": false,
+              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -90,7 +93,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [
@@ -103,6 +107,6 @@
     }
   },
   "cli": {
-    "analytics": "1c77ff5e-fc41-4c76-9948-22faf1d073b3"
+    "analytics": false
   }
 }
