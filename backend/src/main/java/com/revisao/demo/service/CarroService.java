@@ -25,6 +25,9 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer>{
 	}
 	
 	public void salvarCarro(CarroDTO carro) {
+		if (carroRepository.existsByPlaca(carro.getPlaca()))
+			throw new IllegalArgumentException("Carro com essa placa já existente!");
+		carro.setPlaca(carro.getPlaca().toLowerCase());
 		carro.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
 		save(carro);
 	}

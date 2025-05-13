@@ -13,16 +13,18 @@ import { CarroUnicoComponent } from './pages/carro-unico/carro-unico.component';
 import { CadastroRevisaoComponent } from './pages/cadastro-revisao/cadastro-revisao.component';
 import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revisao.component';
 import { RegistroAbastecimentoComponent } from './pages/registro-abastecimento/registro-abastecimento.component';
+import { LoadingComponent } from './shared/loading/loading.component';
+import { SharedModule } from './shared/shared.module';
 
 
 @NgModule({
   declarations: [
     
   
-    CarroUnicoComponent,
+              CarroUnicoComponent,
               CadastroRevisaoComponent,
               RegistroRevisaoComponent,
-              RegistroAbastecimentoComponent
+              RegistroAbastecimentoComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,7 +32,8 @@ import { RegistroAbastecimentoComponent } from './pages/registro-abastecimento/r
     HttpClientModule,
     ReactiveFormsModule,
     CommonModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]

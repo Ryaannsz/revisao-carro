@@ -25,4 +25,6 @@ public interface CarroRepository extends BaseRepository<Carro, Integer>{
 	        """, nativeQuery = true)
 	    Double findKmMaisRecenteByIdCarro(@Param("idCarro") Integer idCarro);
 	
+		boolean existsByPlaca(String placa);
+	
 }

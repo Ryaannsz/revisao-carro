@@ -21,7 +21,7 @@ export class CarroUnicoComponent implements OnInit {
   expAbastId: number | null     = null;
   expRevisaoId: number | null   = null;
   id!: number;
-  
+  loading: boolean = false;
 
 
   constructor(private route: ActivatedRoute,
@@ -30,10 +30,11 @@ export class CarroUnicoComponent implements OnInit {
      private revisaoService: RevisaoService) {}
 
   ngOnInit(): void {
+    this.loading=true;
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     this.carroService.getWithId<Carro>(this.id).subscribe(c => {this.carro = c; this.getKm()});
     this.abastService.getListWithId<Abast>(this.id, '/carro').subscribe(a => this.abastecimentos = a);
-    this.revisaoService.getListWithId<Revisao>(this.id, '/carro').subscribe(r => this.revisoes = r);
+    this.revisaoService.getListWithId<Revisao>(this.id, '/carro').subscribe(r => {this.revisoes = r; this.loading=false});
   }
 
   toggleAbast(id: number)   { this.expAbastId   = this.expAbastId   === id ? null : id; }

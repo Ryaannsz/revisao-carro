@@ -32,7 +32,7 @@ public class MarcaController {
 	
 	@PostMapping
 	public ResponseEntity<Void> postMarca(@Valid @RequestBody MarcaDTO marca){
-		marcaService.save(marca);
+		marcaService.salvarMarca(marca);
 		return ResponseEntity.status(HttpStatus.CREATED).build();	
 	}
 
