@@ -1,4 +1,4 @@
-# 🚗 Car Maintenance Tracker
+# 🚗 Revisão Carro
 
 A full-stack application built with **Angular** (frontend) and **Spring Boot** (backend) to manage vehicle maintenance and fueling records.
 
