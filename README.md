@@ -146,7 +146,7 @@ Frontend: http://localhost:4200
 Backend (API): http://localhost:8080
 
 ### 🔐 Environment Variables (Optional)
-You can configure environment variables using a .env file or define them directly inside docker-compose.yml.
+You can configure environment variables using a .env file or define them directly inside Dockerfile.
 
 ### ✍️ Author
 Ryan Carvalho Bernardo
