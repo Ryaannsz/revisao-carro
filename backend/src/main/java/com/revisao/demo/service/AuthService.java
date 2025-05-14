@@ -1,6 +1,5 @@
 package com.revisao.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,17 +15,21 @@ import com.revisao.demo.repository.UserRepository;
 @Service
 public class AuthService {
 	
-	@Autowired
 	private UserRepository userRepository;
 	
-	@Autowired
 	private UserMapper userMapper;
 	
-	@Autowired
 	private AuthenticationManager authenticationManager;
 	
-	@Autowired
 	TokenService tokenService;
+	
+	public AuthService(UserRepository userRepository, UserMapper userMapper,
+			AuthenticationManager authenticationManager, TokenService tokenService) {
+		this.userRepository=userRepository;
+		this.userMapper=userMapper;
+		this.authenticationManager=authenticationManager;
+		this.tokenService=tokenService;
+	}
 	
 	
 	public AuthResponseDTO authUser(AuthenticatorDTO data) {
