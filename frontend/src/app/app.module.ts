@@ -15,16 +15,22 @@ import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revi
 import { RegistroAbastecimentoComponent } from './pages/registro-abastecimento/registro-abastecimento.component';
 import { LoadingComponent } from './shared/loading/loading.component';
 import { SharedModule } from './shared/shared.module';
+import { AuthComponent } from './auth/auth.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegistroComponent } from './auth/registro/registro.component';
 
 
 @NgModule({
   declarations: [
     
-  
+              AuthComponent,
+              LoginComponent,
+              RegistroComponent,
               CarroUnicoComponent,
               CadastroRevisaoComponent,
               RegistroRevisaoComponent,
               RegistroAbastecimentoComponent,
+              AuthComponent,
   ],
   imports: [
     BrowserModule,
