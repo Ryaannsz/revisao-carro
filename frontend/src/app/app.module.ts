@@ -18,7 +18,11 @@ import { SharedModule } from './shared/shared.module';
 import { AuthComponent } from './auth/auth.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
+import { JwtModule } from '@auth0/angular-jwt';
 
+export function tokenGetter() {
+  return localStorage.getItem('auth_token');
+}
 
 @NgModule({
   declarations: [
@@ -33,6 +37,15 @@ import { RegistroComponent } from './auth/registro/registro.component';
               AuthComponent,
   ],
   imports: [
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        //allowedDomains: ['http://revisao-carro.vercel.app'], // Domínios permitidos
+        //disallowedRoutes: ['http://revisao-carro.vercel.app/login'] // Rotas sem token
+        allowedDomains: ['http://localhost:8080'], 
+        disallowedRoutes: ['http://localhost:8080/login'] 
+      }
+    }),
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,

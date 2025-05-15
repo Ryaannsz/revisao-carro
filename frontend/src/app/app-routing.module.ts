@@ -10,18 +10,19 @@ import { CadastroRevisaoComponent } from './pages/cadastro-revisao/cadastro-revi
 import { RegistroAbastecimentoComponent } from './pages/registro-abastecimento/registro-abastecimento.component';
 import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revisao.component';
 import { AuthComponent } from './auth/auth.component';
+import { AuthGuard } from './guards/AuthGuard';
 
 const routes: Routes = [
-  { path: 'marca', component: CadastroMarcaComponent },
-  { path: 'modelo', component: CadastrarModeloComponent },
-  { path: 'carro', component: CadastrarCarroComponent },
-  { path: 'carros', component: ListaCarrosComponent },
-  { path: 'abast', component: CadastroAbastecimentoComponent},
+  { path: 'marca', component: CadastroMarcaComponent, canActivate: [AuthGuard]},
+  { path: 'modelo', component: CadastrarModeloComponent ,canActivate: [AuthGuard] },
+  { path: 'carro', component: CadastrarCarroComponent, canActivate: [AuthGuard] },
+  { path: 'carros', component: ListaCarrosComponent, canActivate: [AuthGuard] },
+  { path: 'abast', component: CadastroAbastecimentoComponent, canActivate: [AuthGuard]},
   { path: '', redirectTo: 'carros', pathMatch: 'full' },
-  {path: 'carros/unico/:id', component: CarroUnicoComponent},
-  {path: 'revisao/cadastrar', component: CadastroRevisaoComponent},
-  {path: 'abastecimento/registros', component: RegistroAbastecimentoComponent},
-  {path: 'revisao/registros', component: RegistroRevisaoComponent},
+  {path: 'carros/unico/:id', component: CarroUnicoComponent, canActivate: [AuthGuard]},
+  {path: 'revisao/cadastrar', component: CadastroRevisaoComponent, canActivate: [AuthGuard]},
+  {path: 'abastecimento/registros', component: RegistroAbastecimentoComponent, canActivate: [AuthGuard]},
+  {path: 'revisao/registros', component: RegistroRevisaoComponent, canActivate: [AuthGuard]},
   {path: 'login', component: AuthComponent},
   {path: 'registro', component: AuthComponent}
 ];
