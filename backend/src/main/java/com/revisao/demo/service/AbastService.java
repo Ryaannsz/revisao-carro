@@ -30,14 +30,16 @@ public class AbastService extends BaseServiceImpl<AbastDTO, Abast, Integer>{
 	
 	public AbastDTO saveAbast(AbastDTO abast) {
 		
-		if(carroService.getKmRecente(abast.getIdCarro())>=abast.getKmAtual()) {
-			throw new IllegalArgumentException("Quilometragem inferior a atual.");
-		}
-		
 		if(abast.getDtAbast()==null) {
 			Timestamp agora = new Timestamp(System.currentTimeMillis());
 			abast.setDtAbast(agora);
 		}
+		
+		if(carroService.getKmRecente(abast.getIdCarro())>=abast.getKmAtual()) {
+			throw new IllegalArgumentException("Quilometragem inferior a atual.");
+		}
+		
+
 		return save(abast);
 	}
 	

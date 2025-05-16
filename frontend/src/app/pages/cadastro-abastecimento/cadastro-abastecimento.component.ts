@@ -7,6 +7,7 @@ import { Abast } from '../../core/models/abast.model';
 import { User } from '../../core/models/user.model';
 import { Carro } from '../../core/models/carro.model';
 import { FormsModule } from '@angular/forms'; // Adicionar para suporte ao ngModel
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   standalone: true,
@@ -25,17 +26,20 @@ export class CadastroAbastecimentoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private abastService: AbastService,
-    private carroService: CarroService 
+    private carroService: CarroService,
+    private authService: AuthService 
   ) {
     this.abastForm = this.fb.group({
       litroComb: ['', [Validators.required, Validators.min(0.1)]],
       valorComb: ['', [Validators.required, Validators.min(0.1)]],
       kmAtual: ['', [Validators.required, Validators.min(1)]],
-      idUser: ['', Validators.required],
+      idUser: [this.authService.getUserInfo().idUser],
       dtAbast: [''],
       idCarro: ['', Validators.required] 
     });
   }
+
+
 
   ngOnInit(): void {
     this.carroService.getList<Carro>().subscribe({
@@ -70,7 +74,6 @@ export class CadastroAbastecimentoComponent implements OnInit {
 
   cadastrarAbastecimento() {
     if (this.abastForm.valid) {
-      console.log(this.abastForm.value)
       this.abastService.post(this.abastForm.value).subscribe({
         next: () => {
           alert('Abastecimento registrado com sucesso!');

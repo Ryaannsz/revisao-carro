@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Carro } from '../../core/models/carro.model';
 import { RevisaoService } from '../../core/services/revisao.service'; // Novo serviço para revisão
 import { CarroService } from '../../core/services/carro.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-cadastro-revisao',
@@ -21,11 +22,12 @@ export class CadastroRevisaoComponent {
   constructor(
     private fb: FormBuilder,
     private revisaoService: RevisaoService, // Serviço novo
-    private carroService: CarroService
+    private carroService: CarroService,
+    private authService: AuthService
   ) {
     this.revisaoForm = this.fb.group({
       kmAtual: ['', [Validators.required, Validators.min(1)]],
-      idUser: ['', Validators.required],
+      idUser: [this.authService.getUserInfo().idUser],
       dtRevisao: [''],
       idCarro: ['', Validators.required]
     });
@@ -64,7 +66,6 @@ export class CadastroRevisaoComponent {
 
   cadastrarRevisao() {
     if (this.revisaoForm.valid) {
-      console.log(this.revisaoForm.value);
       this.revisaoService.post(this.revisaoForm.value).subscribe({
         next: () => {
           alert('Revisão registrada com sucesso!');

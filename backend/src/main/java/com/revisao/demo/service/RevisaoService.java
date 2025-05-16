@@ -37,14 +37,15 @@ public class RevisaoService
 
     public RevisaoDTO saveRevisao(RevisaoDTO revisao) {
     	
-		if(carroService.getKmRecente(revisao.getIdCarro())<=revisao.getKmAtual()) {
-			throw new IllegalArgumentException("Quilometragem inferior a atual.");
-		}
-		
 		if(revisao.getDtRevisao()==null) {
 	    	Timestamp agora = new Timestamp(System.currentTimeMillis());
 	    	revisao.setDtRevisao(agora);
 		}
+    	
+		if(carroService.getKmRecente(revisao.getIdCarro())>=revisao.getKmAtual()) {
+			throw new IllegalArgumentException("Quilometragem inferior a atual.");
+		}
+
 
     	return save(revisao);
     	

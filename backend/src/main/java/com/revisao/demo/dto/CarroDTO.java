@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revisao.demo.models.Marca;
 import com.revisao.demo.models.Modelo;
+import com.revisao.demo.models.User;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,6 @@ public class CarroDTO {
 	private Modelo modelo;
 	
 	private String placa;
+	
 	
 }

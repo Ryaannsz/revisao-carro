@@ -28,6 +28,7 @@ public class TokenService {
 					.withSubject(user.getNome())
 					.withClaim("role", user.getRoles().toString())
 					.withClaim("nome", user.getUsername())
+					.withClaim("idUser", user.getIdUser())
 					.withExpiresAt(genExpiresToken())
 					.sign(algoritimo);
 			return token;
