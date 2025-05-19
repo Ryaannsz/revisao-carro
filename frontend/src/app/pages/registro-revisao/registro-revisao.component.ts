@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Revisao } from '../../core/models/revisao.model';
 import { RevisaoService } from '../../core/services/revisao.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-registro-revisao',
@@ -13,8 +14,11 @@ export class RegistroRevisaoComponent {
   filteredRevisoes: Revisao[] = [];
   searchQuery: string = '';
   selectedRevisao: Revisao | null = null;
+  loading: boolean = false;
 
-  constructor(private revisaoService: RevisaoService) {}
+  constructor(private revisaoService: RevisaoService,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.revisaoService.getList<Revisao>().subscribe(list => {
@@ -45,14 +49,18 @@ export class RegistroRevisaoComponent {
   }
 
   removeRevisao(id: number): void {
+    this.loading = true;
     this.revisaoService.delete(`/${id}`).subscribe(() => {
+      this.loading = false;
       this.revisoes = this.revisoes.filter(r => r.idRevisao !== id);
       this.onSearch();
       this.closeModal();
+      this.toastService.showSuccess("Revisão removida com sucesso!")
+      this.loading = false;
     });
   }
 
   editRevisao(id: number): void {
-  
+
   }
 }

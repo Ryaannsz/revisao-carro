@@ -1,100 +1,96 @@
 <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-    <h1 class="text-3xl font-bold mb-6">Detalhes do Carro</h1>
-  
-    <!-- Cartão de Dados do Carro -->
-    <div *ngIf="carro" class="grid grid-cols-2 gap-4 mb-8">
-      <div>
-        <span class="font-semibold">Marca:</span> {{ carro.marca.marca | uppercase }}
-      </div>
-      <div>
-        <span class="font-semibold">Modelo:</span> {{ carro.modelo.modelo | uppercase  }}
-      </div>
-      <div>
-        <span class="font-semibold">Placa:</span> {{ carro.placa || '—' | uppercase }}
-      </div>
-      <div>
-        <span class="font-semibold">KM Atual:</span> {{ carro.kmAdicionado }}
-      </div>
-      <div class="col-span-2">
-        <span class="font-semibold">Data Adicionado:</span>
-        {{ carro.dtAdicionado ? (carro.dtAdicionado | date:'medium') : '—' }}
-      </div>
+  <h1 class="text-3xl font-bold mb-6">Detalhes do Carro</h1>
+
+  <!-- Cartão de Dados do Carro -->
+  <div *ngIf="carro" class="grid grid-cols-2 gap-4 mb-8">
+    <div>
+      <span class="font-semibold">Marca:</span> {{ carro.marca.marca | uppercase }}
     </div>
-  
-    <!-- Tabela de Abastecimentos -->
-    <section class="mb-8">
-      <h2 class="text-2xl font-bold mb-4">Abastecimentos</h2>
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-2 text-left">Data</th>
-            <th class="px-4 py-2 text-left">Litros</th>
-            <th class="px-4 py-2 text-left">Valor do combustível</th>
-            <th class="px-4 py-2 text-left">Valor do abastecimento</th>
-            <th class="px-4 py-2 text-left">KM Atual</th>
-            <th class="px-4 py-2 text-left">Ações</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <ng-container *ngFor="let a of abastecimentos">
-            <tr>
-              <td class="px-4 py-2">{{ a.dtAbast | date:'short' }}</td>
-              <td class="px-4 py-2">{{ a.litroComb }}</td>
-              <td class="px-4 py-2">R{{ a.valorComb | currency }}</td>
-              <td class="px-4 py-2">R{{ a.litroComb * a.valorComb | currency }}</td>
-              <td class="px-4 py-2">{{ a.kmAtual }}</td>
-              <td class="px-4 py-2">
-                <button
-                  (click)="toggleAbast(a.idAbast)"
-                  class="text-blue-600 hover:underline focus:outline-none"
-                >Detalhes</button>
-              </td>
-            </tr>
-            <tr *ngIf="expAbastId === a.idAbast" class="bg-gray-50">
-              <td colspan="5" class="px-4 py-2 space-y-1">
-                <div><span class="font-semibold">Usuário:</span> {{ a.user.nome }}</div>
-                <div><span class="font-semibold">ID Usuário:</span> {{ a.user.idUser }}</div>
-              </td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
-    </section>
-  
-    <!-- Tabela de Revisões -->
-    <section>
-      <h2 class="text-2xl font-bold mb-4">Revisões</h2>
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-2 text-left">Data</th>
-            <th class="px-4 py-2 text-left">KM Momento</th>
-            <th class="px-4 py-2 text-left">Ações</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <ng-container *ngFor="let r of revisoes">
-            <tr>
-              <td class="px-4 py-2">{{ r.dtRevisao | date:'short' }}</td>
-              <td class="px-4 py-2">{{ r.kmAtual }}</td>
-              <td class="px-4 py-2">
-                <button
-                  (click)="toggleRevisao(r.idRevisao)"
-                  class="text-blue-600 hover:underline focus:outline-none"
-                >Detalhes</button>
-              </td>
-            </tr>
-            <tr *ngIf="expRevisaoId === r.idRevisao" class="bg-gray-50">
-              <td colspan="3" class="px-4 py-2 space-y-1">
-                <div><span class="font-semibold">Usuário:</span> {{ r.user.nome }}</div>
-                <div><span class="font-semibold">ID Usuário:</span> {{ r.user.idUser }}</div>
-              </td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
-    </section>
+    <div>
+      <span class="font-semibold">Modelo:</span> {{ carro.modelo.modelo | uppercase }}
+    </div>
+    <div>
+      <span class="font-semibold">Placa:</span> {{ carro.placa || '—' | uppercase }}
+    </div>
+    <div>
+      <span class="font-semibold">KM Atual:</span> {{ carro.kmAdicionado }}
+    </div>
+    <div class="col-span-2">
+      <span class="font-semibold">Data Adicionado:</span>
+      {{ carro.dtAdicionado ? (carro.dtAdicionado | date:'medium') : '—' }}
+    </div>
   </div>
+
+  <!-- Tabela de Abastecimentos -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-bold mb-4">Abastecimentos</h2>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 text-left">Data</th>
+          <th class="px-4 py-2 text-left">Litros</th>
+          <th class="px-4 py-2 text-left">Valor do combustível</th>
+          <th class="px-4 py-2 text-left">Valor do abastecimento</th>
+          <th class="px-4 py-2 text-left">KM Atual</th>
+          <th class="px-4 py-2 text-left">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-100">
+        <ng-container *ngFor="let a of abastecimentos">
+          <tr>
+            <td class="px-4 py-2">{{ a.dtAbast | date:'short' }}</td>
+            <td class="px-4 py-2">{{ a.litroComb }}</td>
+            <td class="px-4 py-2">R{{ a.valorComb | currency }}</td>
+            <td class="px-4 py-2">R{{ a.litroComb * a.valorComb | currency }}</td>
+            <td class="px-4 py-2">{{ a.kmAtual }}</td>
+            <td class="px-4 py-2">
+              <button (click)="toggleAbast(a.idAbast)"
+                class="text-blue-600 hover:underline focus:outline-none">Detalhes</button>
+            </td>
+          </tr>
+          <tr *ngIf="expAbastId === a.idAbast" class="bg-gray-50">
+            <td colspan="5" class="px-4 py-2 space-y-1">
+              <div><span class="font-semibold">Usuário:</span> {{ a.user.nome }}</div>
+              <div><span class="font-semibold">ID Usuário:</span> {{ a.user.idUser }}</div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Tabela de Revisões -->
+  <section>
+    <h2 class="text-2xl font-bold mb-4">Revisões</h2>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 text-left">Data</th>
+          <th class="px-4 py-2 text-left">KM Momento</th>
+          <th class="px-4 py-2 text-left">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-100">
+        <ng-container *ngFor="let r of revisoes">
+          <tr>
+            <td class="px-4 py-2">{{ r.dtRevisao | date:'short' }}</td>
+            <td class="px-4 py-2">{{ r.kmAtual }}</td>
+            <td class="px-4 py-2">
+              <button (click)="toggleRevisao(r.idRevisao)"
+                class="text-blue-600 hover:underline focus:outline-none">Detalhes</button>
+            </td>
+          </tr>
+          <tr *ngIf="expRevisaoId === r.idRevisao" class="bg-gray-50">
+            <td colspan="3" class="px-4 py-2 space-y-1">
+              <div><span class="font-semibold">Usuário:</span> {{ r.user.nome }}</div>
+              <div><span class="font-semibold">ID Usuário:</span> {{ r.user.idUser }}</div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </section>
+</div>
 
 
 
@@ -104,10 +100,14 @@
     <!-- Spinner -->
     <svg class="h-8 w-8 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      <path class="opacity-75" fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+      </path>
     </svg>
-    
+
     <!-- Texto (opcional) -->
     <span class="mt-2 text-white">Loading...</span>
   </div>
 </div>
+
+<app-loading [visible]="loading" message="Carregando dados..."></app-loading>

@@ -1,10 +1,40 @@
-<div class="fixed top-5 right-5 z-50 space-y-3">
-  <div *ngFor="let toast of toastService.toasts$ | async" [ngClass]="{
-    'bg-green-500': toast.type === 'success',
-    'bg-red-500': toast.type === 'error',
-    'bg-blue-500': toast.type === 'info',
-    'bg-yellow-500': toast.type === 'warning'
-  }" class="text-white px-4 py-2 rounded shadow-md animate-slide-in animate-fade-out">
-    {{ toast.message }}
+<div class="fixed top-5 right-5 w-96 z-50 space-y-2">
+  <div *ngFor="let toast of toasts$ | async" [ngClass]="{
+         'bg-green-500 text-white': toast.type === 'sucesso',
+         'bg-red-600 text-white': toast.type === 'erro',
+         'bg-blue-600 text-white': toast.type === 'info',
+         'bg-yellow-400 text-black': toast.type === 'aviso'
+       }" class="flex items-start p-4 rounded shadow-lg cursor-pointer animate-fade-in" (click)="close(toast)"
+    role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="flex-shrink-0 mr-3 mt-1">
+      <ng-container [ngSwitch]="toast.type">
+        <svg *ngSwitchCase="'sucesso'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <svg *ngSwitchCase="'erro'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <svg *ngSwitchCase="'info'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01" />
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <svg *ngSwitchCase="'aviso'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 9v2m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+        </svg>
+      </ng-container>
+    </div>
+    <div class="flex-grow">
+      <p class="font-semibold capitalize text-white">{{ toast.type }}</p>
+      <p class="text-sm leading-tight text-white">{{ toast.message }}</p>
+    </div>
+    <button (click)="close(toast)" aria-label="Fechar notificação"
+      class="ml-4 text-white hover:text-gray-300 focus:outline-none">
+      ✕
+    </button>
   </div>
 </div>

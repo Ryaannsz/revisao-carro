@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Abast } from '../../core/models/abast.model';
 import { AbastService } from '../../core/services/abast.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-registro-abastecimento',
@@ -14,14 +15,14 @@ export class RegistroAbastecimentoComponent {
   filteredAbastecimentos: Abast[] = [];
   searchQuery: string = '';
   selectedAbast: Abast | null = null;
+  loading: boolean = false;
 
-  constructor(private abastService: AbastService) {}
+  constructor(private abastService: AbastService,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit(): void {
-    this.abastService.getList<Abast>().subscribe(list => {
-      this.abastecimentos = list;
-      this.filteredAbastecimentos = list;
-    });
+    this.carregarAbast();
   }
 
   onSearch(): void {
@@ -54,6 +55,26 @@ export class RegistroAbastecimentoComponent {
   }
 
   editAbast(id: number): void {
-  
+
+  }
+
+  carregarAbast() {
+    this.loading = true;
+    this.abastService.getList<Abast>().subscribe({
+      next: (list) => {
+        this.loading = false;
+        this.abastecimentos = list;
+        this.filteredAbastecimentos = list;
+        if (list.length === 0)
+          this.toastService.showInfo("Nenhum abastecimento registrado.")
+        else
+          this.toastService.showSuccess("Abastecimentos carregados!")
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toastService.showError('Erro ao buscar lista!');
+      }
+    });
+
   }
 }

@@ -19,6 +19,9 @@ import { AuthComponent } from './auth/auth.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { JwtModule } from '@auth0/angular-jwt';
+import { CadastroMarcaComponent } from './pages/cadastro-marca/cadastro-marca.component';
+import { CadastroAbastecimentoComponent } from './pages/cadastro-abastecimento/cadastro-abastecimento.component';
+import { ListaCarrosComponent } from './pages/lista-carros/lista-carros.component';
 
 export function tokenGetter() {
   return localStorage.getItem('auth_token');
@@ -36,7 +39,12 @@ export function tokenGetter() {
     RegistroAbastecimentoComponent,
     AuthComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    CadastroMarcaComponent,
+    CadastroAbastecimentoComponent,
+    CadastrarCarroComponent,
+    CadastrarModeloComponent,
+    ListaCarrosComponent,
   ],
   imports: [
     JwtModule.forRoot({

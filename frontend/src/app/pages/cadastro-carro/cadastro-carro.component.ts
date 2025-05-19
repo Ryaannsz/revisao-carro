@@ -6,23 +6,26 @@ import { CarroService } from '../../core/services/carro.service';
 import { CommonModule } from '@angular/common';
 import { Marca } from '../../core/models/marca.model';
 import { Modelo } from '../../core/models/modelo.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
+  standalone: false,
   selector: 'app-cadastrar-carro',
   templateUrl: './cadastro-carro.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class CadastrarCarroComponent implements OnInit {
 
   carroForm: FormGroup;
   marcas: Marca[] = [];
   modelos: Modelo[] = [];
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private marcaService: MarcaService,
     private modeloService: ModeloService,
-    private carroService: CarroService
+    private carroService: CarroService,
+    private toastService: ToastService
   ) {
     this.carroForm = this.fb.group({
       idMarca: ['', Validators.required],
@@ -55,20 +58,24 @@ export class CadastrarCarroComponent implements OnInit {
 
   cadastrarCarro() {
 
-    //Formatar padrão placa
-  const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
-  this.carroForm.get('placa')?.setValue(placaFormatada);
+    this.loading = true;
+    const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
+    this.carroForm.get('placa')?.setValue(placaFormatada);
 
     if (this.carroForm.valid) {
       this.carroService.post(this.carroForm.value).subscribe({
         next: (res) => {
           this.carroForm.reset();
+          this.toastService.showSuccess("Carro cadastrado com sucesso!")
+          this.loading = false;
         },
         error: (err) => {
           if (err.status == 409) {
-            alert('Placa já cadastrado!')
+            this.toastService.showWarning('Placa já cadastrado!')
+            this.loading = false;
           }
-          console.error('Erro ao cadastrar carro', err);
+          this.toastService.showError('Erro ao cadastrar carro');
+          this.loading = false;
         }
       });
     }
@@ -86,11 +93,11 @@ export class CadastrarCarroComponent implements OnInit {
   }
 
   formatarPlaca(placa: string): string {
-  if (placa.length !== 7) throw new Error("Caracter insuficiente"); // ou lançar erro
+    if (placa.length !== 7) throw new Error("Caracter insuficiente"); // ou lançar erro
 
-  const parte1 = placa.substring(0, 3).toUpperCase();
-  const parte2 = placa.substring(3).toUpperCase();
+    const parte1 = placa.substring(0, 3).toUpperCase();
+    const parte2 = placa.substring(3).toUpperCase();
 
-  return `${parte1}-${parte2}`;
-}
+    return `${parte1}-${parte2}`;
+  }
 }

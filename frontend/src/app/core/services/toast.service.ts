@@ -1,9 +1,8 @@
-// toast.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface ToastMessage {
-    type: 'success' | 'error' | 'info' | 'warning';
+    type: 'sucesso' | 'erro' | 'info' | 'aviso';
     message: string;
     duration?: number;
 }
@@ -20,21 +19,22 @@ export class ToastService {
         this._toasts.next([...currentToasts, toast]);
 
         setTimeout(() => {
-            this.remove(toast);
+            this.removeToast(toast);
         }, toast.duration ?? 3000);
     }
 
-    private remove(toast: ToastMessage) {
+    // Método público para remover o toast, usado pelo componente para fechar manualmente
+    removeToast(toast: ToastMessage) {
         const updatedToasts = this._toasts.getValue().filter(t => t !== toast);
         this._toasts.next(updatedToasts);
     }
 
     showSuccess(message: string, duration?: number) {
-        this.show({ message, type: 'success', duration });
+        this.show({ message, type: 'sucesso', duration });
     }
 
     showError(message: string, duration?: number) {
-        this.show({ message, type: 'error', duration });
+        this.show({ message, type: 'erro', duration });
     }
 
     showInfo(message: string, duration?: number) {
@@ -42,6 +42,6 @@ export class ToastService {
     }
 
     showWarning(message: string, duration?: number) {
-        this.show({ message, type: 'warning', duration });
+        this.show({ message, type: 'aviso', duration });
     }
 }

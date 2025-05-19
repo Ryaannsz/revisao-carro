@@ -8,12 +8,12 @@ import { User } from '../../core/models/user.model';
 import { Carro } from '../../core/models/carro.model';
 import { FormsModule } from '@angular/forms'; // Adicionar para suporte ao ngModel
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
-  standalone: true,
+  standalone: false,
   selector: 'app-cadastro-abastecimento',
   templateUrl: './cadastro-abastecimento.component.html',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule] // Adicionar FormsModule
 })
 export class CadastroAbastecimentoComponent implements OnInit {
   abastForm: FormGroup;
@@ -22,12 +22,14 @@ export class CadastroAbastecimentoComponent implements OnInit {
   filteredCars: Carro[] = [];
   searchTerm = '';
   selectedCar: Carro | null = null;
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private abastService: AbastService,
     private carroService: CarroService,
-    private authService: AuthService 
+    private authService: AuthService,
+    private toastService: ToastService
   ) {
     this.abastForm = this.fb.group({
       litroComb: ['', [Validators.required, Validators.min(0.1)]],
@@ -35,7 +37,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
       kmAtual: ['', [Validators.required, Validators.min(1)]],
       idUser: [this.authService.getUserInfo().idUser],
       dtAbast: [''],
-      idCarro: ['', Validators.required] 
+      idCarro: ['', Validators.required]
     });
   }
 
@@ -73,15 +75,18 @@ export class CadastroAbastecimentoComponent implements OnInit {
   }
 
   cadastrarAbastecimento() {
+    this.loading = true;
     if (this.abastForm.valid) {
       this.abastService.post(this.abastForm.value).subscribe({
         next: () => {
-          alert('Abastecimento registrado com sucesso!');
+          this.toastService.showSuccess('Abastecimento registrado com sucesso!');
           this.abastForm.reset();
           this.selectedCar = null;
+          this.loading = false;
         },
         error: (err) => {
-          console.error('Erro ao registrar abastecimento:', err);
+          this.toastService.showError('Erro ao registrar abastecimento:');
+          this.loading = false;
         }
       });
     } else {

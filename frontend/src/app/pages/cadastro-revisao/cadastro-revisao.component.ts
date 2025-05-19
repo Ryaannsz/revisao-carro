@@ -4,6 +4,7 @@ import { Carro } from '../../core/models/carro.model';
 import { RevisaoService } from '../../core/services/revisao.service'; // Novo serviço para revisão
 import { CarroService } from '../../core/services/carro.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-cadastro-revisao',
@@ -18,12 +19,14 @@ export class CadastroRevisaoComponent {
   filteredCars: Carro[] = [];
   searchTerm = '';
   selectedCar: Carro | null = null;
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private revisaoService: RevisaoService, // Serviço novo
     private carroService: CarroService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService,
   ) {
     this.revisaoForm = this.fb.group({
       kmAtual: ['', [Validators.required, Validators.min(1)]],
@@ -65,19 +68,22 @@ export class CadastroRevisaoComponent {
   }
 
   cadastrarRevisao() {
+    this.loading = true;
     if (this.revisaoForm.valid) {
       this.revisaoService.post(this.revisaoForm.value).subscribe({
         next: () => {
-          alert('Revisão registrada com sucesso!');
+          this.toastService.showSuccess('Revisão registrada com sucesso!');
           this.revisaoForm.reset();
           this.selectedCar = null;
+          this.loading = false;
         },
         error: (err) => {
-          console.error('Erro ao registrar revisão:', err);
+          this.toastService.showError('Erro ao registrar revisão!');
+          this.loading = false;
         }
       });
     } else {
-      alert('Por favor, preencha todos os campos corretamente.');
+      this.toastService.showWarning('Por favor, preencha todos os campos corretamente.');
     }
   }
 }

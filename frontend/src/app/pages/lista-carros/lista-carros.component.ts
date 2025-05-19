@@ -8,8 +8,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SharedModule],
+  standalone: false,
   selector: 'app-lista-carros',
   templateUrl: './lista-carros.component.html'
 })
@@ -39,6 +38,7 @@ export class ListaCarrosComponent implements OnInit {
       error: (err) => {
         console.error('Erro ao carregar carros:', err);
         this.loading = false;
+        this.toastService.showError("Erro ao listar carros!")
       }
     });
   }
