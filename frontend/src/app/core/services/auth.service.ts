@@ -25,7 +25,8 @@ export class AuthService {
 
   // Verificar se está autenticado
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return token != null && !this.jwtHelper.isTokenExpired(token);
   }
 
   // Remover token (logout)
@@ -34,7 +35,7 @@ export class AuthService {
     // Alternativa: sessionStorage.removeItem(this.TOKEN_KEY);
   }
 
-    getUserInfo(): any {
+  getUserInfo(): any {
     const token = this.getToken();
     return token ? this.jwtHelper.decodeToken(token) : null;
   }
