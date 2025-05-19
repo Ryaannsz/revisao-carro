@@ -1,0 +1,10 @@
+<div class="fixed top-5 right-5 z-50 space-y-3">
+  <div *ngFor="let toast of toastService.toasts$ | async" [ngClass]="{
+    'bg-green-500': toast.type === 'success',
+    'bg-red-500': toast.type === 'error',
+    'bg-blue-500': toast.type === 'info',
+    'bg-yellow-500': toast.type === 'warning'
+  }" class="text-white px-4 py-2 rounded shadow-md animate-slide-in animate-fade-out">
+    {{ toast.message }}
+  </div>
+</div>

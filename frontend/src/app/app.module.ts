@@ -26,15 +26,17 @@ export function tokenGetter() {
 
 @NgModule({
   declarations: [
-    
-              AuthComponent,
-              LoginComponent,
-              RegistroComponent,
-              CarroUnicoComponent,
-              CadastroRevisaoComponent,
-              RegistroRevisaoComponent,
-              RegistroAbastecimentoComponent,
-              AuthComponent,
+    AppComponent,
+    AuthComponent,
+    LoginComponent,
+    RegistroComponent,
+    CarroUnicoComponent,
+    CadastroRevisaoComponent,
+    RegistroRevisaoComponent,
+    RegistroAbastecimentoComponent,
+    AuthComponent,
+    HeaderComponent,
+    FooterComponent
   ],
   imports: [
     JwtModule.forRoot({
@@ -42,8 +44,8 @@ export function tokenGetter() {
         tokenGetter: tokenGetter,
         //allowedDomains: ['http://revisao-carro.vercel.app'], // Domínios permitidos
         //disallowedRoutes: ['http://revisao-carro.vercel.app/login'] // Rotas sem token
-        allowedDomains: ['http://localhost:8080'], 
-        disallowedRoutes: ['http://localhost:8080/login'] 
+        allowedDomains: ['http://localhost:8080'],
+        disallowedRoutes: ['http://localhost:8080/login']
       }
     }),
     BrowserModule,
