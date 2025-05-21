@@ -50,9 +50,15 @@ export class RegistroUsuarioComponent implements OnInit {
 
   promote(user: User) {
     this.userService
-      .patchRole(['ADMIN'], user.idUser)
+      .patchRole('ADMIN', user.idUser)
       .subscribe((updatedUser) => {
         this.loadUsers();
       });
+  }
+
+  demote(user: User) {
+    this.userService.patchRole('USER', user.idUser).subscribe((updatedUser) => {
+      this.loadUsers();
+    });
   }
 }
