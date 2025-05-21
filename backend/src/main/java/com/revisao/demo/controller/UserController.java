@@ -40,7 +40,7 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	@PatchMapping("{id}")
+	@PatchMapping("/{id}")
 	public ResponseEntity<Void> patchUser(@PathVariable Integer id, @RequestBody UpdateRoleDTO role){
 		userService.updateUserRole(id, role.getRoles());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
