@@ -4,6 +4,7 @@ import { Role } from '../../core/models/role.enum';
 import { UserService } from '../../core/services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   standalone: false,
@@ -41,30 +42,30 @@ export class ModalUsuarioComponent {
   userForm: FormGroup;
   showPassword = false;
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private toastService: ToastService
+  ) {
     this.userForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(2)]],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       senha: ['', [Validators.required, Validators.minLength(6)]],
+      roles: ['USER'],
     });
   }
 
   submit() {
     if (this.userForm.invalid) return;
 
-    const newUser: User = {
-      ...this.userForm.value,
-      roles: [Role.USER],
-    };
-
-    this.userService.post(newUser).subscribe({
+    this.userService.post(this.userForm.value).subscribe({
       next: () => {
         this.userCreated.emit();
         this.close.emit();
+        this.toastService.showSuccess('Usuário criado com sucesso!');
       },
       error: (err) => {
-        console.error('Erro ao criar usuário', err);
-        // Aqui você pode adicionar tratamento de erro visual
+        this.toastService.showError('Erro ao criar usuário!');
       },
     });
   }

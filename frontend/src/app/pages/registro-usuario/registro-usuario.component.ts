@@ -44,8 +44,8 @@ export class RegistroUsuarioComponent implements OnInit {
   }
 
   onUserCreated(user: User) {
-    this.users.push(user);
     this.closeModal();
+    this.loadUsers();
   }
 
   promote(user: User) {
