@@ -49,9 +49,10 @@ export class RegistroUsuarioComponent implements OnInit {
   }
 
   promote(user: User) {
-    //this.userService.promoteToAdmin(user.idUser).subscribe((updated) => {
-    // const idx = this.users.findIndex((u) => u.idUser === user.idUser);
-    //  this.users[idx] = updated;
-    // });
+    this.userService
+      .patchRole(['ADMIN'], user.idUser)
+      .subscribe((updatedUser) => {
+        this.loadUsers();
+      });
   }
 }
