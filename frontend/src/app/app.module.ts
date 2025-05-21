@@ -22,6 +22,9 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { CadastroMarcaComponent } from './pages/cadastro-marca/cadastro-marca.component';
 import { CadastroAbastecimentoComponent } from './pages/cadastro-abastecimento/cadastro-abastecimento.component';
 import { ListaCarrosComponent } from './pages/lista-carros/lista-carros.component';
+import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usuario.component';
+import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export function tokenGetter() {
   return localStorage.getItem('auth_token');
@@ -45,6 +48,8 @@ export function tokenGetter() {
     CadastrarCarroComponent,
     CadastrarModeloComponent,
     ListaCarrosComponent,
+    RegistroUsuarioComponent,
+    ModalUsuarioComponent,
   ],
   imports: [
     JwtModule.forRoot({
@@ -53,8 +58,8 @@ export function tokenGetter() {
         //allowedDomains: ['http://revisao-carro.vercel.app'], // Domínios permitidos
         //disallowedRoutes: ['http://revisao-carro.vercel.app/login'] // Rotas sem token
         allowedDomains: ['http://localhost:8080'],
-        disallowedRoutes: ['http://localhost:8080/login']
-      }
+        disallowedRoutes: ['http://localhost:8080/login'],
+      },
     }),
     BrowserModule,
     AppRoutingModule,
@@ -62,9 +67,10 @@ export function tokenGetter() {
     ReactiveFormsModule,
     CommonModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
