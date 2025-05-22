@@ -1,8 +1,10 @@
-<app-header></app-header>
+<body class="min-h-screen flex flex-col">
+  <app-header></app-header>
 
-<div class="content">
-  <app-toast class="fixed top-4 right-4 z-50"></app-toast>
-  <router-outlet></router-outlet>
-</div>
+  <main class="flex-grow">
+    <app-toast class="fixed top-4 right-4 z-50"></app-toast>
+    <router-outlet></router-outlet>
+  </main>
 
-<app-footer></app-footer>
+  <app-footer></app-footer>
+</body>

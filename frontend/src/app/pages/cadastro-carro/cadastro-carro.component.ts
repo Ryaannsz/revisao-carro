@@ -41,23 +41,31 @@ export class CadastrarCarroComponent implements OnInit {
   }
 
 
+  onModeloSelecionado(modelo: Modelo) {
+    this.toastService.showInfo('Modelo selecionado: ' + modelo.modelo);
+    this.carroForm.patchValue({ idModelo: modelo.idModelo });
+  }
+
+  onMarcaSelecionado(marca: Marca) {
+    this.toastService.showInfo('Modelo selecionado: ' + marca.marca);
+    this.carroForm.patchValue({ idMarca: marca.idMarca });
+  }
 
   carregarMarcas() {
     this.marcaService.getList<Marca>().subscribe({
       next: (data) => this.marcas = data,
-      error: (err) => console.error('Erro ao carregar marcas', err)
+      error: (err) => this.toastService.showError('Erro ao carregar marcas')
     });
   }
 
   carregarModelos() {
     this.modeloService.getList<Modelo>().subscribe({
       next: (data) => this.modelos = data,
-      error: (err) => console.error('Erro ao carregar modelos', err)
+      error: (err) => this.toastService.showError('Erro ao carregar modelos', err)
     });
   }
 
   cadastrarCarro() {
-
     this.loading = true;
     const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
     this.carroForm.get('placa')?.setValue(placaFormatada);
