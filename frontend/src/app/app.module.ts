@@ -84,7 +84,7 @@ export function tokenGetter() {
     MatFormFieldModule,
     MatAutocompleteModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
 
     BrowserAnimationsModule,
 
@@ -92,4 +92,4 @@ export function tokenGetter() {
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
