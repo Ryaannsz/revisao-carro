@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revisao.demo.dto.MarcaDTO;
+import com.revisao.demo.models.Marca;
 import com.revisao.demo.service.MarcaService;
 
 import jakarta.validation.Valid;
@@ -31,9 +32,8 @@ public class MarcaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Void> postMarca(@Valid @RequestBody MarcaDTO marca){
-		marcaService.salvarMarca(marca);
-		return ResponseEntity.status(HttpStatus.CREATED).build();	
+	public ResponseEntity<MarcaDTO> postMarca(@Valid @RequestBody MarcaDTO marca){
+		return ResponseEntity.status(HttpStatus.CREATED).body(marcaService.salvarMarca(marca));	
 	}
 
 }

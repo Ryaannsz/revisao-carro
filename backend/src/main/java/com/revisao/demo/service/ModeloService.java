@@ -12,16 +12,19 @@ public class ModeloService extends BaseServiceImpl<ModeloDTO, Modelo, Integer>{
 	
 	private ModeloRepository modeloRepository;
 	
+	private ModeloMapper modeloMapper;
+	
 	public ModeloService(ModeloRepository modeloRepository, ModeloMapper modeloMapper) {
 		super(modeloRepository, modeloMapper);
 		this.modeloRepository = modeloRepository;
+		this.modeloMapper = modeloMapper;
 	}
 	
-	public void salvarModelo(ModeloDTO modelo) {
+	public ModeloDTO salvarModelo(ModeloDTO modelo) {
 		if (modeloRepository.existsByModelo(modelo.getModelo().toLowerCase()))
 			throw new IllegalArgumentException("Modelo já adicionado!");
 		modelo.setModelo(modelo.getModelo().toLowerCase());
-		save(modelo);
+		return modeloMapper.toDTO(modeloRepository.saveAndFlush(modeloMapper.toEntity(modelo)));
 	}
 
 }

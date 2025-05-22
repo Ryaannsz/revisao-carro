@@ -31,9 +31,8 @@ public class ModeloController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Void> postModelo(@Valid @RequestBody ModeloDTO modelo){
-		modeloService.salvarModelo(modelo);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<ModeloDTO> postModelo(@Valid @RequestBody ModeloDTO modelo){
+		return ResponseEntity.status(HttpStatus.CREATED).body(modeloService.salvarModelo(modelo));
 	}
 
 }
