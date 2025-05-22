@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Revisao } from '../../core/models/revisao.model';
 import { RevisaoService } from '../../core/services/revisao.service';
 import { ToastService } from '../../core/services/toast.service';
+import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
 
 @Component({
   selector: 'app-registro-revisao',
@@ -17,7 +18,8 @@ export class RegistroRevisaoComponent {
   loading: boolean = false;
 
   constructor(private revisaoService: RevisaoService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmationService: ConfirmationDialogService
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +63,13 @@ export class RegistroRevisaoComponent {
   }
 
   editRevisao(id: number): void {
-
+    this.confirmationService.confirm(
+      'Tem certeza?',
+      'Você deseja realmente excluir este item?'
+    ).subscribe(result => {
+      if (result) {
+        console.log("positivo")
+      }
+    });
   }
 }
