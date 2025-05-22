@@ -33,6 +33,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usuario.component';
 import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 
 
 export function tokenGetter() {
@@ -61,6 +62,7 @@ export function tokenGetter() {
 
     RegistroUsuarioComponent,
     ModalUsuarioComponent,
+    ConfirmationDialogComponent,
 
   ],
   imports: [

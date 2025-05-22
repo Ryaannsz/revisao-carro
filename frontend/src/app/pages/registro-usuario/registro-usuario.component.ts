@@ -13,7 +13,7 @@ export class RegistroUsuarioComponent implements OnInit {
   showModal = false;
   filteredUsers: User[] = this.users;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.loadUsers();

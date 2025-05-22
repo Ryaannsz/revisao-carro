@@ -1,31 +1,18 @@
 <div class="p-6 max-w-6xl mx-auto">
-  <div
-    class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
-  >
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <h1 class="text-3xl font-bold text-gray-800">Usuários</h1>
 
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-      <input
-        type="text"
-        placeholder="Buscar usuários..."
+      <input type="text" placeholder="Buscar usuários..."
         class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        (input)="filterUsers($event)"
-      />
+        (input)="filterUsers($event)" />
       <button
         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 justify-center shadow-md hover:shadow-lg"
-        (click)="openModal()"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
+        (click)="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
             d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-            clip-rule="evenodd"
-          />
+            clip-rule="evenodd" />
         </svg>
         Criar usuário
       </button>
@@ -33,99 +20,58 @@
   </div>
 
   <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div
-      *ngFor="let user of filteredUsers"
-      class="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col gap-2"
-    >
+    <div *ngFor="let user of filteredUsers"
+      class="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col gap-2">
       <div class="flex justify-between items-start">
         <h2 class="text-lg font-semibold text-gray-800">{{ user.nome }}</h2>
-        <span
-          class="text-xs px-2 py-1 rounded-full"
-          [ngClass]="
+        <span class="text-xs px-2 py-1 rounded-full" [ngClass]="
             user.roles === 'ADMIN'
               ? 'bg-purple-100 text-purple-800'
               : 'bg-blue-100 text-blue-800'
-          "
-        >
+          ">
           {{ user.roles === "ADMIN" ? "Admin" : "Usuário" }}
         </span>
       </div>
 
       <div class="text-sm text-gray-600 space-y-1">
         <p class="flex items-center gap-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 opacity-70"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           {{ user.cpf }}
         </p>
       </div>
 
       <!-- Botão para promover usuário comum -->
-      <button
-        *ngIf="user.roles === 'USER'"
-        (click)="promote(user)"
-        class="mt-2 bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition w-fit text-sm flex items-center gap-1"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
+      <button *ngIf="user.roles === 'USER'" (click)="promote(user)"
+        class="mt-2 bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition w-fit text-sm flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
             d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
-            clip-rule="evenodd"
-          />
+            clip-rule="evenodd" />
         </svg>
-        Tornar Admin
+        Promover
       </button>
 
       <!-- Botão para rebaixar admin -->
-      <button
-        *ngIf="user.roles === 'ADMIN'"
-        (click)="demote(user)"
-        class="mt-2 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition w-fit text-sm flex items-center gap-1"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
+      <button *ngIf="user.roles === 'ADMIN'" (click)="demote(user)"
+        class="mt-2 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition w-fit text-sm flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
             d="M7.707 14.707a1 1 0 01-1.414 0L3.293 11.707a1 1 0 011.414-1.414L7 12.586l8.293-8.293a1 1 0 111.414 1.414l-9 9z"
-            clip-rule="evenodd"
-          />
+            clip-rule="evenodd" />
         </svg>
         Rebaixar
       </button>
     </div>
   </div>
 
-  <div
-    *ngIf="filteredUsers.length === 0"
-    class="text-center py-10 text-gray-500"
-  >
+  <div *ngIf="filteredUsers.length === 0" class="text-center py-10 text-gray-500">
     Nenhum usuário encontrado
   </div>
 </div>
 
 <!-- Modal -->
-<app-modal-usuario
-  *ngIf="showModal"
-  (close)="closeModal()"
-  (userCreated)="onUserCreated($event)"
-></app-modal-usuario>
+<app-modal-usuario *ngIf="showModal" (close)="closeModal()" (userCreated)="onUserCreated($event)"></app-modal-usuario>

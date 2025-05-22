@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Abast } from '../../core/models/abast.model';
 import { AbastService } from '../../core/services/abast.service';
 import { ToastService } from '../../core/services/toast.service';
+import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
 
 @Component({
   selector: 'app-registro-abastecimento',
@@ -18,7 +19,8 @@ export class RegistroAbastecimentoComponent {
   loading: boolean = false;
 
   constructor(private abastService: AbastService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmationService: ConfirmationDialogService
   ) { }
 
   ngOnInit(): void {
@@ -47,11 +49,19 @@ export class RegistroAbastecimentoComponent {
   }
 
   removeAbast(id: number): void {
-    this.abastService.delete(`/${id}`).subscribe(() => {
-      this.abastecimentos = this.abastecimentos.filter(a => a.idAbast !== id);
-      this.onSearch();
-      this.closeModal();
-    });
+    this.confirmationService.confirm(
+      'Tem certeza?',
+      'Você deseja realmente excluir este item?'
+    ).subscribe(result => {
+      if (!result) return;
+      this.loading = true;
+      this.abastService.delete(`/${id}`).subscribe(() => {
+        this.abastecimentos = this.abastecimentos.filter(a => a.idAbast !== id);
+        this.onSearch();
+        this.closeModal();
+        this.toastService.showSuccess("Abastecimento removido com sucesso!");
+      });
+    })
   }
 
   editAbast(id: number): void {
