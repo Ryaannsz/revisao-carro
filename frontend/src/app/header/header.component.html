@@ -8,17 +8,39 @@
       </div>
 
       <!-- Menu Desktop -->
-      <nav class="hidden md:flex space-x-8">
-        <a href="/carros" class="text-white hover:text-blue-200 transition">Home</a>
-        <a href="/carro" class="text-white hover:text-blue-200 transition">Cadastrar Carro</a>
-        <a href="/abast" class="text-white hover:text-blue-200 transition">Cadastrar Abast</a>
-        <a href="/revisao/cadastrar" class="text-white hover:text-blue-200 transition">Cadastrar Revisao</a>
-        <a href="/abastecimento/registros" class="text-white hover:text-blue-200 transition">Registros Abast</a>
-        <a href="/revisao/registros" class="text-white hover:text-blue-200 transition">Registros Revisao</a>
+      <nav class="hidden md:flex space-x-6 text-white">
 
+        <!-- Carro -->
+        <div class="relative group">
+          <span class="cursor-pointer hover:text-blue-200">Carro</span>
+          <div
+            class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            <a href="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+          </div>
+        </div>
+
+        <!-- Abastecimento -->
+        <div class="relative group">
+          <span class="cursor-pointer hover:text-blue-200">Abastecimento</span>
+          <div
+            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            <a href="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+            <a href="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
+          </div>
+        </div>
+
+        <!-- Revisão -->
+        <div class="relative group">
+          <span class="cursor-pointer hover:text-blue-200">Revisão</span>
+          <div
+            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            <a href="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+            <a href="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
+          </div>
+        </div>
       </nav>
 
-      <!-- Botão Hamburguer para Mobile -->
+      <!-- Botão Hamburguer Mobile -->
       <div class="md:hidden flex items-center">
         <button (click)="toggleMenu()" class="text-white focus:outline-none">
           <svg *ngIf="!menuAberto" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,18 +54,57 @@
     </div>
   </div>
 
-  <!-- Menu Mobile Animado -->
-  <div class="md:hidden bg-blue-500 overflow-hidden transition-transform duration-300 ease-in-out" [ngClass]="{
-        'transform translate-y-0 opacity-100 max-h-96': menuAberto,
-        'transform -translate-y-full opacity-0 max-h-0': !menuAberto
-      }">
-    <nav class="flex flex-col items-center space-y-4 py-4">
-      <a href="/carros" class="text-white hover:text-blue-200 transition">Home</a>
-      <a href="/carro" class="text-white hover:text-blue-200 transition">Cadastrar Carro</a>
-      <a href="/abast" class="text-white hover:text-blue-200 transition">Cadastrar Abast</a>
-      <a href="/revisao/cadastrar" class="text-white hover:text-blue-200 transition">Cadastrar Revisao</a>
-      <a href="/abastecimento/registros" class="text-white hover:text-blue-200 transition">Registros Abast</a>
-      <a href="/revisao/registros" class="text-white hover:text-blue-200 transition">Registros Revisao</a>
+  <!-- Menu Mobile -->
+  <div class="md:hidden bg-blue-500 overflow-hidden transition-all duration-300 ease-in-out"
+    [ngClass]="{ 'max-h-96 opacity-100': menuAberto, 'max-h-0 opacity-0': !menuAberto }">
+
+    <nav class="flex flex-col py-4 px-4 space-y-2 text-white">
+
+      <!-- Carro -->
+      <div>
+        <div (click)="toggleSubmenu('carro')" class="font-semibold cursor-pointer flex justify-between items-center">
+          Carro
+          <span class="text-lg">{{ carroAberto ? '−' : '+' }}</span>
+        </div>
+        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
+             'max-h-40 opacity-100 mt-2': carroAberto,
+             'max-h-0 opacity-0': !carroAberto
+           }">
+          <a href="/carro" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+        </div>
+      </div>
+
+      <!-- Abastecimento -->
+      <div>
+        <div (click)="toggleSubmenu('abastecimento')"
+          class="font-semibold cursor-pointer flex justify-between items-center">
+          Abastecimento
+          <span class="text-lg">{{ abastecimentoAberto ? '−' : '+' }}</span>
+        </div>
+        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
+             'max-h-40 opacity-100 mt-2': abastecimentoAberto,
+             'max-h-0 opacity-0': !abastecimentoAberto
+           }">
+          <a href="/abast" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+          <a href="/abastecimento/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
+        </div>
+      </div>
+
+      <!-- Revisão -->
+      <div>
+        <div (click)="toggleSubmenu('revisao')" class="font-semibold cursor-pointer flex justify-between items-center">
+          Revisão
+          <span class="text-lg">{{ revisaoAberto ? '−' : '+' }}</span>
+        </div>
+        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
+             'max-h-40 opacity-100 mt-2': revisaoAberto,
+             'max-h-0 opacity-0': !revisaoAberto
+           }">
+          <a href="/revisao/cadastrar" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+          <a href="/revisao/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
+        </div>
+      </div>
+
     </nav>
   </div>
 </header>
