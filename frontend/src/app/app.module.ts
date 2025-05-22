@@ -22,6 +22,12 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { CadastroMarcaComponent } from './pages/cadastro-marca/cadastro-marca.component';
 import { CadastroAbastecimentoComponent } from './pages/cadastro-abastecimento/cadastro-abastecimento.component';
 import { ListaCarrosComponent } from './pages/lista-carros/lista-carros.component';
+import { ListMarcaComponent } from './shared/shared-consult/list-marca/list-marca.component';
+import { ListModelosComponent } from './shared/shared-consult/list-modelos/list-modelos.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 export function tokenGetter() {
   return localStorage.getItem('auth_token');
@@ -45,6 +51,7 @@ export function tokenGetter() {
     CadastrarCarroComponent,
     CadastrarModeloComponent,
     ListaCarrosComponent,
+
   ],
   imports: [
     JwtModule.forRoot({
@@ -62,7 +69,11 @@ export function tokenGetter() {
     ReactiveFormsModule,
     CommonModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
+    MatInputModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

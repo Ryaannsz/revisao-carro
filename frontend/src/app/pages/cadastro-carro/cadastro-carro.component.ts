@@ -41,6 +41,10 @@ export class CadastrarCarroComponent implements OnInit {
   }
 
 
+  onModeloSelecionado(modelo: Modelo) {
+    console.log('Modelo selecionado:', modelo);
+    this.carroForm.patchValue({ idModelo: modelo.idModelo });
+  }
 
   carregarMarcas() {
     this.marcaService.getList<Marca>().subscribe({

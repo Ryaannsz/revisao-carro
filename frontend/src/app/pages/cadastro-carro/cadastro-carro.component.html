@@ -2,7 +2,7 @@
   <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
     <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">Cadastrar Carro</h2>
 
-    <form [formGroup]="carroForm" (ngSubmit)="cadastrarCarro()">
+    <form [formGroup]="carroForm">
 
       <!-- Marca -->
       <div class="mb-4">
@@ -32,6 +32,11 @@
         </div>
       </div>
 
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Modelo</label>
+        <app-list-modelos (modeloSelecionado)="onModeloSelecionado($event)"></app-list-modelos>
+      </div>
+
       <!-- Kilometragem -->
       <div class="mb-4">
         <label class="block text-gray-700 mb-2">Kilometragem</label>
@@ -58,9 +63,6 @@
         class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg disabled:opacity-50">
         Cadastrar
       </button>
-
-
-
     </form>
   </div>
 </div>
