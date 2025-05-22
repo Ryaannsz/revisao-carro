@@ -51,15 +51,21 @@ export class RegistroRevisaoComponent {
   }
 
   removeRevisao(id: number): void {
-    this.loading = true;
-    this.revisaoService.delete(`/${id}`).subscribe(() => {
-      this.loading = false;
-      this.revisoes = this.revisoes.filter(r => r.idRevisao !== id);
-      this.onSearch();
-      this.closeModal();
-      this.toastService.showSuccess("Revisão removida com sucesso!")
-      this.loading = false;
-    });
+    this.confirmationService.confirm(
+      'Tem certeza?',
+      'Você deseja realmente excluir este item?'
+    ).subscribe(result => {
+      this.loading = true;
+      if (!result) return;
+      this.revisaoService.delete(`/${id}`).subscribe(() => {
+        this.loading = false;
+        this.revisoes = this.revisoes.filter(r => r.idRevisao !== id);
+        this.onSearch();
+        this.closeModal();
+        this.toastService.showSuccess("Revisão removida com sucesso!")
+        this.loading = false;
+      });
+    })
   }
 
   editRevisao(id: number): void {
