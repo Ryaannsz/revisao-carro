@@ -16,7 +16,7 @@ export const carroHandlers = [
 
     // Handler para GET de carros por id
     http.get(`${AppConstants.CARRO_URL}/:id`, ({ params }) => {
-        const id = Number(params)
+        const id = Number(params['id']);
         const carro = carros.get(id);
         if (carro) {
             return HttpResponse.json(carro);
@@ -29,5 +29,16 @@ export const carroHandlers = [
         const newCarro = await request.json() as Carro;
         carros.set(newCarro.idCarro, newCarro);
         return HttpResponse.json(newCarro, { status: 201 });
+    }),
+
+    http.put(`${AppConstants.CARRO_URL}/:id`, async ({ params, request }) => {
+        const id = Number(params['id']);
+        if (!carros.has(id)) {
+            return HttpResponse.json({ message: 'Carro não encontrada' }, { status: 404 });
+        }
+
+        const carroAtualizada = await request.json() as Carro;
+        carros.set(id, carroAtualizada);
+        return HttpResponse.json(carroAtualizada);
     }),
 ];

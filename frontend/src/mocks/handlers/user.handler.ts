@@ -5,7 +5,7 @@ import { User } from '../../app/core/models/user.model';
 
 const users = new Map()
 
-export const handlers = [
+export const userHandlers = [
   // Handler para GET de todos usuários
   http.get(AppConstants.USER_URL, () => {
     return HttpResponse.json(Array.from(users.values()));
@@ -13,7 +13,7 @@ export const handlers = [
 
   // Handler para GET de usuário por id
   http.get(`${AppConstants.USER_URL}/:id`, ({ params }) => {
-    const id = Number(params)
+    const id = Number(params['id']);
     const user = users.get(id);
     if (user) {
       return HttpResponse.json(user);
