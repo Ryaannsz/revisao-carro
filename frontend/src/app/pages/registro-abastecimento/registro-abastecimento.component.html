@@ -37,8 +37,9 @@
   </div>
 
   <!-- Modal de Detalhes -->
-  <div *ngIf="selectedAbast" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+  <div *ngIf="selectedAbast" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+    (click)="closeModal()">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative" (click)="$event.stopPropagation()">
       <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
         ✕
       </button>
@@ -50,8 +51,6 @@
       <p><strong>Valor:</strong> {{ selectedAbast.valorComb | currency }}</p>
       <p><strong>KM Atual:</strong> {{ selectedAbast.kmAtual }}</p>
       <div class="mt-6 flex justify-end space-x-2">
-        <button (click)="editAbast(selectedAbast.idAbast)"
-          class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Editar</button>
         <button (click)="removeAbast(selectedAbast.idAbast)"
           class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Remover</button>
       </div>
