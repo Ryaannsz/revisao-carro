@@ -7,6 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,4 +80,56 @@ class RevisaoServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> revisaoService.saveRevisao(revisaoDTO));
     }
+    
+    @Test
+    void saveRevisao_shouldSetCurrentTimestampIfNull() {
+        revisaoDTO.setKmAtual(15000.0);
+        revisaoDTO.setDtRevisao(null);  // deixar nulo para validar atribuição
+        revisaoDTO.setUser(user);
+
+        Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
+        Revisao revisaoSaved = new Revisao(1, new Timestamp(System.currentTimeMillis()), 15000.0, user, carro);
+
+        when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+        when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
+        when(revisaoRepository.save(any())).thenReturn(revisaoSaved);
+        when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
+
+        RevisaoDTO result = revisaoService.saveRevisao(revisaoDTO);
+
+        assertNotNull(result.getDtRevisao(), "A data de revisão deveria ser setada automaticamente");
+    }
+    
+    @Test
+    void listRevisaoByCarroId_shouldReturnList() {
+        Revisao revisao = new Revisao(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
+        RevisaoDTO revisaoDTO = new RevisaoDTO(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
+
+        when(revisaoRepository.findByCarroIdCarro(carro.getIdCarro())).thenReturn(List.of(revisao));
+        when(revisaoMapper.toDTOList(List.of(revisao))).thenReturn(List.of(revisaoDTO));
+
+        List<RevisaoDTO> result = revisaoService.listRevisaoByCarroId(carro.getIdCarro());
+
+        assertEquals(1, result.size());
+        assertEquals(20000.0, result.get(0).getKmAtual());
+    }
+    
+    @Test
+    void saveRevisao_shouldPropagateExceptionFromRepository() {
+        revisaoDTO.setKmAtual(20000.0);
+        revisaoDTO.setUser(user);
+
+        when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+        when(revisaoMapper.toEntity(any())).thenReturn(new Revisao(null, null, 20000.0, user, carro));
+        when(revisaoRepository.save(any())).thenThrow(new RuntimeException("Erro interno"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> revisaoService.saveRevisao(revisaoDTO));
+
+        assertEquals("Erro interno", exception.getMessage());
+    }
+
+    
+    
+
 }

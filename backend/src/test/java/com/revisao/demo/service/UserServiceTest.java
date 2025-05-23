@@ -68,4 +68,22 @@ class UserServiceTest {
         RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.updateUserRole(1, UserRoles.ADMIN));
         assertEquals("Usuário não encontrado", ex.getMessage());
     }
+    
+    @Test
+    void findById_shouldReturnUserDTO() {
+        when(userRepository.findById(1)).thenReturn(Optional.of(userEntity));
+        when(userMapper.toDTO(userEntity)).thenReturn(userDTO);
+
+        Optional<UserDTO> found = userService.findById(1); 
+
+        assertTrue(found.isPresent());
+        assertEquals("12345678901", found.get().getCpf());
+    }
+    
+    @Test
+    void deleteUser_shouldDeleteById() {
+        userService.delete(1);
+        verify(userRepository).deleteById(1);
+    }
+
 }

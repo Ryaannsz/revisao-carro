@@ -96,5 +96,42 @@ class AbastServiceTest {
         assertEquals(1, result.size());
         assertEquals(abastDTO, result.get(0));
     }
+    
+    @Test
+    void saveAbast_shouldPropagateExceptionFromRepository() {
+        abastDTO.setKmAtual(12000.0);
+        abastDTO.setDtAbast(null);
+
+        when(carroService.getKmRecente(1)).thenReturn(10000.0);
+        when(abastMapper.toEntity(any())).thenReturn(abastEntity);
+        when(abastRepository.save(any())).thenThrow(new RuntimeException("Erro ao salvar"));
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+            () -> abastService.saveAbast(abastDTO));
+
+        assertEquals("Erro ao salvar", ex.getMessage());
+        verify(abastRepository).save(any());
+    }
+    
+    @Test
+    void saveAbast_shouldCallMapperCorrectly() {
+        abastDTO.setKmAtual(12000.0);
+        abastDTO.setDtAbast(null);
+
+        when(carroService.getKmRecente(1)).thenReturn(10000.0);
+        when(abastMapper.toEntity(abastDTO)).thenReturn(abastEntity);
+        when(abastRepository.save(abastEntity)).thenReturn(abastEntity);
+        when(abastMapper.toDTO(abastEntity)).thenReturn(abastDTO);
+
+        AbastDTO result = abastService.saveAbast(abastDTO);
+
+        verify(abastMapper).toEntity(abastDTO);
+        verify(abastRepository).save(abastEntity);
+        verify(abastMapper).toDTO(abastEntity);
+
+        assertEquals(abastDTO, result);
+    }
+
+
 
 }

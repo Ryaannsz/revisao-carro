@@ -41,4 +41,13 @@ export const carroHandlers = [
         carros.set(id, carroAtualizada);
         return HttpResponse.json(carroAtualizada);
     }),
+    http.delete(`${AppConstants.CARRO_URL}/:id`, ({ params }) => {
+        const id = Number(params['id']);
+        if (carros.has(id)) {
+            carros.delete(id);
+            return HttpResponse.json({ message: 'Carro removida com sucesso' });
+        } else {
+            return HttpResponse.json({ message: 'Carro não encontrada' }, { status: 404 });
+        }
+    }),
 ];
