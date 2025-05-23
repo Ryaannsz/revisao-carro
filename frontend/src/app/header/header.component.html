@@ -11,10 +11,10 @@
       <nav class="hidden md:flex space-x-6 text-white">
 
         <!-- Carro -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Carro</span>
+        <div class="relative">
+          <span class="cursor-pointer hover:text-blue-200 peer">Carro</span>
           <div
-            class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg opacity-0 invisible peer-hover:visible peer-hover:opacity-100 hover:visible hover:opacity-100 transition-opacity transition-visibility z-50">
             <a href="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
           </div>
         </div>
@@ -22,24 +22,25 @@
         <span><a href="/usuario/cadastrados">Usuários</a></span>
 
         <!-- Abastecimento -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Abastecimento</span>
+        <div class="relative">
+          <span class="cursor-pointer hover:text-blue-200 peer">Abastecimento</span>
           <div
-            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 invisible peer-hover:visible peer-hover:opacity-100 hover:visible hover:opacity-100 transition-opacity transition-visibility z-50">
             <a href="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
             <a href="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
         </div>
 
         <!-- Revisão -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Revisão</span>
+        <div class="relative">
+          <span class="cursor-pointer hover:text-blue-200 peer">Revisão</span>
           <div
-            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 invisible peer-hover:visible peer-hover:opacity-100 hover:visible hover:opacity-100 transition-opacity transition-visibility z-50">
             <a href="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
             <a href="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
         </div>
+
       </nav>
 
       <!-- Botão Hamburguer Mobile -->
