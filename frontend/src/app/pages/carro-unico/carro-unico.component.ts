@@ -192,7 +192,6 @@ export class CarroUnicoComponent implements OnInit {
       ...this.carro,
       ...this.carroEditado
     };
-    console.log(carroAtualizado)
     this.carroService.put(carroAtualizado, `/${this.id}`).subscribe({
       next: (res) => {
         this.toastService.showSuccess('Carro atualizado com sucesso!');

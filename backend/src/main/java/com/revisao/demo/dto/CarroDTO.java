@@ -24,10 +24,7 @@ public class CarroDTO {
 	private Timestamp dtAdicionado;
 	@NotNull
 	private Double kmAdicionado;
-	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private Integer idModelo;
-	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private Integer idMarca;
+
 	
 	private Marca marca;
 	

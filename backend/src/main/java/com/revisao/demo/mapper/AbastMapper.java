@@ -10,11 +10,4 @@ import com.revisao.demo.models.Abast;
 public interface AbastMapper extends BaseMapper<AbastDTO, Abast>{
 
 
-	@Mapping(source="carro.idCarro", target="idCarro")
- 	AbastDTO toDTO(Abast abast);
-	
-
- 	@Mapping(source = "idCarro", target = "carro.idCarro")
- 	Abast toEntity(AbastDTO dto);
-	
 }
