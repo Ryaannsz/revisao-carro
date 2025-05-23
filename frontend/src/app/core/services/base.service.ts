@@ -10,9 +10,9 @@ export class BaseService {
 
   protected path: string = ''
 
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient) { }
 
-  
+
   get<T>(endpoint: string = ''): Observable<T> {
     return this.http.get<T>(`${this.path}${endpoint}`);
   }
@@ -29,10 +29,10 @@ export class BaseService {
 
 
   delete<T>(endpoint: string = ''): Observable<T> {
-    return this.http.delete<T>(`${this.path}${endpoint}`);
+    return this.http.delete<T>(`${this.path}/${endpoint}`);
   }
 
-  getWithId<T>(id:number, endpoint: string = ''): Observable<T>{
+  getWithId<T>(id: number, endpoint: string = ''): Observable<T> {
     return this.http.get<T>(`${this.path}${endpoint}/${id}`);
   }
 
@@ -40,7 +40,7 @@ export class BaseService {
     return this.http.get<T[]>(`${this.path}${endpoint}`);
   }
 
-  getListWithId<T>(id:number, endpoint: string = ''): Observable<T[]> {
+  getListWithId<T>(id: number, endpoint: string = ''): Observable<T[]> {
     return this.http.get<T[]>(`${this.path}${endpoint}/${id}`);
   }
 }
