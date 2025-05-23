@@ -1,113 +1,265 @@
-<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-  <h1 class="text-3xl font-bold mb-6">Detalhes do Carro</h1>
+<div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+  <!-- Cabeçalho -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Detalhes do Veículo</h1>
+      <p class="text-gray-500 mt-1">Informações completas sobre o veículo e seu histórico</p>
+    </div>
+    <div class="flex gap-2">
+      <button (click)="toggleEditar()"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-sm">
+        <i class="fas fa-edit mr-2"></i>
+        {{ isEditing ? 'Cancelar' : 'Editar' }}
+      </button>
+      <button
+        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-all duration-200 shadow-sm">
+        <i class="fas fa-print mr-2"></i>Imprimir
+      </button>
+    </div>
+  </div>
 
   <!-- Cartão de Dados do Carro -->
-  <div *ngIf="carro" class="grid grid-cols-2 gap-4 mb-8">
-    <div>
-      <span class="font-semibold">Marca:</span> {{ carro.marca.marca | uppercase }}
+  <div *ngIf="carro" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div class="p-5 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Informações do Veículo</h2>
     </div>
-    <div>
-      <span class="font-semibold">Modelo:</span> {{ carro.modelo.modelo | uppercase }}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-5 sm:p-6">
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-500">Marca</p>
+        <p class="text-lg font-semibold text-gray-900">{{ carro.marca.marca | uppercase }}</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-500">Modelo</p>
+        <p class="text-lg font-semibold text-gray-900">{{ carro.modelo.modelo | uppercase }}</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-500">Placa</p>
+        <ng-container *ngIf="!isEditing; else editPlaca">
+          <p class="text-lg font-semibold text-gray-900">{{ carro.placa | uppercase }}</p>
+        </ng-container>
+        <ng-template #editPlaca>
+          <input [(ngModel)]="carroEditado.placa" class="border border-gray-300 rounded px-2 py-1 w-full text-sm" />
+        </ng-template>
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-500">KM Atual</p>
+        <p class="text-lg font-semibold text-blue-600">{{ carro.kmAdicionado | number }} km</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-500">Data de Cadastro</p>
+        <p class="text-lg font-semibold text-gray-900">
+          {{ carro.dtAdicionado ? (carro.dtAdicionado | date:'medium') : '—' }}
+        </p>
+      </div>
     </div>
-    <div>
-      <span class="font-semibold">Placa:</span> {{ carro.placa || '—' | uppercase }}
+    <div *ngIf="isEditing" class="flex justify-end mt-4">
+      <button (click)="salvarAlteracoes()"
+        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 shadow-sm">
+        <i class="fas fa-save mr-2"></i>Salvar Alterações
+      </button>
     </div>
-    <div>
-      <span class="font-semibold">KM Atual:</span> {{ carro.kmAdicionado }}
-    </div>
-    <div class="col-span-2">
-      <span class="font-semibold">Data Adicionado:</span>
-      {{ carro.dtAdicionado ? (carro.dtAdicionado | date:'medium') : '—' }}
-    </div>
+  </div>
+
+  <!-- Abas para seções -->
+  <div class="mb-6 border-b border-gray-200">
+    <nav class="flex space-x-8">
+      <button class="py-4 px-1 border-b-2 font-medium text-sm" [class.border-blue-500]="activeTab === 'abastecimentos'"
+        [class.text-blue-600]="activeTab === 'abastecimentos'"
+        [class.border-transparent]="activeTab !== 'abastecimentos'"
+        [class.text-gray-500]="activeTab !== 'abastecimentos'"
+        [class.hover:text-gray-700]="activeTab !== 'abastecimentos'" (click)="activeTab = 'abastecimentos'">
+        Abastecimentos
+      </button>
+      <button class="py-4 px-1 border-b-2 font-medium text-sm" [class.border-blue-500]="activeTab === 'revisoes'"
+        [class.text-blue-600]="activeTab === 'revisoes'" [class.border-transparent]="activeTab !== 'revisoes'"
+        [class.text-gray-500]="activeTab !== 'revisoes'" [class.hover:text-gray-700]="activeTab !== 'revisoes'"
+        (click)="activeTab = 'revisoes'">
+        Revisões
+      </button>
+    </nav>
   </div>
 
   <!-- Tabela de Abastecimentos -->
-  <section class="mb-8">
-    <h2 class="text-2xl font-bold mb-4">Abastecimentos</h2>
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Data</th>
-          <th class="px-4 py-2 text-left">Litros</th>
-          <th class="px-4 py-2 text-left">Valor do combustível</th>
-          <th class="px-4 py-2 text-left">Valor do abastecimento</th>
-          <th class="px-4 py-2 text-left">KM Atual</th>
-          <th class="px-4 py-2 text-left">Ações</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-100">
-        <ng-container *ngFor="let a of abastecimentos">
+  <section *ngIf="activeTab === 'abastecimentos'"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div class="p-5 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-800">Histórico de Abastecimentos</h2>
+      <button
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-all duration-200 shadow-sm">
+        <i class="fas fa-plus mr-2"></i>Novo Abastecimento
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
           <tr>
-            <td class="px-4 py-2">{{ a.dtAbast | date:'short' }}</td>
-            <td class="px-4 py-2">{{ a.litroComb }}</td>
-            <td class="px-4 py-2">R{{ a.valorComb | currency }}</td>
-            <td class="px-4 py-2">R{{ a.litroComb * a.valorComb | currency }}</td>
-            <td class="px-4 py-2">{{ a.kmAtual }}</td>
-            <td class="px-4 py-2">
-              <button (click)="toggleAbast(a.idAbast)"
-                class="text-blue-600 hover:underline focus:outline-none">Detalhes</button>
-            </td>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Litros</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Valor/L</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KM
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Ações</th>
           </tr>
-          <tr *ngIf="expAbastId === a.idAbast" class="bg-gray-50">
-            <td colspan="5" class="px-4 py-2 space-y-1">
-              <div><span class="font-semibold">Usuário:</span> {{ a.user.nome }}</div>
-              <div><span class="font-semibold">ID Usuário:</span> {{ a.user.idUser }}</div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <ng-container *ngFor="let a of paginatedAbastecimentos">
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ a.dtAbast | date:'shortDate' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ a.litroComb | number:'1.2-2' }} L
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ a.valorComb | currency:'BRL' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ a.litroComb * a.valorComb | currency:'BRL' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ a.kmAtual | number }} km
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button (click)="toggleAbast(a.idAbast)" class="text-blue-600 hover:text-blue-900 mr-3">
+                  <i class="fas fa-info-circle"></i>
+                </button>
+                <button class="text-yellow-600 hover:text-yellow-900 mr-3">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-red-600 hover:text-red-900">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="expAbastId === a.idAbast" class="bg-gray-50">
+              <td colspan="6" class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Usuário</p>
+                    <p class="text-sm text-gray-900">{{ a.user.nome }}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">ID Usuário</p>
+                    <p class="text-sm text-gray-900">{{ a.user.idUser }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+      <div class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500">
+          Página {{ currentPageAbast }} de {{ totalPagesAbast }}
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="changePageAbast(currentPageAbast - 1)" [disabled]="currentPageAbast === 1"
+          class="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Anterior
+        </button>
+        <button (click)="changePageAbast(currentPageAbast + 1)"
+          [disabled]="currentPageAbast * itemsPerPage >= abastecimentos.length"
+          class="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Próximo
+        </button>
+      </div>
+    </div>
   </section>
 
   <!-- Tabela de Revisões -->
-  <section>
-    <h2 class="text-2xl font-bold mb-4">Revisões</h2>
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Data</th>
-          <th class="px-4 py-2 text-left">KM Momento</th>
-          <th class="px-4 py-2 text-left">Ações</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-100">
-        <ng-container *ngFor="let r of revisoes">
+  <section *ngIf="activeTab === 'revisoes'"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div class="p-5 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-800">Histórico de Revisões</h2>
+      <button
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-all duration-200 shadow-sm">
+        <i class="fas fa-plus mr-2"></i>Nova Revisão
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
           <tr>
-            <td class="px-4 py-2">{{ r.dtRevisao | date:'short' }}</td>
-            <td class="px-4 py-2">{{ r.kmAtual }}</td>
-            <td class="px-4 py-2">
-              <button (click)="toggleRevisao(r.idRevisao)"
-                class="text-blue-600 hover:underline focus:outline-none">Detalhes</button>
-            </td>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KM
+              Momento</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Ações</th>
           </tr>
-          <tr *ngIf="expRevisaoId === r.idRevisao" class="bg-gray-50">
-            <td colspan="3" class="px-4 py-2 space-y-1">
-              <div><span class="font-semibold">Usuário:</span> {{ r.user.nome }}</div>
-              <div><span class="font-semibold">ID Usuário:</span> {{ r.user.idUser }}</div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <ng-container *ngFor="let r of paginatedRevisoes">
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ r.dtRevisao | date:'shortDate' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ r.kmAtual | number }} km
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                Revisão periódica
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button (click)="toggleRevisao(r.idRevisao)" class="text-blue-600 hover:text-blue-900 mr-3">
+                  <i class="fas fa-info-circle"></i>
+                </button>
+                <button class="text-yellow-600 hover:text-yellow-900 mr-3">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-red-600 hover:text-red-900">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="expRevisaoId === r.idRevisao" class="bg-gray-50">
+              <td colspan="4" class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Usuário</p>
+                    <p class="text-sm text-gray-900">{{ r.user.nome }}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">ID Usuário</p>
+                    <p class="text-sm text-gray-900">{{ r.user.idUser }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+      <div class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500">
+          Página {{ currentPageRevisoes }} de {{ totalPagesRevisoes }}
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="changePageRevisoes(currentPageRevisoes - 1)" [disabled]="currentPageRevisoes === 1"
+          class="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Anterior
+        </button>
+        <button (click)="changePageRevisoes(currentPageRevisoes + 1)"
+          [disabled]="currentPageRevisoes * itemsPerPage >= revisoes.length"
+          class="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Próximo
+        </button>
+      </div>
+    </div>
   </section>
-</div>
 
-
-
-<!-- Loading Overlay -->
-<div *ngIf="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/50 backdrop-blur-sm">
-  <div class="flex flex-col items-center">
-    <!-- Spinner -->
-    <svg class="h-8 w-8 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-      </path>
-    </svg>
-
-    <!-- Texto (opcional) -->
-    <span class="mt-2 text-white">Loading...</span>
-  </div>
-</div>
-
-<app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+  <!-- Loading Overlay -->
+  <app-loading [visible]="loading" message="Carregando dados..."></app-loading>
