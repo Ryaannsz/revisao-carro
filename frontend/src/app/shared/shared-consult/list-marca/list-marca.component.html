@@ -11,7 +11,7 @@
         <li *ngFor="let marca of filteredMarca$ | async" (mousedown)="$event.preventDefault()"
             (click)="selectMarca(marca)" class="cursor-pointer px-4 py-2 hover:bg-blue-600 hover:text-white"
             role="option" [attr.aria-selected]="marca.marca === marcaField.value">
-            {{ marca.marca }}
+            {{ marca.marca | uppercase}}
         </li>
     </ul>
 

@@ -11,7 +11,7 @@
         <li *ngFor="let modelo of filteredModelos$ | async" (mousedown)="$event.preventDefault()"
             (click)="selectModelo(modelo)" class="cursor-pointer px-4 py-2 hover:bg-blue-600 hover:text-white"
             role="option" [attr.aria-selected]="modelo.modelo === modeloField.value">
-            {{ modelo.modelo }}
+            {{ modelo.modelo | uppercase}}
         </li>
     </ul>
 

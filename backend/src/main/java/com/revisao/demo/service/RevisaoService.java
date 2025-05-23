@@ -42,7 +42,7 @@ public class RevisaoService
 	    	revisao.setDtRevisao(agora);
 		}
     	
-		if(carroService.getKmRecente(revisao.getIdCarro())>=revisao.getKmAtual()) {
+		if(carroService.getKmRecente(revisao.getCarro().getIdCarro())>=revisao.getKmAtual()) {
 			throw new IllegalArgumentException("Quilometragem inferior a atual.");
 		}
 

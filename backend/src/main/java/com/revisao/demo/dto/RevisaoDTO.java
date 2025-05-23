@@ -22,11 +22,6 @@ public class RevisaoDTO {
 	
 	private Double kmAtual;
 	
-	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private Integer idUser;
-	
-	@NotNull @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private Integer idCarro;
 	
 	private User user;
 	

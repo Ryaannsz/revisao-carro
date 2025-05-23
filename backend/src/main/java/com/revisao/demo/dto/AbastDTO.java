@@ -26,13 +26,11 @@ public class AbastDTO {
 	
 	private Timestamp dtAbast;
 	
-	@NotNull
-	private Integer idUser;
+
 	
 	private User user;
 	
-	@NotNull
-	private Integer idCarro;
+
 	
 	private Carro carro;
 	

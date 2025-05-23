@@ -69,13 +69,6 @@ export class RegistroRevisaoComponent {
   }
 
   editRevisao(id: number): void {
-    this.confirmationService.confirm(
-      'Tem certeza?',
-      'Você deseja realmente excluir este item?'
-    ).subscribe(result => {
-      if (result) {
-        console.log("positivo")
-      }
-    });
+
   }
 }
