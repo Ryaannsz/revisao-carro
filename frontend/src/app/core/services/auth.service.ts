@@ -1,6 +1,6 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,30 +9,31 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private jwtHelper = new JwtHelperService();
 
+  // BehaviorSubject para controlar o estado de login
+  private loggedIn = new BehaviorSubject<boolean>(this.isAuthenticated());
+
+  // Observable para ser escutado pelo componente
+  isLoggedIn$ = this.loggedIn.asObservable();
+
   constructor() { }
 
-  // Salvar tokens
   setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
-    // Alternativa: sessionStorage.setItem(this.TOKEN_KEY, token);
+    this.loggedIn.next(true); // notifica que está logado
   }
 
-  // Obter token
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
-    // Alternativa: return sessionStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Verificar se está autenticado
   isAuthenticated(): boolean {
     const token = this.getToken();
     return token != null && !this.jwtHelper.isTokenExpired(token);
   }
 
-  // Remover token (logout)
   removeToken(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    // Alternativa: sessionStorage.removeItem(this.TOKEN_KEY);
+    this.loggedIn.next(false); // notifica que deslogou
   }
 
   getUserInfo(): any {

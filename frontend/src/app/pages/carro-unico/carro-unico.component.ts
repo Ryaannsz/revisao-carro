@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CarroService } from '../../core/services/carro.service';
 import { AbastService } from '../../core/services/abast.service';
 import { RevisaoService } from '../../core/services/revisao.service';
@@ -38,7 +38,8 @@ export class CarroUnicoComponent implements OnInit {
     private abastService: AbastService,
     private revisaoService: RevisaoService,
     private toastService: ToastService,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -144,6 +145,29 @@ export class CarroUnicoComponent implements OnInit {
         this.deleteRevisao(id);
       }
     });
+  }
+
+  deleteCarro() {
+    this.confirmationDialogService.confirm(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir este carro?'
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.loading = true;
+      this.carroService.delete(this.id.toString()).subscribe({
+        next: (res) => {
+          this.toastService.showSuccess("Carro deletado com sucesso!");
+          this.loading = false;
+          this.router.navigate(['/carros'])
+        },
+        error: (err) => {
+          this.toastService.showError("Erro ao deletar o carro!");
+          this.loading = false;
+          console.log(err)
+        }
+      })
+    })
+    this.loading = false;
   }
 
   private deleteAbastecimento(id: number): void {

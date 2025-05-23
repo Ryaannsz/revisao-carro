@@ -8,13 +8,14 @@
       </div>
 
       <!-- Menu Desktop -->
-      <nav class="hidden md:flex space-x-6 text-white">
+      <nav class="hidden md:flex space-x-6 text-white items-center">
 
         <!-- Carro -->
         <div class="relative group">
           <span class="cursor-pointer hover:text-blue-200">Carro</span>
-          <div
-            class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
+           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+           transition-opacity duration-200 z-50">
             <a href="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
           </div>
         </div>
@@ -24,8 +25,9 @@
         <!-- Abastecimento -->
         <div class="relative group">
           <span class="cursor-pointer hover:text-blue-200">Abastecimento</span>
-          <div
-            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
+           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+           transition-opacity duration-200 z-50">
             <a href="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
             <a href="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
@@ -33,13 +35,23 @@
 
         <!-- Revisão -->
         <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Revisão</span>
-          <div
-            class="absolute left-0 mt-2 w-52 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+          <span class="cursor-pointer hover:text-blue-200 peer">Revisão</span>
+          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
+           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+           transition-opacity duration-200 z-50">
             <a href="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
             <a href="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
         </div>
+
+        <!-- Botão Logout -->
+        <ng-container *ngIf="logado">
+          <button (click)="logout()"
+            class="ml-6 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white font-semibold transition-colors duration-200">
+            Logout
+          </button>
+        </ng-container>
+
       </nav>
 
       <!-- Botão Hamburguer Mobile -->
@@ -106,6 +118,12 @@
           <a href="/revisao/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
         </div>
       </div>
+
+      <!-- Logout Mobile -->
+      <button (click)="logout()"
+        class="mt-4 w-full bg-red-600 hover:bg-red-700 py-2 rounded text-white font-semibold transition-colors duration-200">
+        Logout
+      </button>
 
     </nav>
   </div>
