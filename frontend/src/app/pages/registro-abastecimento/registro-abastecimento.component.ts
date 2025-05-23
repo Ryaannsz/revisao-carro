@@ -60,8 +60,10 @@ export class RegistroAbastecimentoComponent {
         this.onSearch();
         this.closeModal();
         this.toastService.showSuccess("Abastecimento removido com sucesso!");
+        this.loading = false;
       });
     })
+    this.loading = false;
   }
 
   editAbast(id: number): void {
@@ -84,7 +86,8 @@ export class RegistroAbastecimentoComponent {
         this.loading = false;
         this.toastService.showError('Erro ao buscar lista!');
       }
-    });
 
+    });
+    this.loading = false;
   }
 }
