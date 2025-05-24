@@ -8,6 +8,7 @@ import { Abast } from '../../core/models/abast.model';
 import { Revisao } from '../../core/models/revisao.model';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   standalone: false,
@@ -39,7 +40,8 @@ export class CarroUnicoComponent implements OnInit {
     private revisaoService: RevisaoService,
     private toastService: ToastService,
     private confirmationDialogService: ConfirmationDialogService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -148,6 +150,7 @@ export class CarroUnicoComponent implements OnInit {
   }
 
   deleteCarro() {
+    if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
     this.confirmationDialogService.confirm(
       'Confirmar exclusão',
       'Tem certeza que deseja excluir este carro?'

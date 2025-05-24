@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject } from 'rxjs';
+import { Role } from '../models/role.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +40,13 @@ export class AuthService {
   getUserInfo(): any {
     const token = this.getToken();
     return token ? this.jwtHelper.decodeToken(token) : null;
+  }
+
+  getUserRole(): any {
+    const user = this.getUserInfo();
+    if (user.role === "USER")
+      return false;
+    else
+      return true;
   }
 }

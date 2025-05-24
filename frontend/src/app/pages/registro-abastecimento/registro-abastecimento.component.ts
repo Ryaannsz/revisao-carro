@@ -3,6 +3,7 @@ import { Abast } from '../../core/models/abast.model';
 import { AbastService } from '../../core/services/abast.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-registro-abastecimento',
@@ -20,7 +21,8 @@ export class RegistroAbastecimentoComponent {
 
   constructor(private abastService: AbastService,
     private toastService: ToastService,
-    private confirmationService: ConfirmationDialogService
+    private confirmationService: ConfirmationDialogService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -49,6 +51,7 @@ export class RegistroAbastecimentoComponent {
   }
 
   removeAbast(id: number): void {
+    if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
     this.confirmationService.confirm(
       'Tem certeza?',
       'Você deseja realmente excluir este item?'
