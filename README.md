@@ -132,7 +132,7 @@ volumes:
 ### ▶️ Running the Application
 Clone the repository:
 ```
-git clone https://github.com/your-username/revisao-carro.git
+git clone https://github.com/Ryaannsz/revisao-carro.git
 cd revisao-carro
 ```
 Build and run with Docker Compose:
