@@ -7,7 +7,7 @@
       <!--Marca -->
       <div class="mb-4">
         <app-list-marca (marcaSelecionado)="onMarcaSelecionado($event)"></app-list-marca>
-        <div *ngIf="carroForm.get('modeloId')?.invalid && carroForm.get('modeloId')?.touched"
+        <div *ngIf="carroForm.get('marca')?.invalid && carroForm.get('marca')?.touched"
           class="text-red-500 text-sm mt-1">
           A marca é obrigatório.
         </div>
@@ -17,7 +17,7 @@
       <!--Modelo -->
       <div class="mb-4">
         <app-list-modelos (modeloSelecionado)="onModeloSelecionado($event)"></app-list-modelos>
-        <div *ngIf="carroForm.get('modeloId')?.invalid && carroForm.get('modeloId')?.touched"
+        <div *ngIf="carroForm.get('modelo')?.invalid && carroForm.get('modelo')?.touched"
           class="text-red-500 text-sm mt-1">
           O modelo é obrigatório.
         </div>

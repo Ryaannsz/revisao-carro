@@ -32,7 +32,7 @@ export class CadastroRevisaoComponent {
       kmAtual: ['', [Validators.required, Validators.min(1)]],
       idUser: [this.authService.getUserInfo().idUser],
       dtRevisao: [''],
-      idCarro: ['', Validators.required]
+      carro: ['', Validators.required]
     });
   }
 
@@ -63,7 +63,7 @@ export class CadastroRevisaoComponent {
 
   selectCar(car: Carro): void {
     this.selectedCar = car;
-    this.revisaoForm.patchValue({ idCarro: car.idCarro });
+    this.revisaoForm.patchValue({ carro: car });
     this.showModal = false;
   }
 
@@ -80,6 +80,7 @@ export class CadastroRevisaoComponent {
         error: (err) => {
           this.toastService.showError('Erro ao registrar revisão!');
           this.loading = false;
+          console.log(err)
         }
       });
     } else {

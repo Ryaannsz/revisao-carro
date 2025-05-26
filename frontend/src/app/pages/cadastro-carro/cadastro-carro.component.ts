@@ -28,8 +28,8 @@ export class CadastrarCarroComponent implements OnInit {
     private toastService: ToastService
   ) {
     this.carroForm = this.fb.group({
-      idMarca: ['', Validators.required],
-      idModelo: ['', Validators.required],
+      marca: ['', Validators.required],
+      modelo: ['', Validators.required],
       kmAdicionado: ['', [Validators.required, Validators.min(0)]],
       placa: ['', Validators.required]
     });
@@ -43,12 +43,12 @@ export class CadastrarCarroComponent implements OnInit {
 
   onModeloSelecionado(modelo: Modelo) {
     this.toastService.showInfo('Modelo selecionado: ' + modelo.modelo);
-    this.carroForm.patchValue({ idModelo: modelo.idModelo });
+    this.carroForm.patchValue({ modelo: modelo });
   }
 
   onMarcaSelecionado(marca: Marca) {
     this.toastService.showInfo('Modelo selecionado: ' + marca.marca);
-    this.carroForm.patchValue({ idMarca: marca.idMarca });
+    this.carroForm.patchValue({ marca: marca });
   }
 
   carregarMarcas() {
@@ -71,6 +71,7 @@ export class CadastrarCarroComponent implements OnInit {
     this.carroForm.get('placa')?.setValue(placaFormatada);
 
     if (this.carroForm.valid) {
+      console.log(this.carroForm.value)
       this.carroService.post(this.carroForm.value).subscribe({
         next: (res) => {
           this.carroForm.reset();
