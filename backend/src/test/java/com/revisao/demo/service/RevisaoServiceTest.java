@@ -1,10 +1,9 @@
 package com.revisao.demo.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
@@ -15,12 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.revisao.demo.dto.RevisaoDTO;
-import com.revisao.demo.dto.UserDTO;
 import com.revisao.demo.enums.UserRoles;
 import com.revisao.demo.mapper.RevisaoMapper;
 import com.revisao.demo.models.Carro;
@@ -50,86 +48,82 @@ class RevisaoServiceTest {
 
     @BeforeEach
     void setUp() {
-        carro = new Carro();
-        carro.setIdCarro(1);
+	carro = new Carro();
+	carro.setIdCarro(1);
 
-        revisaoDTO = new RevisaoDTO(null, null, 12000.0, new User(), carro);
-        
-        user = new User(1, "Jhon", "wodmwd", "wdlawdml", UserRoles.ADMIN);
+	revisaoDTO = new RevisaoDTO(null, null, 12000.0, new User(), carro);
+
+	user = new User(1, "Jhon", "wodmwd", "wdlawdml", UserRoles.ADMIN);
     }
 
     @Test
     void saveRevisao_shouldSaveSuccessfully() {
-        RevisaoDTO revisaoDTO = new RevisaoDTO(null, null, 15000.0, user, carro);
-        Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
+	RevisaoDTO revisaoDTO = new RevisaoDTO(null, null, 15000.0, user, carro);
+	Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
 
-        when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
-        when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
-        when(revisaoRepository.save(any())).thenReturn(revisaoEntity);
-        when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
+	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
+	when(revisaoRepository.save(any())).thenReturn(revisaoEntity);
+	when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
 
-        RevisaoDTO result = revisaoService.saveRevisao(revisaoDTO);
+	RevisaoDTO result = revisaoService.saveRevisao(revisaoDTO);
 
-        assertNotNull(result); 
-        assertEquals(15000.0, result.getKmAtual());
+	assertNotNull(result);
+	assertEquals(15000.0, result.getKmAtual());
     }
 
     @Test
     void saveRevisao_shouldThrowExceptionIfKmIsLower() {
-        when(carroService.getKmRecente(1)).thenReturn(13000.0);
+	when(carroService.getKmRecente(1)).thenReturn(13000.0);
 
-        assertThrows(IllegalArgumentException.class, () -> revisaoService.saveRevisao(revisaoDTO));
+	assertThrows(IllegalArgumentException.class, () -> revisaoService.saveRevisao(revisaoDTO));
     }
-    
+
     @Test
     void saveRevisao_shouldSetCurrentTimestampIfNull() {
-        revisaoDTO.setKmAtual(15000.0);
-        revisaoDTO.setDtRevisao(null);  // deixar nulo para validar atribuição
-        revisaoDTO.setUser(user);
+	revisaoDTO.setKmAtual(15000.0);
+	revisaoDTO.setDtRevisao(null); // deixar nulo para validar atribuição
+	revisaoDTO.setUser(user);
 
-        Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
-        Revisao revisaoSaved = new Revisao(1, new Timestamp(System.currentTimeMillis()), 15000.0, user, carro);
+	Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
+	Revisao revisaoSaved = new Revisao(1, new Timestamp(System.currentTimeMillis()), 15000.0, user, carro);
 
-        when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
-        when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
-        when(revisaoRepository.save(any())).thenReturn(revisaoSaved);
-        when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
+	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
+	when(revisaoRepository.save(any())).thenReturn(revisaoSaved);
+	when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
 
-        RevisaoDTO result = revisaoService.saveRevisao(revisaoDTO);
+	RevisaoDTO result = revisaoService.saveRevisao(revisaoDTO);
 
-        assertNotNull(result.getDtRevisao(), "A data de revisão deveria ser setada automaticamente");
+	assertNotNull(result.getDtRevisao(), "A data de revisão deveria ser setada automaticamente");
     }
-    
+
     @Test
     void listRevisaoByCarroId_shouldReturnList() {
-        Revisao revisao = new Revisao(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
-        RevisaoDTO revisaoDTO = new RevisaoDTO(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
+	Revisao revisao = new Revisao(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
+	RevisaoDTO revisaoDTO = new RevisaoDTO(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
 
-        when(revisaoRepository.findByCarroIdCarro(carro.getIdCarro())).thenReturn(List.of(revisao));
-        when(revisaoMapper.toDTOList(List.of(revisao))).thenReturn(List.of(revisaoDTO));
+	when(revisaoRepository.findByCarro_idCarro(carro.getIdCarro())).thenReturn(List.of(revisao));
+	when(revisaoMapper.toDTOList(List.of(revisao))).thenReturn(List.of(revisaoDTO));
 
-        List<RevisaoDTO> result = revisaoService.listRevisaoByCarroId(carro.getIdCarro());
+	List<RevisaoDTO> result = revisaoService.listRevisaoByCarroId(carro.getIdCarro());
 
-        assertEquals(1, result.size());
-        assertEquals(20000.0, result.get(0).getKmAtual());
+	assertEquals(1, result.size());
+	assertEquals(20000.0, result.get(0).getKmAtual());
     }
-    
+
     @Test
     void saveRevisao_shouldPropagateExceptionFromRepository() {
-        revisaoDTO.setKmAtual(20000.0);
-        revisaoDTO.setUser(user);
+	revisaoDTO.setKmAtual(20000.0);
+	revisaoDTO.setUser(user);
 
-        when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
-        when(revisaoMapper.toEntity(any())).thenReturn(new Revisao(null, null, 20000.0, user, carro));
-        when(revisaoRepository.save(any())).thenThrow(new RuntimeException("Erro interno"));
+	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(revisaoMapper.toEntity(any())).thenReturn(new Revisao(null, null, 20000.0, user, carro));
+	when(revisaoRepository.save(any())).thenThrow(new RuntimeException("Erro interno"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> revisaoService.saveRevisao(revisaoDTO));
+	RuntimeException exception = assertThrows(RuntimeException.class, () -> revisaoService.saveRevisao(revisaoDTO));
 
-        assertEquals("Erro interno", exception.getMessage());
+	assertEquals("Erro interno", exception.getMessage());
     }
-
-    
-    
 
 }

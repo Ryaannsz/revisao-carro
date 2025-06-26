@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.revisao.demo.models.Revisao;
 
-public interface RevisaoRepository extends BaseRepository<Revisao, Integer>{
+public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
 
-	List<Revisao> findByCarroIdCarro(Integer idCarro);
-	
-	void deleteByCarro_IdCarro(Integer idCarro);
-	
+    List<Revisao> findByCarro_idCarro(Integer idCarro);
+
+    void deleteByCarro_idCarro(Integer idCarro);
+
 }

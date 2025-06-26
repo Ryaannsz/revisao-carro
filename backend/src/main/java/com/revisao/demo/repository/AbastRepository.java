@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.revisao.demo.models.Abast;
 
-public interface AbastRepository extends BaseRepository<Abast, Integer>{
+public interface AbastRepository extends BaseRepository<Abast, Integer> {
 
-	List<Abast> findByCarroIdCarro(Integer idCarro);
-	
-	void deleteByCarro_IdCarro(Integer idCarro);
+    List<Abast> findByCarro_idCarro(Integer idCarro);
+
+    void deleteByCarro_idCarro(Integer idCarro);
 }

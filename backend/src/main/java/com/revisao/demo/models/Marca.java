@@ -13,12 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name="TB_MARCA")
+@Table(name = "TB_MARCA")
 public class Marca {
-	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idMarca;
-	
-	private String marca; 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idMarca;
+
+    private String marca;
 
 }

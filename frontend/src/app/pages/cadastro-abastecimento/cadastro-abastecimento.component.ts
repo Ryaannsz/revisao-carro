@@ -37,7 +37,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
       kmAtual: ['', [Validators.required, Validators.min(1)]],
       idUser: [this.authService.getUserInfo().idUser],
       dtAbast: [''],
-      idCarro: ['', Validators.required]
+      carro: ['', Validators.required]
     });
   }
 
@@ -70,7 +70,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
 
   selectCar(car: Carro): void {
     this.selectedCar = car;
-    this.abastForm.patchValue({ idCarro: car.idCarro });
+    this.abastForm.patchValue({ carro: car });
     this.showModal = false;
   }
 
@@ -87,6 +87,8 @@ export class CadastroAbastecimentoComponent implements OnInit {
         error: (err) => {
           this.toastService.showError('Erro ao registrar abastecimento:');
           this.loading = false;
+          console.log(err)
+          console.log(this.abastForm.value)
         }
       });
     } else {

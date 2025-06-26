@@ -17,30 +17,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="tb_abastecimento")
+@Table(name = "tb_abastecimento")
 public class Abast {
-	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idAbast;
-	
-	private Double litroComb;
-	
-	private Double valorComb;
-	
-	private Timestamp dtAbast;
-	
-	private Double kmAtual;
-	
 
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private User user;
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idAbast;
 
+    private Double litroComb;
 
-	
-	@ManyToOne
-	@JoinColumn(name="carro_id")
-	private Carro carro;
+    private Double valorComb;
+
+    private Timestamp dtAbast;
+
+    private Double kmAtual;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "carro_id")
+    private Carro carro;
 
 }

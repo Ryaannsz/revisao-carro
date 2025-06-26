@@ -19,28 +19,24 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "TB_CARRO")
 
-
 public class Carro {
-	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idCarro;
-	
-	private Timestamp dtAdicionado;
-	
-	private Double kmAdicionado;
-	
-	private String placa;
-	
-	
-	@ManyToOne
-	@JoinColumn(name="modelo_id")
-	private Modelo modelo;
-	
-	
-	
-	@ManyToOne
-	@JoinColumn(name="marca_id")
-	private Marca marca;
-	
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idCarro;
+
+    private Timestamp dtAdicionado;
+
+    private Double kmAdicionado;
+
+    private String placa;
+
+    @ManyToOne
+    @JoinColumn(name = "modelo_id")
+    private Modelo modelo;
+
+    @ManyToOne
+    @JoinColumn(name = "marca_id")
+    private Marca marca;
 
 }

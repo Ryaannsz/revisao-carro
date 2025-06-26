@@ -1,19 +1,12 @@
-FROM openjdk:17-jdk-slim AS build
+FROM maven:3.8-openjdk-17 AS build
 
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y maven
-
-COPY . .
-
+WORKDIR /usr/local/service
+COPY pom.xml /usr/local/service/pom.xml
+COPY src /usr/local/service/src
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk-slim
-
+FROM openjdk:17-jdk-alpine
 WORKDIR /app
+COPY --from=build /usr/local/service/target/*.jar /app/app.jar
 
-COPY --from=build /app/target/*.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
