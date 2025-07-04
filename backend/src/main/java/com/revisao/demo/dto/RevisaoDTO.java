@@ -2,11 +2,8 @@ package com.revisao.demo.dto;
 
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revisao.demo.models.Carro;
-import com.revisao.demo.models.User;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,19 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RevisaoDTO {
 
-	private Integer idRevisao;
+    private Integer idRevisao;
 
-	private Timestamp dtRevisao;
-	
-	private Double kmAtual;
-	
-	
-	private User user;
-	
-	private Carro carro;
-	
-	
-	
-	
-	
+    private Timestamp dtRevisao;
+
+    private Double kmAtual;
+
+    private String userId;
+
+    private Carro carro;
+
 }

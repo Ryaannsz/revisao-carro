@@ -2,10 +2,8 @@ package com.revisao.demo.dto;
 
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revisao.demo.models.Marca;
 import com.revisao.demo.models.Modelo;
-import com.revisao.demo.models.User;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,21 +14,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-
 public class CarroDTO {
 
-	private Integer idCarro;
+    private Integer idCarro;
 
-	private Timestamp dtAdicionado;
-	@NotNull
-	private Double kmAdicionado;
+    private Timestamp dtAdicionado;
+    @NotNull
+    private Double kmAdicionado;
 
-	
-	private Marca marca;
-	
-	private Modelo modelo;
-	
-	private String placa;
-	
-	
+    private Marca marca;
+
+    private Modelo modelo;
+
+    private String placa;
+
 }

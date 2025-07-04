@@ -13,6 +13,31 @@ services:
     ports:
       - "5432:5432"
 
+  db_auth:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+      POSTGRES_DB: authdb
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+
+  auth-server:
+    build:
+      context: ./autenticator
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL_AUTH: jdbc:postgresql://db_auth:5432/authdb
+      USERNAME_AUTH: auth_user
+      PASSWORD_AUTH: auth_pass
+    depends_on:
+      - db_auth
+
   backend:
     build:
       context: ./backend
@@ -29,11 +54,12 @@ services:
     build:
       context: ./bff
     ports:
-      - "8070:8070"   
+      - "8070:8070"
     environment:
-      API_URL: "http://api.backend:8080"  
+      API_URL: http://backend:8080
     depends_on:
       - backend
+      - auth-server
 
   frontend:
     build:
@@ -45,3 +71,4 @@ services:
 
 volumes:
   postgres-data:
+  auth-postgres-data:

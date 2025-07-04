@@ -32,9 +32,7 @@ public class Abast {
 
     private Double kmAtual;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private String userId;
 
     @ManyToOne
     @JoinColumn(name = "carro_id")
