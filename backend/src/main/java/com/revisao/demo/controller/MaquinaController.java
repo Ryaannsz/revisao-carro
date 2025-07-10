@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("abastecimento")
+@RequestMapping("maquina")
 @RequiredArgsConstructor
 public class MaquinaController {
 

@@ -34,6 +34,7 @@ import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usua
 import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
+import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
 
 
 export function tokenGetter() {
@@ -63,6 +64,7 @@ export function tokenGetter() {
     RegistroUsuarioComponent,
     ModalUsuarioComponent,
     ConfirmationDialogComponent,
+    CadastroMaquinaComponent,
 
   ],
   imports: [
