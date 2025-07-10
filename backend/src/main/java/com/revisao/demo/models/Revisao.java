@@ -1,8 +1,6 @@
 package com.revisao.demo.models;
 
-
-
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,29 +17,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="TB_REVISAO")
+@Table(name = "TB_REVISAO")
 
 public class Revisao {
-		
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idRevisao;
-	
-	private Timestamp dtRevisao;
-	
-	private Double kmAtual;
-	
-	
 
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private User user;
-	
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@ManyToOne
-	@JoinColumn(name="carro_id")
-	private Carro carro;
-	
-	
-	
+    private Date dtRevisao;
+
+    private Double kmAtual;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "carro_id")
+    private Carro carro;
+
 }

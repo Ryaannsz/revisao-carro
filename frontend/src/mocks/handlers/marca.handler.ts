@@ -15,7 +15,7 @@ export const marcaHandlers = [
 
     http.post(AppConstants.MARCA_URL, async ({ request }) => {
         const newMarca = await request.json() as Marca;
-        marcas.set(newMarca.idMarca, newMarca);
+        marcas.set(newMarca.id, newMarca);
         return HttpResponse.json(newMarca, { status: 201 });
     }),
 ];

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,9 +47,9 @@ class AbastServiceTest {
     void setup() {
 	User user = new User();
 	Carro carro = new Carro();
-	carro.setIdCarro(1);
+	carro.setId(1);
 
-	abastEntity = new Abast(1, 50.0, 200.0, new Timestamp(System.currentTimeMillis()), 10000.0, user, carro);
+	abastEntity = new Abast(1, 50.0, 200.0, new Date(System.currentTimeMillis()), 10000.0, user, carro);
 	abastDTO = new AbastDTO(1, 50.0, 200.0, 10000.0, null, user, carro);
     }
 
@@ -86,7 +86,7 @@ class AbastServiceTest {
 	List<Abast> entities = List.of(abastEntity);
 	List<AbastDTO> dtos = List.of(abastDTO);
 
-	when(abastRepository.findByCarro_idCarro(1)).thenReturn(entities);
+	when(abastRepository.findByCarro_id(1)).thenReturn(entities);
 	when(abastMapper.toDTOList(entities)).thenReturn(dtos);
 
 	List<AbastDTO> result = abastService.findAllByCarroId(1);

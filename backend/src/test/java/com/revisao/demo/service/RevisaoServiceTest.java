@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +49,7 @@ class RevisaoServiceTest {
     @BeforeEach
     void setUp() {
 	carro = new Carro();
-	carro.setIdCarro(1);
+	carro.setId(1);
 
 	revisaoDTO = new RevisaoDTO(null, null, 12000.0, new User(), carro);
 
@@ -61,7 +61,7 @@ class RevisaoServiceTest {
 	RevisaoDTO revisaoDTO = new RevisaoDTO(null, null, 15000.0, user, carro);
 	Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
 
-	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(carroService.getKmRecente(carro.getId())).thenReturn(10000.0);
 	when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
 	when(revisaoRepository.save(any())).thenReturn(revisaoEntity);
 	when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
@@ -86,9 +86,9 @@ class RevisaoServiceTest {
 	revisaoDTO.setUser(user);
 
 	Revisao revisaoEntity = new Revisao(null, null, 15000.0, user, carro);
-	Revisao revisaoSaved = new Revisao(1, new Timestamp(System.currentTimeMillis()), 15000.0, user, carro);
+	Revisao revisaoSaved = new Revisao(1, new Date(System.currentTimeMillis()), 15000.0, user, carro);
 
-	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(carroService.getKmRecente(carro.getId())).thenReturn(10000.0);
 	when(revisaoMapper.toEntity(any())).thenReturn(revisaoEntity);
 	when(revisaoRepository.save(any())).thenReturn(revisaoSaved);
 	when(revisaoMapper.toDTO(any())).thenReturn(revisaoDTO);
@@ -100,13 +100,13 @@ class RevisaoServiceTest {
 
     @Test
     void listRevisaoByCarroId_shouldReturnList() {
-	Revisao revisao = new Revisao(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
-	RevisaoDTO revisaoDTO = new RevisaoDTO(1, new Timestamp(System.currentTimeMillis()), 20000.0, user, carro);
+	Revisao revisao = new Revisao(1, new Date(System.currentTimeMillis()), 20000.0, user, carro);
+	RevisaoDTO revisaoDTO = new RevisaoDTO(1, new Date(System.currentTimeMillis()), 20000.0, user, carro);
 
-	when(revisaoRepository.findByCarro_idCarro(carro.getIdCarro())).thenReturn(List.of(revisao));
+	when(revisaoRepository.findByCarro_id(carro.getId())).thenReturn(List.of(revisao));
 	when(revisaoMapper.toDTOList(List.of(revisao))).thenReturn(List.of(revisaoDTO));
 
-	List<RevisaoDTO> result = revisaoService.listRevisaoByCarroId(carro.getIdCarro());
+	List<RevisaoDTO> result = revisaoService.listRevisaoByCarroId(carro.getId());
 
 	assertEquals(1, result.size());
 	assertEquals(20000.0, result.get(0).getKmAtual());
@@ -117,7 +117,7 @@ class RevisaoServiceTest {
 	revisaoDTO.setKmAtual(20000.0);
 	revisaoDTO.setUser(user);
 
-	when(carroService.getKmRecente(carro.getIdCarro())).thenReturn(10000.0);
+	when(carroService.getKmRecente(carro.getId())).thenReturn(10000.0);
 	when(revisaoMapper.toEntity(any())).thenReturn(new Revisao(null, null, 20000.0, user, carro));
 	when(revisaoRepository.save(any())).thenThrow(new RuntimeException("Erro interno"));
 

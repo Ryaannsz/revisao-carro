@@ -24,7 +24,7 @@ export const userHandlers = [
 
   http.post(AppConstants.USER_URL, async ({ request }) => {
     const newUser = await request.json() as User;
-    users.set(newUser.idUser, newUser);
+    users.set(newUser.id, newUser);
     return HttpResponse.json(newUser, { status: 201 });
   }),
 ];

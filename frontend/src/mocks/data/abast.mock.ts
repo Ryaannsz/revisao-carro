@@ -3,7 +3,7 @@ import { mockUser } from './user.mock';
 import { mockCarro } from './carro.mock';
 
 export const mockAbast: Abast = {
-    idAbast: 1,
+    id: 1,
     litroComb: 40,
     valorComb: 250,
     kmAtual: 50500,

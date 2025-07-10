@@ -5,7 +5,7 @@ import { Carro } from '../../app/core/models/carro.model';
 import { mockCarro } from '../data/carro.mock';
 
 const carros = new Map<number, Carro>([
-    [mockCarro.idCarro, mockCarro]
+    [mockCarro.id, mockCarro]
 ]);
 
 export const carroHandlers = [
@@ -27,7 +27,7 @@ export const carroHandlers = [
 
     http.post(AppConstants.CARRO_URL, async ({ request }) => {
         const newCarro = await request.json() as Carro;
-        carros.set(newCarro.idCarro, newCarro);
+        carros.set(newCarro.id, newCarro);
         return HttpResponse.json(newCarro, { status: 201 });
     }),
 

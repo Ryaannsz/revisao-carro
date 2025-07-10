@@ -10,16 +10,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -38,82 +36,74 @@ class AbastControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-	@MockBean
+    @MockBean
     private AbastService abastService;
 
     private AbastDTO abastDTO;
 
     @BeforeEach
     void setup() {
-        User user = new User();
-        Carro carro = new Carro();
-        carro.setIdCarro(1);
+	User user = new User();
+	Carro carro = new Carro();
+	carro.setId(1);
 
-        abastDTO = new AbastDTO(1, 50.0, 200.0, 10000.0, new Timestamp(System.currentTimeMillis()), user, carro);
+	abastDTO = new AbastDTO(1, 50.0, 200.0, 10000.0, new Date(System.currentTimeMillis()), user, carro);
     }
 
     @Test
     void getAllAbast_shouldReturnList() throws Exception {
-        when(abastService.findAll()).thenReturn(List.of(abastDTO));
+	when(abastService.findAll()).thenReturn(List.of(abastDTO));
 
-        mockMvc.perform(get("/abastecimento"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].idAbast").value(abastDTO.getIdAbast()));
+	mockMvc.perform(get("/abastecimento")).andExpect(status().isOk())
+		.andExpect(jsonPath("$[0].id").value(abastDTO.getId()));
     }
 
     @Test
     void postAbast_shouldReturnCreated() throws Exception {
-        String json = """
-            {
-              "idAbast": 1,
-              "litroComb": 50.0,
-              "valorComb": 200.0,
-              "kmAtual": 10000.0,
-              "dtAbast": "2025-05-23T10:00:00.000+0000",
-              "user": null,
-              "carro": {"idCarro": 1}
-            }
-            """;
+	String json = """
+		{
+		  "idAbast": 1,
+		  "litroComb": 50.0,
+		  "valorComb": 200.0,
+		  "kmAtual": 10000.0,
+		  "dtAbast": "2025-05-23T10:00:00.000+0000",
+		  "user": null,
+		  "carro": {"idCarro": 1}
+		}
+		""";
 
-        doReturn(abastDTO).when(abastService).saveAbast(any());
+	doReturn(abastDTO).when(abastService).saveAbast(any());
 
-        mockMvc.perform(post("/abastecimento")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated());
+	mockMvc.perform(post("/abastecimento").contentType(MediaType.APPLICATION_JSON).content(json))
+		.andExpect(status().isCreated());
     }
 
     @Test
     void getSpecAbast_shouldReturnAbastDTO() throws Exception {
-        when(abastService.findById(1)).thenReturn(Optional.of(abastDTO));
+	when(abastService.findById(1)).thenReturn(Optional.of(abastDTO));
 
-        mockMvc.perform(get("/abastecimento/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idAbast").value(1));
+	mockMvc.perform(get("/abastecimento/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     void getSpecAbast_shouldReturnNotFound() throws Exception {
-        when(abastService.findById(1)).thenReturn(Optional.empty());
+	when(abastService.findById(1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/abastecimento/1"))
-                .andExpect(status().isNotFound());
+	mockMvc.perform(get("/abastecimento/1")).andExpect(status().isNotFound());
     }
 
     @Test
     void getAllByCarroId_shouldReturnList() throws Exception {
-        when(abastService.findAllByCarroId(1)).thenReturn(List.of(abastDTO));
+	when(abastService.findAllByCarroId(1)).thenReturn(List.of(abastDTO));
 
-        mockMvc.perform(get("/abastecimento/carro/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].idAbast").value(1));
+	mockMvc.perform(get("/abastecimento/carro/1")).andExpect(status().isOk())
+		.andExpect(jsonPath("$[0].id").value(1));
     }
 
     @Test
     void deleteAbast_shouldReturnOk() throws Exception {
-        doNothing().when(abastService).delete(1);
+	doNothing().when(abastService).delete(1);
 
-        mockMvc.perform(delete("/abastecimento/1"))
-                .andExpect(status().isOk());
+	mockMvc.perform(delete("/abastecimento/1")).andExpect(status().isOk());
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revisao.demo.dto.MarcaDTO;
-import com.revisao.demo.models.Marca;
 import com.revisao.demo.service.MarcaService;
 
 import jakarta.validation.Valid;
@@ -23,17 +22,17 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("marca")
 @RequiredArgsConstructor
 public class MarcaController {
-	
-	private final MarcaService marcaService;
-	
-	@GetMapping
-	public List<MarcaDTO> getAllMarcas(){
-		return marcaService.findAll();
-	}
-	
-	@PostMapping
-	public ResponseEntity<MarcaDTO> postMarca(@Valid @RequestBody MarcaDTO marca){
-		return ResponseEntity.status(HttpStatus.CREATED).body(marcaService.salvarMarca(marca));	
-	}
+
+    private final MarcaService marcaService;
+
+    @GetMapping
+    public List<MarcaDTO> getAllMarcas() {
+	return marcaService.findAll();
+    }
+
+    @PostMapping
+    public ResponseEntity<MarcaDTO> postMarca(@Valid @RequestBody MarcaDTO marca) {
+	return ResponseEntity.status(HttpStatus.CREATED).body(marcaService.salvarMarca(marca));
+    }
 
 }

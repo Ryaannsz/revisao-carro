@@ -3,7 +3,7 @@ import { mockUser } from './user.mock';
 import { mockCarro } from './carro.mock';
 
 export const mockRevisao: Revisao = {
-    idRevisao: 1,
+    id: 1,
     kmAtual: 50500,
     user: mockUser,
     carro: mockCarro,

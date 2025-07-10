@@ -6,8 +6,8 @@ import com.revisao.demo.models.Revisao;
 
 public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
 
-    List<Revisao> findByCarro_idCarro(Integer idCarro);
+    List<Revisao> findByCarro_id(Integer idCarro);
 
-    void deleteByCarro_idCarro(Integer idCarro);
+    void deleteByCarro_id(Integer idCarro);
 
 }

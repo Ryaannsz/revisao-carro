@@ -1,6 +1,6 @@
 package com.revisao.demo.service;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -29,19 +29,19 @@ public class AbastService extends BaseServiceImpl<AbastDTO, Abast, Integer> {
     public AbastDTO saveAbast(AbastDTO abast) {
 
 	if (abast.getDtAbast() == null) {
-	    Timestamp agora = new Timestamp(System.currentTimeMillis());
+	    Date agora = new Date(System.currentTimeMillis());
 	    abast.setDtAbast(agora);
 	}
 
-	if (carroService.getKmRecente(abast.getCarro().getIdCarro()) >= abast.getKmAtual()) {
+	if (carroService.getKmRecente(abast.getCarro().getId()) >= abast.getKmAtual()) {
 	    throw new IllegalArgumentException("Quilometragem inferior a atual.");
 	}
 
 	return save(abast);
     }
 
-    public List<AbastDTO> findAllByCarroId(Integer idCarro) {
-	return abastMapper.toDTOList(abastRepository.findByCarro_idCarro(idCarro));
+    public List<AbastDTO> findAllByCarroId(Integer carroId) {
+	return abastMapper.toDTOList(abastRepository.findByCarro_id(carroId));
     }
 
 }

@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,72 +42,62 @@ class RevisaoControllerTest {
 
     @BeforeEach
     void setUp() {
-        Carro carro = new Carro();
-        carro.setIdCarro(1);
+	Carro carro = new Carro();
+	carro.setId(1);
 
-        revisaoDTO = new RevisaoDTO(1, new Timestamp(System.currentTimeMillis()), 15000.0, new User(), carro);
+	revisaoDTO = new RevisaoDTO(1, new Date(System.currentTimeMillis()), 15000.0, new User(), carro);
     }
 
     @Test
     void getAllRevisao_shouldReturnList() throws Exception {
-        when(revisaoService.findAll()).thenReturn(List.of(revisaoDTO));
+	when(revisaoService.findAll()).thenReturn(List.of(revisaoDTO));
 
-        mockMvc.perform(get("/revisao"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].idRevisao").value(1));
+	mockMvc.perform(get("/revisao")).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
     }
 
     @Test
     void postRevisao_shouldReturnCreated() throws Exception {
-        String json = """
-            {
-              "idRevisao": 1,
-              "kmAtual": 15000.0,
-              "carro": { "idCarro": 1 },
-              "user": null,
-              "dtRevisao": null
-            }
-            """;
+	String json = """
+		{
+		  "idRevisao": 1,
+		  "kmAtual": 15000.0,
+		  "carro": { "idCarro": 1 },
+		  "user": null,
+		  "dtRevisao": null
+		}
+		""";
 
-        doReturn(revisaoDTO).when(revisaoService).saveRevisao(any());
+	doReturn(revisaoDTO).when(revisaoService).saveRevisao(any());
 
-        mockMvc.perform(post("/revisao")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated());
+	mockMvc.perform(post("/revisao").contentType(MediaType.APPLICATION_JSON).content(json))
+		.andExpect(status().isCreated());
     }
 
     @Test
     void getSpecRevisao_shouldReturnFound() throws Exception {
-        when(revisaoService.findById(1)).thenReturn(Optional.of(revisaoDTO));
+	when(revisaoService.findById(1)).thenReturn(Optional.of(revisaoDTO));
 
-        mockMvc.perform(get("/revisao/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idRevisao").value(1));
+	mockMvc.perform(get("/revisao/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     void getSpecRevisao_shouldReturnNotFound() throws Exception {
-        when(revisaoService.findById(1)).thenReturn(Optional.empty());
+	when(revisaoService.findById(1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/revisao/1"))
-                .andExpect(status().isNotFound());
+	mockMvc.perform(get("/revisao/1")).andExpect(status().isNotFound());
     }
 
     @Test
     void getRevisaoByCarroId_shouldReturnList() throws Exception {
-        when(revisaoService.listRevisaoByCarroId(1)).thenReturn(List.of(revisaoDTO));
+	when(revisaoService.listRevisaoByCarroId(1)).thenReturn(List.of(revisaoDTO));
 
-        mockMvc.perform(get("/revisao/carro/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].idRevisao").value(1));
+	mockMvc.perform(get("/revisao/carro/1")).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
     }
 
     @Test
     void deleteRevisao_shouldReturnOk() throws Exception {
-        doNothing().when(revisaoService).delete(1);
+	doNothing().when(revisaoService).delete(1);
 
-        mockMvc.perform(delete("/revisao/1"))
-                .andExpect(status().isOk());
+	mockMvc.perform(delete("/revisao/1")).andExpect(status().isOk());
     }
 }

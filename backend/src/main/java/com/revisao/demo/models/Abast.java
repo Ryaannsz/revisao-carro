@@ -1,6 +1,6 @@
 package com.revisao.demo.models;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,13 +22,13 @@ public class Abast {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idAbast;
+    private Integer id;
 
     private Double litroComb;
 
     private Double valorComb;
 
-    private Timestamp dtAbast;
+    private Date dtAbast;
 
     private Double kmAtual;
 

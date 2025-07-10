@@ -24,35 +24,40 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name="TB_USER")
-public class User implements UserDetails{
+@Table(name = "tb_user")
+public class User implements UserDetails {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idUser;
-	
-	private String nome;
-	
-	private String cpf;
-	
-	private String senha;
-	
-	@Enumerated(EnumType.STRING)
-	private UserRoles roles;
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if(this.roles == UserRoles.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-		else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public String getPassword() {
-		return senha;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Override
-	public String getUsername() {
-		return cpf;
-	}
-	
+    private String nome;
+
+    private String cpf;
+
+    private String senha;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoles roles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+	if (this.roles == UserRoles.ADMIN)
+	    return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+	else
+	    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+	return senha;
+    }
+
+    @Override
+    public String getUsername() {
+	return cpf;
+    }
+
 }

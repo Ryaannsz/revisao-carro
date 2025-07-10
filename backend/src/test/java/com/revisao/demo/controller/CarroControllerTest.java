@@ -1,6 +1,5 @@
 package com.revisao.demo.controller;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -11,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,67 +44,56 @@ class CarroControllerTest {
 
     @BeforeEach
     void setup() {
-        carroDTO = new CarroDTO();
-        carroDTO.setIdCarro(1);
-        carroDTO.setPlaca("abc1234");
-        carroDTO.setKmAdicionado(12345.0);
-        carroDTO.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
+	carroDTO = new CarroDTO();
+	carroDTO.setId(1);
+	carroDTO.setPlaca("abc1234");
+	carroDTO.setKmAdicionado(12345.0);
+	carroDTO.setDtAdicionado(new Date(System.currentTimeMillis()));
     }
 
     @Test
     void getAllCarros_shouldReturnList() throws Exception {
-        when(carroService.findAll()).thenReturn(List.of(carroDTO));
+	when(carroService.findAll()).thenReturn(List.of(carroDTO));
 
-        mockMvc.perform(get("/carro"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].idCarro").value(carroDTO.getIdCarro()))
-               .andExpect(jsonPath("$[0].placa").value(carroDTO.getPlaca()));
+	mockMvc.perform(get("/carro")).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(carroDTO.getId()))
+		.andExpect(jsonPath("$[0].placa").value(carroDTO.getPlaca()));
     }
 
     @Test
     void postCarro_shouldReturnCreated() throws Exception {
-        doNothing().when(carroService).salvarCarro(any());
+	doNothing().when(carroService).salvarCarro(any());
 
-        mockMvc.perform(post("/carro")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(carroDTO)))
-                .andExpect(status().isCreated());
+	mockMvc.perform(post("/carro").contentType(MediaType.APPLICATION_JSON)
+		.content(objectMapper.writeValueAsString(carroDTO))).andExpect(status().isCreated());
     }
 
     @Test
     void getSpecCarro_shouldReturnCarro() throws Exception {
-        when(carroService.findById(1)).thenReturn(Optional.of(carroDTO));
+	when(carroService.findById(1)).thenReturn(Optional.of(carroDTO));
 
-        mockMvc.perform(get("/carro/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idCarro").value(1))
-                .andExpect(jsonPath("$.placa").value(carroDTO.getPlaca()));
+	mockMvc.perform(get("/carro/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1))
+		.andExpect(jsonPath("$.placa").value(carroDTO.getPlaca()));
     }
 
     @Test
     void getSpecCarro_shouldReturnNotFound() throws Exception {
-        when(carroService.findById(1)).thenReturn(Optional.empty());
+	when(carroService.findById(1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/carro/1"))
-                .andExpect(status().isNotFound());
+	mockMvc.perform(get("/carro/1")).andExpect(status().isNotFound());
     }
 
     @Test
     void getKmRecente_shouldReturnKm() throws Exception {
-        when(carroService.getKmRecente(1)).thenReturn(12345.0);
+	when(carroService.getKmRecente(1)).thenReturn(12345.0);
 
-        mockMvc.perform(get("/carro/1/km/recente"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("12345.0"));
+	mockMvc.perform(get("/carro/1/km/recente")).andExpect(status().isOk()).andExpect(content().string("12345.0"));
     }
 
     @Test
     void putCarro_shouldReturnOk() throws Exception {
-    	when(carroService.update(any(), any())).thenReturn(carroDTO);
+	when(carroService.update(any(), any())).thenReturn(carroDTO);
 
-        mockMvc.perform(put("/carro/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(carroDTO)))
-                .andExpect(status().isOk());
+	mockMvc.perform(put("/carro/1").contentType(MediaType.APPLICATION_JSON)
+		.content(objectMapper.writeValueAsString(carroDTO))).andExpect(status().isOk());
     }
 }

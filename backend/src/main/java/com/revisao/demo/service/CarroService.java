@@ -1,6 +1,6 @@
 package com.revisao.demo.service;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,15 +37,15 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
 	if (carroRepository.existsByPlaca(carro.getPlaca()))
 	    throw new IllegalArgumentException("Carro com essa placa já existente!");
 	carro.setPlaca(carro.getPlaca().toLowerCase());
-	carro.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
+	carro.setDtAdicionado(new Date(System.currentTimeMillis()));
 	save(carro);
     }
 
     @Transactional
-    public void deleteCarro(Integer idCarro) {
-	abastRepository.deleteByCarro_idCarro(idCarro);
-	revisaoRepository.deleteByCarro_idCarro(idCarro);
-	delete(idCarro);
+    public void deleteCarro(Integer carroId) {
+	abastRepository.deleteByCarro_id(carroId);
+	revisaoRepository.deleteByCarro_id(carroId);
+	delete(carroId);
     }
 
 }

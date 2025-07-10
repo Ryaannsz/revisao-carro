@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,15 +48,15 @@ class CarroServiceTest {
 	MockitoAnnotations.openMocks(this);
 
 	carro = new Carro();
-	carro.setIdCarro(1);
+	carro.setId(1);
 	carro.setPlaca("abc1234");
-	carro.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
+	carro.setDtAdicionado(new Date(System.currentTimeMillis()));
 	carro.setKmAdicionado(12345.0);
 
 	carroDTO = new CarroDTO();
-	carroDTO.setIdCarro(1);
+	carroDTO.setId(1);
 	carroDTO.setPlaca("abc1234");
-	carroDTO.setDtAdicionado(new Timestamp(System.currentTimeMillis()));
+	carroDTO.setDtAdicionado(new Date(System.currentTimeMillis()));
 	carroDTO.setKmAdicionado(12345.0);
     }
 
@@ -116,12 +116,12 @@ class CarroServiceTest {
 
     @Test
     void deleteCarro_shouldDeleteAbastAndRevisaoAndCarro() {
-	Integer idCarro = 1;
+	Integer carroId = 1;
 
-	carroService.deleteCarro(idCarro);
+	carroService.deleteCarro(carroId);
 
-	verify(abastRepository).deleteByCarro_idCarro(idCarro);
-	verify(revisaoRepository).deleteByCarro_idCarro(idCarro);
-	verify(carroRepository).deleteById(idCarro);
+	verify(abastRepository).deleteByCarro_id(carroId);
+	verify(revisaoRepository).deleteByCarro_id(carroId);
+	verify(carroRepository).deleteById(carroId);
     }
 }

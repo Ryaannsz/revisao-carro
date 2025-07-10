@@ -1,8 +1,8 @@
 import { Carro } from "./carro.model";
 import { User } from "./user.model";
 
-export interface Abast{
-    idAbast: number,
+export interface Abast {
+    id: number,
     litroComb: number,
     valorComb: number,
     kmAtual: number,

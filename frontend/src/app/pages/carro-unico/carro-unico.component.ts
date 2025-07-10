@@ -89,7 +89,7 @@ export class CarroUnicoComponent implements OnInit {
   }
 
   getKm(): void {
-    this.carroService.getKmRecente(this.carro?.idCarro ?? 0).subscribe({
+    this.carroService.getKmRecente(this.carro?.id ?? 0).subscribe({
       next: (res) => {
         if (this.carro) {
           this.carro.kmAdicionado = res;

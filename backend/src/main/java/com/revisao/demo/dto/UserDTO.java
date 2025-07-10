@@ -12,15 +12,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDTO {
 
-	private Integer idUser;
-	
-	@NotNull
-	private String cpf;
-	@NotNull
-	private String nome;
-	@NotNull
-	private String senha;
-	
-	private UserRoles roles;
-	
+    private Integer id;
+
+    @NotNull
+    private String cpf;
+    @NotNull
+    private String nome;
+    @NotNull
+    private String senha;
+
+    private UserRoles roles;
+
 }

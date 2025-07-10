@@ -15,7 +15,7 @@ export const modeloHandlers = [
 
     http.post(AppConstants.MODELO_URL, async ({ request }) => {
         const newModelos = await request.json() as Modelo;
-        modelos.set(newModelos.idModelo, newModelos);
+        modelos.set(newModelos.id, newModelos);
         return HttpResponse.json(newModelos, { status: 201 });
     }),
 ];

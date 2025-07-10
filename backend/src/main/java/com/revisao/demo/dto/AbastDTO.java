@@ -1,7 +1,8 @@
 package com.revisao.demo.dto;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.revisao.demo.models.Carro;
 import com.revisao.demo.models.User;
 
@@ -14,27 +15,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AbastDTO {
-	
 
-	private Integer idAbast;
-	@NotNull
-	private Double litroComb;
-	@NotNull
-	private Double valorComb;
-	@NotNull
-	private Double kmAtual;
-	
-	private Timestamp dtAbast;
-	
+    private Integer id;
+    @NotNull
+    private Double litroComb;
+    @NotNull
+    private Double valorComb;
+    @NotNull
+    private Double kmAtual;
 
-	
-	private User user;
-	
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/Sao_Paulo")
+    private Date dtAbast;
 
-	
-	private Carro carro;
-	
+    private User user;
 
-
+    private Carro carro;
 
 }

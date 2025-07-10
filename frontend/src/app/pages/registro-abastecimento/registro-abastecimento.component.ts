@@ -59,7 +59,7 @@ export class RegistroAbastecimentoComponent {
       if (!result) return;
       this.loading = true;
       this.abastService.delete(`/${id}`).subscribe(() => {
-        this.abastecimentos = this.abastecimentos.filter(a => a.idAbast !== id);
+        this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
         this.onSearch();
         this.closeModal();
         this.toastService.showSuccess("Abastecimento removido com sucesso!");

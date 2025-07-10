@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MarcaDTO {
 
-	private Integer idMarca;
-	
-	@NotNull
-	private String marca;
-	
+    private Integer id;
+
+    @NotNull
+    private String marca;
+
 }

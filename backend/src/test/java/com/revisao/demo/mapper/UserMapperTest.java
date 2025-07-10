@@ -1,6 +1,9 @@
 package com.revisao.demo.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,134 +25,130 @@ public class UserMapperTest {
 
     private User entity;
     private UserDTO dto;
-    
-    
-    
+
     @BeforeEach
-    void seTup(){
-    	dto = new UserDTO();
-    	dto.setCpf("12345678900");
-    	dto.setNome("Ryan");
-    	dto.setIdUser(1);
-    	dto.setRoles(UserRoles.ADMIN);
-    	
-    	entity = new User();
-    	entity=mapper.toEntity(dto);
+    void seTup() {
+	dto = new UserDTO();
+	dto.setCpf("12345678900");
+	dto.setNome("Ryan");
+	dto.setId(1);
+	dto.setRoles(UserRoles.ADMIN);
+
+	entity = new User();
+	entity = mapper.toEntity(dto);
     }
- 
 
     @Test
     void testToEntity() {
 
-
-        assertNotNull(entity);
-        assertEquals(dto.getIdUser(), entity.getIdUser());
-        assertEquals(dto.getNome(), entity.getNome());
-        assertEquals(dto.getCpf(), entity.getCpf());
-        assertEquals(dto.getRoles(), entity.getRoles());
-        assertNull(entity.getSenha()); // senha não é mapeada pelo DTO
+	assertNotNull(entity);
+	assertEquals(dto.getId(), entity.getId());
+	assertEquals(dto.getNome(), entity.getNome());
+	assertEquals(dto.getCpf(), entity.getCpf());
+	assertEquals(dto.getRoles(), entity.getRoles());
+	assertNull(entity.getSenha()); // senha não é mapeada pelo DTO
     }
 
     @Test
     void testToDTO() {
-        User entity = new User();
-        entity.setIdUser(2);
-        entity.setNome("Carla");
-        entity.setCpf("98765432100");
-        entity.setRoles(UserRoles.USER);
-        entity.setSenha("1234");
+	User entity = new User();
+	entity.setId(2);
+	entity.setNome("Carla");
+	entity.setCpf("98765432100");
+	entity.setRoles(UserRoles.USER);
+	entity.setSenha("1234");
 
-        UserDTO dto = mapper.toDTO(entity);
+	UserDTO dto = mapper.toDTO(entity);
 
-        assertNotNull(dto);
-        assertEquals(entity.getIdUser(), dto.getIdUser());
-        assertEquals(entity.getNome(), dto.getNome());
-        assertEquals(entity.getCpf(), dto.getCpf());
-        assertEquals(entity.getRoles(), dto.getRoles());
+	assertNotNull(dto);
+	assertEquals(entity.getId(), dto.getId());
+	assertEquals(entity.getNome(), dto.getNome());
+	assertEquals(entity.getCpf(), dto.getCpf());
+	assertEquals(entity.getRoles(), dto.getRoles());
     }
 
     @Test
     void testToDTOList() {
-        User u1 = new User();
-        u1.setIdUser(1);
-        u1.setNome("Ana");
-        u1.setCpf("11111111111");
-        u1.setRoles(UserRoles.ADMIN);
+	User u1 = new User();
+	u1.setId(1);
+	u1.setNome("Ana");
+	u1.setCpf("11111111111");
+	u1.setRoles(UserRoles.ADMIN);
 
-        User u2 = new User();
-        u2.setIdUser(2);
-        u2.setNome("Bruno");
-        u2.setCpf("22222222222");
-        u2.setRoles(UserRoles.USER);
+	User u2 = new User();
+	u2.setId(2);
+	u2.setNome("Bruno");
+	u2.setCpf("22222222222");
+	u2.setRoles(UserRoles.USER);
 
-        List<User> users = Arrays.asList(u1, u2);
+	List<User> users = Arrays.asList(u1, u2);
 
-        List<UserDTO> dtos = mapper.toDTOList(users);
+	List<UserDTO> dtos = mapper.toDTOList(users);
 
-        assertNotNull(dtos);
-        assertEquals(2, dtos.size());
-        assertEquals("Ana", dtos.get(0).getNome());
-        assertEquals("Bruno", dtos.get(1).getNome());
+	assertNotNull(dtos);
+	assertEquals(2, dtos.size());
+	assertEquals("Ana", dtos.get(0).getNome());
+	assertEquals("Bruno", dtos.get(1).getNome());
     }
 
     @Test
     void testToEntityList() {
-        UserDTO dto1 = new UserDTO();
-        dto1.setCpf("33333333333");
-        dto1.setNome("Lucas");
-        dto.setIdUser(3);
-        dto.setRoles(UserRoles.USER);
-        
-        UserDTO dto2 = new UserDTO();
-        dto2.setCpf("44444444444");
-        dto2.setNome("Mariana");
-        dto2.setIdUser(4);
-        dto2.setRoles(UserRoles.ADMIN);
+	UserDTO dto1 = new UserDTO();
+	dto1.setCpf("33333333333");
+	dto1.setNome("Lucas");
+	dto.setId(3);
+	dto.setRoles(UserRoles.USER);
 
-        List<UserDTO> dtos = Arrays.asList(dto1, dto2);
+	UserDTO dto2 = new UserDTO();
+	dto2.setCpf("44444444444");
+	dto2.setNome("Mariana");
+	dto2.setId(4);
+	dto2.setRoles(UserRoles.ADMIN);
 
-        List<User> users = mapper.toEntityList(dtos);
+	List<UserDTO> dtos = Arrays.asList(dto1, dto2);
 
-        assertNotNull(users);
-        assertEquals(2, users.size());
-        assertEquals("Lucas", users.get(0).getNome());
-        assertEquals("Mariana", users.get(1).getNome());
+	List<User> users = mapper.toEntityList(dtos);
+
+	assertNotNull(users);
+	assertEquals(2, users.size());
+	assertEquals("Lucas", users.get(0).getNome());
+	assertEquals("Mariana", users.get(1).getNome());
     }
 
     // Testes para métodos UserDetails
 
     @Test
     void testGetAuthoritiesForAdmin() {
-        User admin = new User();
-        admin.setRoles(UserRoles.ADMIN);
+	User admin = new User();
+	admin.setRoles(UserRoles.ADMIN);
 
-        Collection<? extends GrantedAuthority> authorities = admin.getAuthorities();
+	Collection<? extends GrantedAuthority> authorities = admin.getAuthorities();
 
-        assertNotNull(authorities);
-        assertEquals(2, authorities.size());
-        assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")));
+	assertNotNull(authorities);
+	assertEquals(2, authorities.size());
+	assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
+	assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
     @Test
     void testGetAuthoritiesForUser() {
-        User user = new User();
-        user.setRoles(UserRoles.USER);
+	User user = new User();
+	user.setRoles(UserRoles.USER);
 
-        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+	Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
-        assertNotNull(authorities);
-        assertEquals(1, authorities.size());
-        assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")));
+	assertNotNull(authorities);
+	assertEquals(1, authorities.size());
+	assertTrue(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
     @Test
     void testGetPasswordAndUsername() {
-        User user = new User();
-        user.setSenha("senhaSecreta");
-        user.setCpf("99988877766");
+	User user = new User();
+	user.setSenha("senhaSecreta");
+	user.setCpf("99988877766");
 
-        assertEquals("senhaSecreta", user.getPassword());
-        assertEquals("99988877766", user.getUsername());
+	assertEquals("senhaSecreta", user.getPassword());
+	assertEquals("99988877766", user.getUsername());
     }
 }
