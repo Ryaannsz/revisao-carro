@@ -5,6 +5,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.revisao.demo.models.Carro;
 
+import java.util.List;
+
 public interface CarroRepository extends BaseRepository<Carro, Integer> {
 
     @Query(value = """
@@ -25,5 +27,7 @@ public interface CarroRepository extends BaseRepository<Carro, Integer> {
     Double findKmMaisRecenteByIdCarro(@Param("carroId") Integer carroId);
 
     boolean existsByPlaca(String placa);
+
+    List<Carro> findByEmpresaId(@Param("empresaId") Integer empresaId);
 
 }

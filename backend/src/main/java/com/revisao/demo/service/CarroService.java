@@ -1,7 +1,10 @@
 package com.revisao.demo.service;
 
 import java.sql.Date;
+import java.util.List;
 
+import com.revisao.demo.dto.EmpresaDTO;
+import com.revisao.demo.dto.UserDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +49,10 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
 	abastRepository.deleteByCarro_id(carroId);
 	revisaoRepository.deleteByCarro_id(carroId);
 	delete(carroId);
+    }
+
+    public List<CarroDTO> getCarrosByEmpresa(Integer empresaId) {
+        return mapper.toDTOList(carroRepository.findByEmpresaId(empresaId));
     }
 
 }

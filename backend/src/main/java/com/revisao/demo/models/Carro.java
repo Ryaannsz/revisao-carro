@@ -39,4 +39,8 @@ public class Carro {
     @JoinColumn(name = "marca_id")
     private Marca marca;
 
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
 }

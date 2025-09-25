@@ -3,6 +3,7 @@ package com.revisao.demo.dto;
 import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.revisao.demo.models.Empresa;
 import com.revisao.demo.models.Marca;
 import com.revisao.demo.models.Modelo;
 
@@ -19,7 +20,7 @@ public class CarroDTO {
 
     private Integer id;
 
-    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "America/Sao_Paulo")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/Sao_Paulo")
     private Date dtAdicionado;
 
     @NotNull
@@ -30,5 +31,7 @@ public class CarroDTO {
     private Modelo modelo;
 
     private String placa;
+
+    private Empresa empresa;
 
 }

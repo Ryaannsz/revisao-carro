@@ -32,7 +32,9 @@ public class AuthService {
 	var auth = this.authenticationManager.authenticate(usernamePassword);
 	var token = tokenService.generateToken((User) auth.getPrincipal());
 
-	return new AuthResponseDTO(token);
+
+
+	return new AuthResponseDTO(token, userRepository.findEmpresaIdByCpf(data.getCpf()));
     }
 
     public void registerUser(RegisterDTO data) {

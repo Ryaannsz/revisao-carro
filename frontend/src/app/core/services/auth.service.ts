@@ -8,6 +8,7 @@ import { Role } from '../models/role.enum';
 })
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
+  private readonly EMPRESA_ID = 'empresa_id';
   private jwtHelper = new JwtHelperService();
 
   // BehaviorSubject para controlar o estado de login
@@ -23,8 +24,17 @@ export class AuthService {
     this.loggedIn.next(true); // notifica que está logado
   }
 
+  setEmpresaId(empresaId: string): void{
+    localStorage.setItem(this.EMPRESA_ID, empresaId);
+    console.log(this.EMPRESA_ID)
+  }
+
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  getEmpresaId(): string | null{
+    return localStorage.getItem(this.EMPRESA_ID);
   }
 
   isAuthenticated(): boolean {
@@ -35,6 +45,10 @@ export class AuthService {
   removeToken(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     this.loggedIn.next(false); // notifica que deslogou
+  }
+
+  removeEmpresaId(): void{
+    localStorage.removeItem(this.EMPRESA_ID);
   }
 
   getUserInfo(): any {

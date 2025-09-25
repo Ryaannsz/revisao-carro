@@ -14,20 +14,26 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+    private readonly skipPaths = ['/auth/login', '/auth/refresh'];
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
-    
-    if (token) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+    const empresaId = this.authService.getEmpresaId(); // lê do localStorage
+
+    // 1) Header Authorization
+    let request = token
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
+
+    // 2) Adiciona ?empresaId=... como query param (exceto rotas de auth)
+    const shouldSkip = this.skipPaths.some(p => request.url.includes(p));
+    if (!shouldSkip && empresaId != null && empresaId !== '' && !request.params.has('empresaId')) {
+      const params = request.params.set('empresaId', String(empresaId));
+      request = request.clone({ params });
     }
 
     return next.handle(request).pipe(
@@ -36,7 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
           this.authService.removeToken();
           this.router.navigate(['/login']);
         }
-        return throwError(error);
+        return throwError(() => error);
       })
     );
   }
