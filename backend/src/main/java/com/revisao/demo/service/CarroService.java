@@ -24,22 +24,27 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
 
     private final RevisaoRepository revisaoRepository;
 
+    private final EmpresaService empresaService;
+
     public CarroService(CarroRepository carroRepository, CarroMapper carroMapper, AbastRepository abastRepository,
-	    RevisaoRepository revisaoRepository) {
+	    RevisaoRepository revisaoRepository,
+        EmpresaService empresaService) {
 	super(carroRepository, carroMapper);
 	this.carroRepository = carroRepository;
 	this.abastRepository = abastRepository;
 	this.revisaoRepository = revisaoRepository;
+    this.empresaService = empresaService;
     }
 
     public Double getKmRecente(Integer idCarro) {
 	return carroRepository.findKmMaisRecenteByIdCarro(idCarro);
     }
 
-    public void salvarCarro(CarroDTO carro) {
+    public void salvarCarro(CarroDTO carro, Integer empresaId) {
 	if (carroRepository.existsByPlaca(carro.getPlaca()))
 	    throw new IllegalArgumentException("Carro com essa placa já existente!");
 	carro.setPlaca(carro.getPlaca().toLowerCase());
+    carro.setEmpresa(empresaService.findById(empresaId).orElseThrow( () -> new IllegalStateException("Não deveria conseguir cadastrar por não ter empresa")));
 	carro.setDtAdicionado(new Date(System.currentTimeMillis()));
 	save(carro);
     }

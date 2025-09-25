@@ -32,6 +32,6 @@ public class CarroDTO {
 
     private String placa;
 
-    private Empresa empresa;
+    private EmpresaDTO empresa;
 
 }

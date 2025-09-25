@@ -22,7 +22,7 @@ public class UserDTO {
     @NotNull
     private String senha;
 
-    private Empresa empresa;
+    private EmpresaDTO empresa;
 
     private UserRoles roles;
 
