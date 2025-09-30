@@ -26,7 +26,6 @@ login(data: FormBuilder) {
   return this.post< {token: string, empresaId: string}>(data).pipe(
     tap((response: {token: string, empresaId: string}) => {
       this.authService.setToken(response.token);
-      this.authService.setEmpresaId(response.empresaId)
     })
   );
 }

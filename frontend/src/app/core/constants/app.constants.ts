@@ -10,6 +10,8 @@ export class AppConstants {
   static readonly USER_URL = `${AppConstants.BASE_URL}/user`;
   static readonly MAQUINA_URL = `${AppConstants.BASE_URL}/maquina`
   static readonly REVISAO_MAQUINA_URL = `${AppConstants.BASE_URL}/revisao/maquina`
+  static readonly DASHBOARD_URL = `${AppConstants.BASE_URL}/dashboard`
+
 
   static readonly LOGIN_URL = `${AppConstants.BASE_URL}/auth/login`;
   static readonly REGISTRO_URL = `${AppConstants.BASE_URL}/auth/registro`;

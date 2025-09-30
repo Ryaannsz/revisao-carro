@@ -35,6 +35,8 @@ import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.comp
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
+import { LineChartComponent } from './components/line-chart/line-chart.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 
 export function tokenGetter() {
@@ -65,6 +67,8 @@ export function tokenGetter() {
     ModalUsuarioComponent,
     ConfirmationDialogComponent,
     CadastroMaquinaComponent,
+    LineChartComponent,
+    DashboardComponent,
 
   ],
   imports: [

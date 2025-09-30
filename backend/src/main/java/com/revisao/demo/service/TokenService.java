@@ -24,8 +24,12 @@ public class TokenService {
 	try {
 	    Algorithm algoritimo = Algorithm.HMAC256(secret);
 	    String token = JWT.create().withIssuer("auth-api-aciel").withSubject(user.getNome())
-		    .withClaim("role", user.getRoles().toString()).withClaim("nome", user.getUsername())
-		    .withClaim("idUser", user.getId()).withExpiresAt(genExpiresToken()).sign(algoritimo);
+		    .withClaim("role", user.getRoles().toString())
+                .withClaim("nome", user.getUsername())
+		            .withClaim("idUser", user.getId())
+                        .withClaim("empresaId", user.getEmpresa().getId())
+                            .withExpiresAt(genExpiresToken()).sign(algoritimo);
+
 	    return token;
 	} catch (JWTCreationException exception) {
 	    throw new RuntimeException("Erro ao criar o token", exception);
