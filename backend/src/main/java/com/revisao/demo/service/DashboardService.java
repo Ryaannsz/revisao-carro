@@ -9,6 +9,11 @@ import com.revisao.demo.repository.RevisaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import java.sql.Date;
 import java.time.temporal.ChronoUnit;
@@ -22,10 +27,12 @@ public class DashboardService {
     private final AbastRepository abastRepository;
     private final RevisaoRepository revisaoRepository;
 
+
     public DashboardResumoDTO resumoDaEmpresa(String empresaId) {
         var gasto = abastRepository.gastoMensal(empresaId);
         var litros = abastRepository.litrosMensais(empresaId);
         var km = abastRepository.kmRodadoMensal(empresaId);
+
         var preco = abastRepository.precoMedioLitroMensalRaw(empresaId)
                 .stream()
                 .map(row -> new MesValorDTO(
@@ -35,9 +42,11 @@ public class DashboardService {
                 .toList();;
         var revisoes = revisaoRepository.revisoesPorMes(empresaId);
 
+
         var eficiencia = calcularEficiencia(km, litros);
 
         var proximas = estimarProximasRevisoes(revisaoRepository.ultimaRevisaoPorCarro(empresaId));
+
 
         var dto = new DashboardResumoDTO();
         dto.setGastoMensal(gasto);
@@ -61,12 +70,25 @@ public class DashboardService {
 
     private List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
         // Exemplo: próxima revisão = última revisão + 10.000 km (ajuste para sua regra real)
+
         return ultimas.stream().map(r -> {
             var carro = r.getCarro();
             var placa = carro.getPlaca();
-            var prox = Date.from(r.getDtRevisao().toInstant().plus(180, ChronoUnit.DAYS));
-            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), r.getKmAtual(), (Date) prox);
+            var prox = plusDaysDate(r.getDtRevisao(), 180);
+            java.sql.Date sqlDate = new java.sql.Date(prox.getTime());
+            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), r.getKmAtual(), sqlDate);
         }).toList();
+    }
+
+    public static java.util.Date plusDaysDate(java.util.Date in, long days) {
+        Objects.requireNonNull(in, "Data não pode ser nula");
+
+        if (in instanceof java.sql.Date sqlDate) {
+            LocalDate base = sqlDate.toLocalDate().plusDays(days);
+            return java.util.Date.from(base.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        } else {
+            return java.util.Date.from(in.toInstant().plusSeconds(days * 24 * 60 * 60));
+        }
     }
 
 }

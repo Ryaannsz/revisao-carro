@@ -15,25 +15,30 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
     // a partir daqui, dashboard
 
     @Query("""
-    select new com.revisao.demo.dto.MesValorDTO(
-      function('DATE_FORMAT', r.dtRevisao, '%Y-%m'), count(r.id)
-    )
-    from Revisao r
-    join r.carro c
-    where c.empresa.id = :empresaId
-    group by function('DATE_FORMAT', r.dtRevisao, '%Y-%m')
-    order by 1
-  """)
+      select new com.revisao.demo.dto.MesValorDTO(
+        concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m')),
+        count(r.id)
+      )
+      from Revisao r
+      join r.carro c
+      where c.empresa.id = :empresaId
+      group by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
+      order by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
+    """)
     List<MesValorDTO> revisoesPorMes(String empresaId);
 
     @Query("""
-    select r from Revisao r
-    join r.carro c
-    where c.empresa.id = :empresaId
+  select r from Revisao r
+  join r.carro c
+  where c.empresa.id = :empresaId
     and r.dtRevisao = (
-      select max(r2.dtRevisao) from Revisao r2 where r2.carro.id = c.id
+      select max(r2.dtRevisao) from Revisao r2 where r2.carro = r.carro
     )
-  """)
+    and r.id = (
+      select max(r3.id) from Revisao r3
+      where r3.carro = r.carro and r3.dtRevisao = r.dtRevisao
+    )
+""")
     List<Revisao> ultimaRevisaoPorCarro(String empresaId);
 
 }

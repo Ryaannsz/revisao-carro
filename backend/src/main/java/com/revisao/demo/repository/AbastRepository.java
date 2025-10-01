@@ -16,41 +16,43 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
     //dashboard querys aqui:
     @Query("""
   select new com.revisao.demo.dto.MesValorDTO(
-    cast(function('DATE_FORMAT', a.dtAbast, '%Y-%m') as string),
-    cast(sum(a.valorComb) as double)
+    concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
+    sum(a.valorComb)
   )
   from Abast a
   join a.carro c
   where c.empresa.id = :empresaId
-  group by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
-  order by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
+  group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
+  order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
     List<MesValorDTO> gastoMensal(String empresaId);
 
+
     @Query("""
   select new com.revisao.demo.dto.MesValorDTO(
-    cast(function('DATE_FORMAT', a.dtAbast, '%Y-%m') as string),
-    cast(sum(a.litroComb) as double)
+    concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
+    sum(a.litroComb)
   )
   from Abast a
   join a.carro c
   where c.empresa.id = :empresaId
-  group by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
-  order by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
+  group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
+  order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
     List<MesValorDTO> litrosMensais(String empresaId);
 
     @Query("""
   select new com.revisao.demo.dto.MesValorDTO(
-    cast(function('DATE_FORMAT', a.dtAbast, '%Y-%m') as string),
-    cast(max(a.kmAtual) - min(a.kmAtual) as double)
+    concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
+    ( coalesce(max(a.kmAtual), 0d) - coalesce(min(a.kmAtual), 0d) ) * 1.0
   )
   from Abast a
   where a.carro.empresa.id = :empresaId
-  group by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
-  order by function('DATE_FORMAT', a.dtAbast, '%Y-%m')
+  group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
+  order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
     List<MesValorDTO> kmRodadoMensal(String empresaId);
+
 
     @Query(value = """
   with Tot as (
@@ -58,8 +60,8 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
       date_format(a.dt_abast, '%Y-%m') as mes,
       sum(a.valor_comb) as soma_valor,
       sum(a.litro_comb) as soma_litros
-    from abast a
-    join carro c on c.id = a.carro_id
+    from tb_abastecimento a
+    join tb_carro c on c.id = a.carro_id
     where c.empresa_id = :empresaId
     group by date_format(a.dt_abast, '%Y-%m')
   )

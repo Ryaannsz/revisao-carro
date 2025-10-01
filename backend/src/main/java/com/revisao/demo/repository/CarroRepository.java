@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import com.revisao.demo.models.Carro;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CarroRepository extends BaseRepository<Carro, Integer> {
 
@@ -29,5 +30,7 @@ public interface CarroRepository extends BaseRepository<Carro, Integer> {
     boolean existsByPlaca(String placa);
 
     List<Carro> findByEmpresaId(@Param("empresaId") Integer empresaId);
+
+    Optional<Carro> findByPlaca(String placa);
 
 }

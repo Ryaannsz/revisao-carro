@@ -19,7 +19,10 @@ public class DashboardController {
 
     @GetMapping("/resumo")
     public DashboardResumoDTO resumo() {
-        String empresaId = AuthUtils.getEmpresaId(); // do JWT
-        return service.resumoDaEmpresa(empresaId);
+
+        //String empresaId = AuthUtils.getEmpresaId();
+
+        System.out.println("Aqui: " + service.resumoDaEmpresa(Integer.toString(1)));
+        return service.resumoDaEmpresa(Integer.toString(1));
     }
 }
