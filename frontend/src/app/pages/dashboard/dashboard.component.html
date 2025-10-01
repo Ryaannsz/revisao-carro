@@ -1,44 +1,155 @@
 <!-- dashboard.component.html -->
-<div class="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6" *ngIf="vm$ | async as vm">
-  <section class="rounded-2xl shadow p-4 bg-white">
-    <h2 class="text-lg font-semibold mb-2">Gasto mensal (R$)</h2>
-    <app-line-chart [labels]="vm.gasto.labels" [datasets]="vm.gasto.datasets"></app-line-chart>
-  </section>
+<div class="p-6 space-y-6" *ngIf="vm$ | async as vm">
+  <!-- Header & filtros -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <h1 class="text-xl font-semibold">Dashboard</h1>
 
-  <section class="rounded-2xl shadow p-4 bg-white">
-    <h2 class="text-lg font-semibold mb-2">Litros por mês (L)</h2>
-    <app-line-chart [labels]="vm.litros.labels" [datasets]="vm.litros.datasets"></app-line-chart>
-  </section>
+    <div class="flex items-center gap-2">
+      <label class="text-sm text-slate-600">Período:</label>
+      <select class="px-3 py-2 rounded-lg border border-slate-200"
+              [ngModel]="periodMonths"
+              (ngModelChange)="setPeriod($event)">
+        <option [ngValue]="3">Últ. 3 meses</option>
+        <option [ngValue]="6">Últ. 6 meses</option>
+        <option [ngValue]="12">Últ. 12 meses</option>
+        <option [ngValue]="24">Últ. 24 meses</option>
+        <option [ngValue]="Infinity">Tudo</option>
+      </select>
+    </div>
+  </header>
 
-  <section class="rounded-2xl shadow p-4 bg-white">
-    <h2 class="text-lg font-semibold mb-2">Eficiência (km/L)</h2>
-    <app-line-chart [labels]="vm.eficiencia.labels" [datasets]="vm.eficiencia.datasets"></app-line-chart>
-  </section>
+  <!-- Grade dos gráficos -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <!-- CARD GENÉRICO DE GRÁFICO -->
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Gasto mensal (R$)</h2>
+        <button class="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
+                (click)="openFullscreen('gasto')">Ampliar</button>
+      </div>
+      <app-line-chart
+        [labels]="vm.gasto.labelsFiltered"
+        [datasets]="vm.gasto.datasetsColored"
+        [options]="chartOptionsCurrency">
+      </app-line-chart>
+    </section>
 
-  <section class="rounded-2xl shadow p-4 bg-white">
-    <h2 class="text-lg font-semibold mb-2">Revisões por mês</h2>
-    <app-line-chart [labels]="vm.revisoes.labels" [datasets]="vm.revisoes.datasets"></app-line-chart>
-  </section>
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Litros por mês (L)</h2>
+        <button class="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
+                (click)="openFullscreen('litros')">Ampliar</button>
+      </div>
+      <app-line-chart
+        [labels]="vm.litros.labelsFiltered"
+        [datasets]="vm.litros.datasetsColored"
+        [options]="chartOptionsNumber">
+      </app-line-chart>
+    </section>
 
-  <section class="rounded-2xl shadow p-4 bg-white xl:col-span-2">
-    <h2 class="text-lg font-semibold mb-2">Próximas revisões</h2>
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="text-left">
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Eficiência (km/L)</h2>
+        <button class="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
+                (click)="openFullscreen('eficiencia')">Ampliar</button>
+      </div>
+      <app-line-chart
+        [labels]="vm.eficiencia.labelsFiltered"
+        [datasets]="vm.eficiencia.datasetsColored"
+        [options]="chartOptionsNumber">
+      </app-line-chart>
+    </section>
+
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Revisões por mês</h2>
+        <button class="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
+                (click)="openFullscreen('revisoes')">Ampliar</button>
+      </div>
+      <app-line-chart
+        [labels]="vm.revisoes.labelsFiltered"
+        [datasets]="vm.revisoes.datasetsColored"
+        [options]="chartOptionsNumber">
+      </app-line-chart>
+    </section>
+
+    <!-- Próximas revisões -->
+    <section class="rounded-2xl shadow p-4 bg-white xl:col-span-2">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Próximas revisões</h2>
+        <div class="text-sm text-slate-500">Total: {{ vm.proximas.length }}</div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+          <tr class="text-left border-b">
             <th class="p-2">Placa</th>
             <th class="p-2">Última</th>
             <th class="p-2">Próxima (estimada)</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Km atual</th>
           </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let x of vm.proximas" class="border-t">
-            <td class="p-2">{{ x.placa }}</td>
-            <td class="p-2">{{ x.ultimaRevisao | date:'shortDate' }}</td>
-            <td class="p-2">{{ x.proximaRevisaoEstimada | date:'shortDate' }}</td>
+          </thead>
+          <tbody>
+          <tr *ngFor="let x of vm.proximasSorted"
+              class="border-b hover:bg-slate-50">
+            <td class="p-2 font-medium">{{ x.placa }}</td>
+            <td class="p-2">{{ x.ultimaRevisao | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2">{{ x.proximaRevisaoEstimada | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2">
+              <span
+                class="px-2 py-1 rounded-md text-xs font-semibold"
+                [ngClass]="x._statusClass">
+                {{ x._statusText }}
+              </span>
+            </td>
+            <td class="p-2">{{ x.kmAtual | number:'1.0-0' }}</td>
           </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Overlay full-screen para ampliar gráfico -->
+  <div *ngIf="fullscreenKey"
+       class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-6xl h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between p-3 border-b">
+        <h3 class="font-semibold">
+          {{ fullscreenTitle }}
+        </h3>
+        <button class="px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
+                (click)="closeFullscreen()">Fechar</button>
+      </div>
+      <div class="p-4 flex-1">
+        <ng-container [ngSwitch]="fullscreenKey">
+          <app-line-chart *ngSwitchCase="'gasto'"
+            [labels]="vm.gasto.labelsFiltered"
+            [datasets]="vm.gasto.datasetsColored"
+            [options]="chartOptionsCurrencyLarge">
+          </app-line-chart>
+
+          <app-line-chart *ngSwitchCase="'litros'"
+            [labels]="vm.litros.labelsFiltered"
+            [datasets]="vm.litros.datasetsColored"
+            [options]="chartOptionsNumberLarge">
+          </app-line-chart>
+
+          <app-line-chart *ngSwitchCase="'eficiencia'"
+            [labels]="vm.eficiencia.labelsFiltered"
+            [datasets]="vm.eficiencia.datasetsColored"
+            [options]="chartOptionsNumberLarge">
+          </app-line-chart>
+
+          <app-line-chart *ngSwitchCase="'revisoes'"
+            [labels]="vm.revisoes.labelsFiltered"
+            [datasets]="vm.revisoes.datasetsColored"
+            [options]="chartOptionsNumberLarge">
+          </app-line-chart>
+        </ng-container>
+      </div>
     </div>
-  </section>
+  </div>
 </div>

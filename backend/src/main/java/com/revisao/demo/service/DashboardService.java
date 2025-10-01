@@ -27,6 +27,7 @@ public class DashboardService {
     private final AbastRepository abastRepository;
     private final RevisaoRepository revisaoRepository;
 
+    private final CarroService carroService;
 
     public DashboardResumoDTO resumoDaEmpresa(String empresaId) {
         var gasto = abastRepository.gastoMensal(empresaId);
@@ -72,11 +73,12 @@ public class DashboardService {
         // Exemplo: próxima revisão = última revisão + 10.000 km (ajuste para sua regra real)
 
         return ultimas.stream().map(r -> {
+            var kmRecente = carroService.getKmRecente((r.getCarro().getId()));
             var carro = r.getCarro();
             var placa = carro.getPlaca();
             var prox = plusDaysDate(r.getDtRevisao(), 180);
             java.sql.Date sqlDate = new java.sql.Date(prox.getTime());
-            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), r.getKmAtual(), sqlDate);
+            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), kmRecente, sqlDate);
         }).toList();
     }
 

@@ -15,4 +15,9 @@ export class AppConstants {
 
   static readonly LOGIN_URL = `${AppConstants.BASE_URL}/auth/login`;
   static readonly REGISTRO_URL = `${AppConstants.BASE_URL}/auth/registro`;
+
+  static readonly MESES_ABREV = [
+  'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+  'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+];
 }
