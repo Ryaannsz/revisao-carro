@@ -3,6 +3,7 @@ package com.revisao.demo.controller;
 import java.util.List;
 
 
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +24,12 @@ public class CarroController {
 	
 	@GetMapping
 	public List<CarroDTO> getAllCarros(){
-		return carroService.findAll();
+		return carroService.getCarrosByEmpresa(Integer.parseInt(AuthUtils.getEmpresaId()));
 	}
 	
 	@PostMapping
-	public ResponseEntity<Void> postCarro(@Valid @RequestBody CarroDTO carro, @RequestParam("empresaId") Integer empresaId){
-		carroService.salvarCarro(carro, empresaId);
+	public ResponseEntity<Void> postCarro(@Valid @RequestBody CarroDTO carro){
+		carroService.salvarCarro(carro, Integer.parseInt(AuthUtils.getEmpresaId()));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	

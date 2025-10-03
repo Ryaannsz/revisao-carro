@@ -68,13 +68,11 @@ export class CadastrarCarroComponent implements OnInit {
   }
 
   cadastrarCarro() {
-    let empresaId = this.authService.getEmpresaId();
     this.loading = true;
     const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
     this.carroForm.get('placa')?.setValue(placaFormatada);
     if (this.carroForm.valid) {
-      console.log(this.carroForm.value, empresaId)
-      this.carroService.postByEmpresa(this.carroForm.value, empresaId!).subscribe({
+      this.carroService.postByEmpresa(this.carroForm.value).subscribe({
         next: (res) => {
           this.carroForm.reset();
           this.toastService.showSuccess("Carro cadastrado com sucesso!")

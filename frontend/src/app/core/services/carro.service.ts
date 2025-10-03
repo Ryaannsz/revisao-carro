@@ -20,10 +20,10 @@ export class CarroService extends BaseService{
     return this.http.get<number>(url)
   }
 
-  postByEmpresa(data: Carro, empresaId: string): Observable<Carro>{
+  postByEmpresa(data: Carro): Observable<Carro>{
     const url = `${AppConstants.CARRO_URL}`;
-    const params = new HttpParams().set('empresaId', empresaId);
-    return this.http.post<Carro>(url, data, {params});
+
+    return this.http.post<Carro>(url, data);
   }
 
 }

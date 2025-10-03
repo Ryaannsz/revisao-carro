@@ -1,6 +1,7 @@
 package com.revisao.demo.seeder;
 
 
+import com.revisao.demo.enums.UserRoles;
 import com.revisao.demo.models.*;
 import com.revisao.demo.repository.*;
 import com.revisao.demo.service.*;
@@ -61,7 +62,17 @@ public class BootstrapSeeder implements CommandLineRunner {
         Empresa empresa = ensureEmpresaId1();
 
 
-        User user = ensureUserId1(empresa);
+        User user = ensureUserId(empresa,1, bootstrapProperties.getCpf(), bootstrapProperties.getNomeUser());
+
+        //teste empresa 2
+        Empresa empresa2 = new Empresa();
+        empresa2.setNome("Empresa 2");
+        empresa2.setCnpj("awdfawd");
+        empresa2.setAtivo(true);
+        empresaRepository.save(empresa2);
+
+        //teste user2
+        User user2 = ensureUserId(empresa2, 2, "09876543210", "User 2");
 
         // 3) Marca & Modelo (sem grande diversidade)
         Marca marca = marcaRepository.findByMarca("Volkswagen").orElseGet(() -> {
@@ -110,28 +121,28 @@ public class BootstrapSeeder implements CommandLineRunner {
         });
     }
 
-    private User ensureUserId1(Empresa empresa) {
-        Optional<User> existing = userRepository.findById(1);
+    private User ensureUserId(Empresa empresa, Integer id, String cpf, String nome) {
+        Optional<User> existing = userRepository.findById(id);
         if (existing.isPresent()) return existing.get();
 
         // cria via SQL nativo para fixar id=1 (respeitando seu requisito)
         // Ajuste os nomes/colunas conforme seu esquema real.
-        String cpf = bootstrapProperties.getCpf();
         String senha = passwordEncoder.encode(bootstrapProperties.getSenha());
-        String nome = bootstrapProperties.getNomeUser();
+
 
         em.createNativeQuery("""
     INSERT INTO tb_user (id, cpf, senha, nome, empresa_id, roles)
-    VALUES (1, ?1, ?2, ?3, ?4, ?5)
+    VALUES (?6, ?1, ?2, ?3, ?4, ?5)
 """)
                 .setParameter(1, cpf)
                 .setParameter(2, senha)
                 .setParameter(3, nome)
                 .setParameter(4, empresa.getId())
                 .setParameter(5, "ADMIN")
+                .setParameter(6, id)
                 .executeUpdate();
 
-        return userRepository.findById(1).orElseThrow();
+        return userRepository.findById(id).orElseThrow();
     }
 
     private Carro ensureCarro(String placa, Empresa empresa, Marca marca, Modelo modelo, double kmInicial) {
