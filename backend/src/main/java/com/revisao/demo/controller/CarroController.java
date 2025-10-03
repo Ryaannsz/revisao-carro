@@ -3,17 +3,10 @@ package com.revisao.demo.controller;
 import java.util.List;
 
 
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.revisao.demo.dto.CarroDTO;
 import com.revisao.demo.service.CarroService;
@@ -31,12 +24,12 @@ public class CarroController {
 	
 	@GetMapping
 	public List<CarroDTO> getAllCarros(){
-		return carroService.findAll();
+		return carroService.getCarrosByEmpresa(Integer.parseInt(AuthUtils.getEmpresaId()));
 	}
 	
 	@PostMapping
 	public ResponseEntity<Void> postCarro(@Valid @RequestBody CarroDTO carro){
-		carroService.salvarCarro(carro);
+		carroService.salvarCarro(carro, Integer.parseInt(AuthUtils.getEmpresaId()));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	

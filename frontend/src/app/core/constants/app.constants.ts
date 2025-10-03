@@ -8,7 +8,16 @@ export class AppConstants {
   static readonly ABAST_URL = `${AppConstants.BASE_URL}/abastecimento`;
   static readonly REVISAO_URL = `${AppConstants.BASE_URL}/revisao`;
   static readonly USER_URL = `${AppConstants.BASE_URL}/user`;
+  static readonly MAQUINA_URL = `${AppConstants.BASE_URL}/maquina`
+  static readonly REVISAO_MAQUINA_URL = `${AppConstants.BASE_URL}/revisao/maquina`
+  static readonly DASHBOARD_URL = `${AppConstants.BASE_URL}/dashboard`
+
 
   static readonly LOGIN_URL = `${AppConstants.BASE_URL}/auth/login`;
   static readonly REGISTRO_URL = `${AppConstants.BASE_URL}/auth/registro`;
+
+  static readonly MESES_ABREV = [
+  'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+  'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+];
 }

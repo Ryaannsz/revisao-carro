@@ -56,7 +56,7 @@ export class RegistroUsuarioComponent implements OnInit {
   promote(user: User) {
     if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
     this.userService
-      .patchRole('ADMIN', user.idUser)
+      .patchRole('ADMIN', user.id)
       .subscribe((updatedUser) => {
         this.loadUsers();
         this.toastService.showSuccess("Usuário promovido com sucesso!")
@@ -65,7 +65,7 @@ export class RegistroUsuarioComponent implements OnInit {
 
   demote(user: User) {
     if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
-    this.userService.patchRole('USER', user.idUser).subscribe((updatedUser) => {
+    this.userService.patchRole('USER', user.id).subscribe((updatedUser) => {
       this.loadUsers();
       this.toastService.showSuccess("Usuário rebaixado com sucesso!")
     });

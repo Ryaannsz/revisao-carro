@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Marca } from '../../core/models/marca.model';
 import { Modelo } from '../../core/models/modelo.model';
 import { ToastService } from '../../core/services/toast.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   standalone: false,
@@ -25,13 +26,14 @@ export class CadastrarCarroComponent implements OnInit {
     private marcaService: MarcaService,
     private modeloService: ModeloService,
     private carroService: CarroService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService
   ) {
     this.carroForm = this.fb.group({
       marca: ['', Validators.required],
       modelo: ['', Validators.required],
       kmAdicionado: ['', [Validators.required, Validators.min(0)]],
-      placa: ['', Validators.required]
+      placa: ['', Validators.required],
     });
   }
 
@@ -69,10 +71,8 @@ export class CadastrarCarroComponent implements OnInit {
     this.loading = true;
     const placaFormatada = this.formatarPlaca(this.carroForm.get('placa')?.value);
     this.carroForm.get('placa')?.setValue(placaFormatada);
-
     if (this.carroForm.valid) {
-      console.log(this.carroForm.value)
-      this.carroService.post(this.carroForm.value).subscribe({
+      this.carroService.postByEmpresa(this.carroForm.value).subscribe({
         next: (res) => {
           this.carroForm.reset();
           this.toastService.showSuccess("Carro cadastrado com sucesso!")

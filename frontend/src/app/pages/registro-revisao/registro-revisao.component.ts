@@ -62,7 +62,7 @@ export class RegistroRevisaoComponent {
       if (!result) return;
       this.revisaoService.delete(`/${id}`).subscribe(() => {
         this.loading = false;
-        this.revisoes = this.revisoes.filter(r => r.idRevisao !== id);
+        this.revisoes = this.revisoes.filter(r => r.id !== id);
         this.onSearch();
         this.closeModal();
         this.toastService.showSuccess("Revisão removida com sucesso!")

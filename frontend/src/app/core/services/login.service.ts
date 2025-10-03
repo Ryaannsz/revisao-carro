@@ -11,6 +11,8 @@ import { tap } from "rxjs";
     providedIn: 'root'
 })
 
+
+
 export class LoginService extends BaseService{
     constructor(http: HttpClient,
         private authService: AuthService
@@ -21,8 +23,8 @@ export class LoginService extends BaseService{
 
 
 login(data: FormBuilder) {
-  return this.post< {token: string}>(data).pipe(
-    tap((response: {token: string}) => {
+  return this.post< {token: string, empresaId: string}>(data).pipe(
+    tap((response: {token: string, empresaId: string}) => {
       this.authService.setToken(response.token);
     })
   );

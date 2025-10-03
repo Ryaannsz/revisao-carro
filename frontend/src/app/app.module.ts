@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CadastrarModeloComponent } from './pages/cadastro-modelo/cadastro-modelo.component';
@@ -34,6 +34,13 @@ import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usua
 import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
+import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
+import { LineChartComponent } from './components/line-chart/line-chart.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { CarStatsComponent } from './components/car-stats/car-stats.component';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faCalendarDay, faCar, faCarSide, faCheckCircle, faChevronDown, faCoins, faGasPump, faGear, faSave, faSearch, faTachographDigital, faTachometer, faTachometerAlt, faTimes, faTools, faWater } from '@fortawesome/free-solid-svg-icons';
 
 
 export function tokenGetter() {
@@ -63,6 +70,10 @@ export function tokenGetter() {
     RegistroUsuarioComponent,
     ModalUsuarioComponent,
     ConfirmationDialogComponent,
+    CadastroMaquinaComponent,
+    LineChartComponent,
+    DashboardComponent,
+    CarStatsComponent,
 
   ],
   imports: [
@@ -82,16 +93,24 @@ export function tokenGetter() {
     CommonModule,
     FormsModule,
     SharedModule,
-
+    FontAwesomeModule,
     MatFormFieldModule,
     MatAutocompleteModule,
     MatInputModule,
     MatButtonModule,
-
+    
     BrowserAnimationsModule,
 
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+    constructor(library: FaIconLibrary) {
+    library.addIcons(faCalendarDay, faGear, faTachometerAlt, faWater, faCoins, faCar, 
+      faChevronDown, faSave, faCarSide, faTimes, faSearch,
+       faCheckCircle, faTools, faGasPump);
+  }
+ }

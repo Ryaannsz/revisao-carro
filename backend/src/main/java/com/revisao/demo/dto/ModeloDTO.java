@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModeloDTO {
 
-	private Integer idModelo;
-	
-	@NotNull
-	private String modelo;
-	
-	
+    private Integer id;
+
+    @NotNull
+    private String modelo;
+
 }

@@ -48,7 +48,7 @@
       <div class="space-y-1">
         <p class="text-sm font-medium text-gray-500">Data de Cadastro</p>
         <p class="text-lg font-semibold text-gray-900">
-          {{ carro.dtAdicionado ? (carro.dtAdicionado | date:'medium') : '—' }}
+          {{ carro.dtAdicionado }}
         </p>
       </div>
     </div>
@@ -126,7 +126,7 @@
                 {{ a.kmAtual | number }} km
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button (click)="toggleAbast(a.idAbast)" class="text-blue-600 hover:text-blue-900 mr-3">
+                <button (click)="toggleAbast(a.id)" class="text-blue-600 hover:text-blue-900 mr-3">
                   <i class="fas fa-info-circle"></i>
                 </button>
                 <button class="text-yellow-600 hover:text-yellow-900 mr-3">
@@ -137,7 +137,7 @@
                 </button>
               </td>
             </tr>
-            <tr *ngIf="expAbastId === a.idAbast" class="bg-gray-50">
+            <tr *ngIf="expAbastId === a.id" class="bg-gray-50">
               <td colspan="6" class="px-6 py-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -146,7 +146,7 @@
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-500">ID Usuário</p>
-                    <p class="text-sm text-gray-900">{{ a.user.idUser }}</p>
+                    <p class="text-sm text-gray-900">{{ a.user.id }}</p>
                   </div>
                 </div>
               </td>
@@ -212,7 +212,7 @@
                 Revisão periódica
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button (click)="toggleRevisao(r.idRevisao)" class="text-blue-600 hover:text-blue-900 mr-3">
+                <button (click)="toggleRevisao(r.id)" class="text-blue-600 hover:text-blue-900 mr-3">
                   <i class="fas fa-info-circle"></i>
                 </button>
                 <button class="text-yellow-600 hover:text-yellow-900 mr-3">
@@ -223,7 +223,7 @@
                 </button>
               </td>
             </tr>
-            <tr *ngIf="expRevisaoId === r.idRevisao" class="bg-gray-50">
+            <tr *ngIf="expRevisaoId === r.id" class="bg-gray-50">
               <td colspan="4" class="px-6 py-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -232,7 +232,7 @@
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-500">ID Usuário</p>
-                    <p class="text-sm text-gray-900">{{ r.user.idUser }}</p>
+                    <p class="text-sm text-gray-900">{{ r.user.id }}</p>
                   </div>
                 </div>
               </td>

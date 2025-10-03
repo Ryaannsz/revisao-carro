@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,44 +18,51 @@ import com.revisao.demo.models.User;
 
 public class TokenService {
 
-	@Value("${api.security.token.secret}")
-	private String secret;
-	
-	public String generateToken(User user) {
-		try {
-			Algorithm algoritimo = Algorithm.HMAC256(secret);
-			String token = JWT.create()
-					.withIssuer("auth-api-aciel")
-					.withSubject(user.getNome())
-					.withClaim("role", user.getRoles().toString())
-					.withClaim("nome", user.getUsername())
-					.withClaim("idUser", user.getIdUser())
-					.withExpiresAt(genExpiresToken())
-					.sign(algoritimo);
-			return token;
-		}catch(JWTCreationException exception) {
-			throw new RuntimeException("Erro ao criar o token", exception);
-		}
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+    public String generateToken(User user) {
+	try {
+	    Algorithm algoritimo = Algorithm.HMAC256(secret);
+	    String token = JWT.create().withIssuer("auth-api-aciel").withSubject(user.getNome())
+		    .withClaim("role", user.getRoles().toString())
+                .withClaim("nome", user.getUsername())
+		            .withClaim("idUser", user.getId())
+                        .withClaim("empresaId", user.getEmpresa().getId())
+                            .withExpiresAt(genExpiresToken()).sign(algoritimo);
+
+	    return token;
+	} catch (JWTCreationException exception) {
+	    throw new RuntimeException("Erro ao criar o token", exception);
 	}
-	
-	public String validateToken(String token) {
-		try {
-			Algorithm algoritimo = Algorithm.HMAC256(secret);
-			return JWT.require(algoritimo)
-					.withIssuer("auth-api-aciel")
-					.build()
-					.verify(token)
-					.getSubject();
-			
-			
-		}catch(JWTVerificationException exception) {
-			return "";
-		}
+    }
+
+    public String validateToken(String token) {
+	try {
+	    Algorithm algoritimo = Algorithm.HMAC256(secret);
+	    return JWT.require(algoritimo).withIssuer("auth-api-aciel").build().verify(token).getSubject();
+
+	} catch (JWTVerificationException exception) {
+	    return "";
 	}
-	
-	private Instant genExpiresToken() {
-		return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
-	}
-	
-	
+    }
+
+    private Instant genExpiresToken() {
+	return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
+
+    public String getClaim(String token, String claimName) {
+        try {
+            Algorithm algoritimo = Algorithm.HMAC256(secret);
+            DecodedJWT decoded = JWT.require(algoritimo)
+                    .withIssuer("auth-api-aciel")
+                    .build()
+                    .verify(token);
+
+            return decoded.getClaim(claimName).toString();
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException("Token inválido ou claim não encontrado: " + claimName, e);
+        }
+    }
+
 }

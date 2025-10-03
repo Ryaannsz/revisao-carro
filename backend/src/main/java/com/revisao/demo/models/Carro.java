@@ -1,6 +1,6 @@
 package com.revisao.demo.models;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,9 +23,9 @@ public class Carro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idCarro;
+    private Integer id;
 
-    private Timestamp dtAdicionado;
+    private Date dtAdicionado;
 
     private Double kmAdicionado;
 
@@ -38,5 +38,9 @@ public class Carro {
     @ManyToOne
     @JoinColumn(name = "marca_id")
     private Marca marca;
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
 
 }

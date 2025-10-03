@@ -4,7 +4,7 @@ import { Revisao } from "../../app/core/models/revisao.model";
 import { mockRevisao } from "../data/revisao.mock";
 
 const revisoes = new Map<number, Revisao>([
-    [mockRevisao.idRevisao, mockRevisao]
+    [mockRevisao.id, mockRevisao]
 ]);
 
 export const revisaoHandlers = [
@@ -27,7 +27,7 @@ export const revisaoHandlers = [
     // POST nova revisão
     http.post(AppConstants.REVISAO_URL, async ({ request }) => {
         const novaRevisao = await request.json() as Revisao;
-        revisoes.set(novaRevisao.idRevisao, novaRevisao);
+        revisoes.set(novaRevisao.id, novaRevisao);
         return HttpResponse.json(novaRevisao, { status: 201 });
     }),
 
@@ -55,7 +55,7 @@ export const revisaoHandlers = [
     }),
     http.get(`${AppConstants.REVISAO_URL}/carro/:id`, ({ params }) => {
         const id = Number(params['id']);
-        const revisoesDoCarro = Array.from(revisoes.values()).filter(a => a.carro.idCarro === id);
+        const revisoesDoCarro = Array.from(revisoes.values()).filter(a => a.carro.id === id);
 
         return HttpResponse.json(revisoesDoCarro);
     }),

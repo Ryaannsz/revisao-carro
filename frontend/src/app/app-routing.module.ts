@@ -12,6 +12,7 @@ import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revi
 import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './guards/AuthGuard';
 import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usuario.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 const routes: Routes = [
   {
@@ -61,8 +62,14 @@ const routes: Routes = [
     component: RegistroUsuarioComponent,
     canActivate: [AuthGuard],
   },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
+  },
   { path: 'login', component: AuthComponent },
   { path: 'registro', component: AuthComponent },
+  
 ];
 
 @NgModule({

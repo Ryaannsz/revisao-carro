@@ -5,26 +5,32 @@ import org.springframework.data.repository.query.Param;
 
 import com.revisao.demo.models.Carro;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface CarroRepository extends BaseRepository<Carro, Integer> {
 
     @Query(value = """
-    	    SELECT km.km_atualizado
+    	    SELECT MAX(km.km_atualizado)
     	    FROM (
-    	        SELECT c.id_carro, c.km_adicionado AS km_atualizado, c.dt_adicionado AS data_registro
+    	        SELECT c.id AS id, c.km_adicionado AS km_atualizado
     	        FROM tb_carro c
     	        UNION ALL
-    	        SELECT r.carro_id AS id_carro, r.km_atual AS km_atualizado, r.dt_revisao AS data_registro
+    	        SELECT r.carro_id AS id, r.km_atual AS km_atualizado
     	        FROM tb_revisao r
     	        UNION ALL
-    	        SELECT a.carro_id AS id_carro, a.km_atual AS km_atualizado, a.dt_abast AS data_registro
+    	        SELECT a.carro_id AS id, a.km_atual AS km_atualizado
     	        FROM tb_abastecimento a
     	    ) km
-    	    WHERE km.id_carro = :carroId
-    	    ORDER BY km.data_registro DESC
-    	    LIMIT 1
+    	    WHERE km.id = :carroId
     	""", nativeQuery = true)
+
     Double findKmMaisRecenteByIdCarro(@Param("carroId") Integer carroId);
 
     boolean existsByPlaca(String placa);
+
+    List<Carro> findByEmpresaId(@Param("empresaId") Integer empresaId);
+
+    Optional<Carro> findByPlaca(String placa);
 
 }

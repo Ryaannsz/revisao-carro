@@ -4,7 +4,7 @@ import { Abast } from "../../app/core/models/abast.model";
 import { mockAbast } from "../data/abast.mock";
 
 const abasts = new Map<number, Abast>([
-    [mockAbast.idAbast, mockAbast]
+    [mockAbast.id, mockAbast]
 ]);
 
 export const abastHandlers = [
@@ -27,7 +27,7 @@ export const abastHandlers = [
     // POST novo
     http.post(AppConstants.ABAST_URL, async ({ request }) => {
         const newAbast = await request.json() as Abast;
-        abasts.set(newAbast.idAbast, newAbast);
+        abasts.set(newAbast.id, newAbast);
         return HttpResponse.json(newAbast, { status: 201 });
     }),
 
@@ -56,7 +56,7 @@ export const abastHandlers = [
 
     http.get(`${AppConstants.ABAST_URL}/carro/:id`, ({ params }) => {
         const id = Number(params['id']);
-        const abastsDoCarro = Array.from(abasts.values()).filter(a => a.carro.idCarro === id);
+        const abastsDoCarro = Array.from(abasts.values()).filter(a => a.carro.id === id);
 
         return HttpResponse.json(abastsDoCarro);
     }),

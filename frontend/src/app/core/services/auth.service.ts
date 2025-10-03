@@ -49,4 +49,9 @@ export class AuthService {
     else
       return true;
   }
+
+  getEmpresaId(): string | null{
+    const user = this.getUserInfo();
+    return user.empresaId;
+  }
 }

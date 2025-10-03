@@ -45,7 +45,7 @@ export class ListaCarrosComponent implements OnInit {
 
   getKm() {
     this.carros.map((car) => {
-      this.carroService.getKmRecente(car.idCarro).subscribe({
+      this.carroService.getKmRecente(car.id).subscribe({
         next: (res) => {
           car.kmAdicionado = res;
         }
