@@ -2,7 +2,7 @@ package com.revisao.demo.repository;
 
 import java.util.List;
 
-import com.revisao.demo.dto.MesValorDTO;
+import com.revisao.demo.dto.dashboards.MesValorDTO;
 import com.revisao.demo.models.Revisao;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,7 +15,7 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
     // a partir daqui, dashboard
 
     @Query("""
-      select new com.revisao.demo.dto.MesValorDTO(
+      select new com.revisao.demo.dto.dashboards.MesValorDTO(
         concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m')),
         count(r.id)
       )

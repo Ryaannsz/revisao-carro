@@ -12,6 +12,6 @@ public class AuthResponseDTO {
 	
     private String token;
 
-    private Integer empresaId;
+
 
 }

@@ -1,4 +1,4 @@
-package com.revisao.demo.dto;
+package com.revisao.demo.dto.dashboards;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +17,10 @@ public class MesValorDTO {
     public MesValorDTO(String mes, Long valor) {
         this.mes = mes;
         this.valor = valor.doubleValue();
+    }
+
+    public MesValorDTO(String mes) {
+        this.mes = mes;
     }
 
 

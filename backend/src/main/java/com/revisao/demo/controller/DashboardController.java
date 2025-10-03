@@ -1,6 +1,6 @@
 package com.revisao.demo.controller;
 
-import com.revisao.demo.dto.DashboardResumoDTO;
+import com.revisao.demo.dto.dashboards.DashboardResumoDTO;
 import com.revisao.demo.service.DashboardService;
 import com.revisao.demo.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +20,8 @@ public class DashboardController {
     @GetMapping("/resumo")
     public DashboardResumoDTO resumo() {
 
-        //String empresaId = AuthUtils.getEmpresaId();
+        String empresaId = AuthUtils.getEmpresaId();
 
-        System.out.println("Aqui: " + service.resumoDaEmpresa(Integer.toString(1)));
-        return service.resumoDaEmpresa(Integer.toString(1));
+        return service.resumoDaEmpresa(empresaId);
     }
 }

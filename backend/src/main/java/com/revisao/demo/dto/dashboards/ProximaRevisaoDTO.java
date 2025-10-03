@@ -1,4 +1,4 @@
-package com.revisao.demo.dto;
+package com.revisao.demo.dto.dashboards;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

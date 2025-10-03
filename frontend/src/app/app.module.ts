@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CadastrarModeloComponent } from './pages/cadastro-modelo/cadastro-modelo.component';
@@ -37,6 +37,8 @@ import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confir
 import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { CarStatsComponent } from './components/car-stats/car-stats.component';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
 
 
 export function tokenGetter() {
@@ -69,6 +71,7 @@ export function tokenGetter() {
     CadastroMaquinaComponent,
     LineChartComponent,
     DashboardComponent,
+    CarStatsComponent,
 
   ],
   imports: [
@@ -97,7 +100,9 @@ export function tokenGetter() {
     BrowserAnimationsModule,
 
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

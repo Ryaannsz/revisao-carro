@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,20 @@ public class TokenService {
 
     private Instant genExpiresToken() {
 	return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
+
+    public String getClaim(String token, String claimName) {
+        try {
+            Algorithm algoritimo = Algorithm.HMAC256(secret);
+            DecodedJWT decoded = JWT.require(algoritimo)
+                    .withIssuer("auth-api-aciel")
+                    .build()
+                    .verify(token);
+
+            return decoded.getClaim(claimName).toString();
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException("Token inválido ou claim não encontrado: " + claimName, e);
+        }
     }
 
 }

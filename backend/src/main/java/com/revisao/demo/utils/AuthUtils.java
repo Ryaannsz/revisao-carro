@@ -10,14 +10,15 @@ public final class AuthUtils {
 
     public static String getEmpresaId() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
+
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
             throw new IllegalStateException("Usuário não autenticado");
         }
 
-        // Aqui depende de como você armazenou o token no Authentication
-        String token = (String) auth.getCredentials();
+        if (auth.getPrincipal() instanceof CustomUserPrincipal p) {
 
-        DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaim("empresaId").asString();
+            return p.getEmpresaId();
+        }
+        throw new IllegalStateException("Principal inesperado: " + auth.getPrincipal());
     }
 }

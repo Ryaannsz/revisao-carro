@@ -2,9 +2,8 @@ package com.revisao.demo.repository;
 
 import java.util.List;
 
-import com.revisao.demo.dto.MesValorDTO;
+import com.revisao.demo.dto.dashboards.MesValorDTO;
 import com.revisao.demo.models.Abast;
-import com.revisao.demo.models.Revisao;
 import org.springframework.data.jpa.repository.Query;
 
 public interface AbastRepository extends BaseRepository<Abast, Integer> {
@@ -15,7 +14,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
 
     //dashboard querys aqui:
     @Query("""
-  select new com.revisao.demo.dto.MesValorDTO(
+  select new com.revisao.demo.dto.dashboards.MesValorDTO(
     concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
     sum(a.valorComb)
   )
@@ -29,7 +28,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
 
 
     @Query("""
-  select new com.revisao.demo.dto.MesValorDTO(
+  select new com.revisao.demo.dto.dashboards.MesValorDTO(
     concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
     sum(a.litroComb)
   )
@@ -42,7 +41,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
     List<MesValorDTO> litrosMensais(String empresaId);
 
     @Query("""
-  select new com.revisao.demo.dto.MesValorDTO(
+  select new com.revisao.demo.dto.dashboards.MesValorDTO(
     concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
     ( coalesce(max(a.kmAtual), 0d) - coalesce(min(a.kmAtual), 0d) ) * 1.0
   )

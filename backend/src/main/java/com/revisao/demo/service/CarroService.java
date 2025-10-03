@@ -1,10 +1,12 @@
 package com.revisao.demo.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.revisao.demo.dto.EmpresaDTO;
 import com.revisao.demo.dto.UserDTO;
+import com.revisao.demo.dto.dashboards.CarOptionDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,5 +61,22 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
     public List<CarroDTO> getCarrosByEmpresa(Integer empresaId) {
         return mapper.toDTOList(carroRepository.findByEmpresaId(empresaId));
     }
+
+    public List<CarOptionDTO> convertToCarOption(List<CarroDTO> carros){
+        List<CarOptionDTO> carOptionDTOs = new ArrayList<>();
+        carros.forEach(carro -> {
+            CarOptionDTO carOptionDTO = new CarOptionDTO();
+            carOptionDTO.setId(carro.getId());
+            carOptionDTO.setLabel(carro.getPlaca());
+            carOptionDTO.setKmAtual(getKmRecente(carro.getId()));
+            carOptionDTOs.add(carOptionDTO);
+        });
+        return carOptionDTOs;
+    }
+
+    public List<CarOptionDTO> getCarOptions(Integer empresaId) {
+        return convertToCarOption(getCarrosByEmpresa(empresaId));
+    }
+
 
 }

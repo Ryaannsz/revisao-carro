@@ -2,6 +2,8 @@ package com.revisao.demo.infra.security;
 
 import java.io.IOException;
 
+import com.revisao.demo.utils.CustomUserPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,15 +19,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@RequiredArgsConstructor
 @Component
 public class SecurityFilter extends OncePerRequestFilter{
 
-	@Autowired
-	TokenService tokenService;
+	private final TokenService tokenService;
 	
-	@Autowired
-	UserRepository userRepository;
-	
+
+	private final UserRepository userRepository;
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -36,13 +38,15 @@ public class SecurityFilter extends OncePerRequestFilter{
             filterChain.doFilter(request, response);
             return;
         }
-		
 		var token = this.recoveryToken(request);
 		if(token != null) {
 			var subject = tokenService.validateToken(token);
-			UserDetails user = userRepository.findByCpf(subject);
-			
-			var authen = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+			UserDetails user = userRepository.findByNome(subject);
+            String empresaId = tokenService.getClaim(token, "empresaId");
+
+            var principal = new CustomUserPrincipal(user, empresaId);
+
+			var authen = new UsernamePasswordAuthenticationToken(principal, null, user.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authen);
 		}
 		filterChain.doFilter(request, response);
@@ -54,6 +58,8 @@ public class SecurityFilter extends OncePerRequestFilter{
 		if(authHeader==null) return null;
 		else return authHeader.replace("Bearer ", "");
 	}
+
+
 	
 	
 	

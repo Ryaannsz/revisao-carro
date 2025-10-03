@@ -1,0 +1,79 @@
+<!-- src/app/pages/dashboard/car-stats/car-stats.component.html -->
+<div class="space-y-4">
+  <div class="flex flex-col md:flex-row md:items-end gap-3">
+    <div class="flex-1">
+      <label class="block text-sm text-slate-600 mb-1">Selecionar carros</label>
+
+      <!-- Caixa rolável com checkboxes -->
+      <div class="w-full border border-slate-200 rounded-lg p-2 max-h-60 overflow-auto space-y-1">
+        <label *ngFor="let c of allCars" class="flex items-center gap-2 py-1 cursor-pointer">
+          <input type="checkbox" class="h-4 w-4" [checked]="selectedIds.includes(c.id)"
+            (change)="toggleCarEvt(c.id, $event)" />
+          <span class="text-sm text-slate-700">{{ c.label }}</span>
+        </label>
+      </div>
+
+      <!-- Ações -->
+      <div class="mt-2 flex gap-2">
+        <button type="button" class="px-2 py-1 text-xs rounded bg-slate-100 hover:bg-slate-200"
+          (click)="selectAll()">Selecionar todos</button>
+        <button type="button" class="px-2 py-1 text-xs rounded bg-slate-100 hover:bg-slate-200"
+          (click)="clearAll()">Limpar</button>
+      </div>
+
+      <!-- Chips selecionados -->
+      <div class="mt-2 flex flex-wrap gap-2">
+        <span *ngFor="let id of selectedIds"
+          class="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center gap-1">
+          {{ labelDoCarro(id) }}
+          <button type="button" class="hover:text-red-600" (click)="remove(id)">✕</button>
+        </span>
+      </div>
+    </div>
+
+
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">Modo</label>
+      <div class="flex gap-2">
+        <button class="px-3 py-2 rounded-lg border" [class.bg-slate-900]="mode==='sum'"
+          [class.text-white]="mode==='sum'" (click)="setMode('sum')">Somar</button>
+        <button class="px-3 py-2 rounded-lg border" [class.bg-slate-900]="mode==='compare'"
+          [class.text-white]="mode==='compare'" (click)="setMode('compare')">Comparar</button>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">Período</label>
+      <select class="px-3 py-2 rounded-lg border border-slate-200" [ngModel]="months"
+        (ngModelChange)="setMonths($event)">
+        <option [ngValue]="3">3m</option>
+        <option [ngValue]="6">6m</option>
+        <option [ngValue]="12">12m</option>
+        <option [ngValue]="24">24m</option>
+        <option [ngValue]="0">Tudo</option>
+      </select>
+    </div>
+
+    <div class="ml-auto">
+      <button class="px-4 py-2 rounded-lg bg-slate-900 text-white" (click)="load()">Atualizar</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <h3 class="text-lg font-semibold mb-2">Gasto mensal ({{ mode==='sum' ? 'soma' : 'comparativo' }})</h3>
+      <app-line-chart [labels]="vm.labels" [datasets]="vm.gasto" [options]="chartOptionsCurrency"></app-line-chart>
+    </section>
+
+    <section class="rounded-2xl shadow p-4 bg-white">
+      <h3 class="text-lg font-semibold mb-2">Litros por mês ({{ mode==='sum' ? 'soma' : 'comparativo' }})</h3>
+      <app-line-chart [labels]="vm.labels" [datasets]="vm.litros" [options]="chartOptionsNumber"></app-line-chart>
+    </section>
+
+    <section class="rounded-2xl shadow p-4 bg-white xl:col-span-2">
+      <h3 class="text-lg font-semibold mb-2">Eficiência (km/L) ({{ mode==='sum' ? 'média ponderada' : 'comparativo' }})
+      </h3>
+      <app-line-chart [labels]="vm.labels" [datasets]="vm.eficiencia" [options]="chartOptionsNumber"></app-line-chart>
+    </section>
+  </div>
+</div>

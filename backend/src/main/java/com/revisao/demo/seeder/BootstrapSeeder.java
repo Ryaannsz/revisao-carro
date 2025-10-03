@@ -70,9 +70,21 @@ public class BootstrapSeeder implements CommandLineRunner {
             return marcaRepository.save(m);
         });
 
+        Marca marca2 = marcaRepository.findByMarca("Ford").orElseGet(() -> {
+            Marca m = new Marca();
+            m.setMarca("Ford");
+            return marcaRepository.save(m);
+        });
+
         Modelo modelo = modeloRepository.findByModelo("Gol 1.6").orElseGet(() -> {
             Modelo md = new Modelo();
             md.setModelo("Gol 1.6");
+            return modeloRepository.save(md);
+        });
+
+        Modelo modelo2 = modeloRepository.findByModelo("Ranger").orElseGet(() -> {
+            Modelo md = new Modelo();
+            md.setModelo("Ranger");
             return modeloRepository.save(md);
         });
 
@@ -80,8 +92,11 @@ public class BootstrapSeeder implements CommandLineRunner {
         Carro carro1 = ensureCarro("ABC-1A23", empresa, marca, modelo, 42000);
         Carro carro2 = ensureCarro("DEF-4B56", empresa, marca, modelo, 15800);
 
+        Carro carro3 = ensureCarro("PLA-8K72", empresa, marca2, modelo2, 6391);
+        Carro carro4 = ensureCarro("IAK-9B73", empresa, marca2, modelo2, 23521);
+
         // 5) Gerar Abastecimentos & Revisões diversificados
-        gerarDadosDiversificados(user, empresa, Arrays.asList(carro1, carro2));
+        gerarDadosDiversificados(user, empresa, Arrays.asList(carro1, carro2, carro3, carro4));
     }
 
     private Empresa ensureEmpresaId1() {

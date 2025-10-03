@@ -12,4 +12,6 @@ public interface UserRepository extends BaseRepository<User, Integer>{
     @Query("select u.empresa.id from User u where u.cpf = :cpf")
     Integer findEmpresaIdByCpf(String cpf);
 
+
+    UserDetails findByNome(String nome);
 }

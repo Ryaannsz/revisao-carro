@@ -1,22 +1,18 @@
 package com.revisao.demo.service;
 
-import com.revisao.demo.dto.DashboardResumoDTO;
-import com.revisao.demo.dto.MesValorDTO;
-import com.revisao.demo.dto.ProximaRevisaoDTO;
+import com.revisao.demo.dto.dashboards.DashboardResumoDTO;
+import com.revisao.demo.dto.dashboards.MesValorDTO;
+import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
 import com.revisao.demo.models.Revisao;
 import com.revisao.demo.repository.AbastRepository;
 import com.revisao.demo.repository.RevisaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
-import java.util.logging.Logger;
 
-import java.sql.Date;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 

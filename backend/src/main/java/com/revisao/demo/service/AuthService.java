@@ -34,7 +34,7 @@ public class AuthService {
 
 
 
-	return new AuthResponseDTO(token, userRepository.findEmpresaIdByCpf(data.getCpf()));
+	return new AuthResponseDTO(token);
     }
 
     public void registerUser(RegisterDTO data) {
