@@ -2,7 +2,7 @@
   <!-- Form Container -->
   <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg transition-all duration-300 hover:shadow-2xl">
     <h2 class="text-3xl font-bold mb-8 text-center text-green-600 animate-fade-in-down">
-      <i class="fas fa-gas-pump mr-3"></i>Registrar Abastecimento
+      <fa-icon [icon]="['fas', 'gas-pump']" class="mr-3"></fa-icon>Registrar Abastecimento
     </h2>
 
     <form [formGroup]="abastForm" (ngSubmit)="cadastrarAbastecimento()" class="space-y-6">
@@ -10,7 +10,7 @@
       <div class="space-y-4">
         <div class="form-group animate-fade-in-up delay-100">
           <label class="block text-gray-600 mb-2 font-medium">
-            <i class="fas fa-water mr-2 text-green-500"></i>Litros Abastecidos
+              <fa-icon [icon]="['fas', 'water']" class="mr-2 text-green-500"></fa-icon>Litros Abastecidos
           </label>
           <input type="number" formControlName="litroComb"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
@@ -18,7 +18,7 @@
 
         <div class="form-group animate-fade-in-up delay-200">
           <label class="block text-gray-600 mb-2 font-medium">
-            <i class="fas fa-coins mr-2 text-green-500"></i>Valor Combustível (R$)
+            <fa-icon [icon]="['fas', 'coins']" class="mr-2 text-green-500"></fa-icon>Valor Combustível (R$)
           </label>
           <input type="number" formControlName="valorComb"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
@@ -26,15 +26,16 @@
 
         <div class="form-group animate-fade-in-up delay-300">
           <label class="block text-gray-600 mb-2 font-medium">
-            <i class="fas fa-tachometer-alt mr-2 text-green-500"></i>KM Atual
+            <fa-icon [icon]="['fas', 'tachometer-alt']" class="mr-2 text-green-500"></fa-icon>KM atual
           </label>
           <input type="number" formControlName="kmAtual"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+                  <span>KM atual: {{ kmPuxado }}</span>
         </div>
 
         <div class="form-group animate-fade-in-up delay-500">
           <label class="block text-gray-600 mb-2 font-medium">
-            <i class="fas fa-calendar-day mr-2 text-green-500"></i>Data do Abastecimento
+            <fa-icon [icon]="['fas', 'calendar-day']" class="mr-2 text-green-500"></fa-icon>Data do Abastecimento
           </label>
           <input type="date" formControlName="dtAbast"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
@@ -42,7 +43,7 @@
 
         <div class="form-group animate-fade-in-up delay-600">
           <label class="block text-gray-600 mb-2 font-medium">
-            <i class="fas fa-car mr-2 text-green-500"></i>Carro
+            <fa-icon [icon]="['fas', 'car']" class="mr-2 text-green-500"></fa-icon>Carro
           </label>
           <button type="button" (click)="openModal()"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-left focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all hover:border-green-300 group flex justify-between items-center">
@@ -52,14 +53,14 @@
               (selectedCar.placa | uppercase)
               : 'Selecione um carro' }}
             </span>
-            <i class="fas fa-chevron-down text-gray-400 group-hover:text-green-500 transition-transform"></i>
+            <fa-icon [icon]="['fas', 'chevron-down']" class="text-gray-400 group-hover:text-green-500 transition-transform"></fa-icon>
           </button>
         </div>
       </div>
 
       <button type="submit"
         class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-green-200/50">
-        <i class="fas fa-save mr-2"></i>Registrar Abastecimento
+        <fa-icon [icon]="['fas', 'save']" class="mr-2"></fa-icon>Registrar Abastecimento
       </button>
     </form>
   </div>
@@ -73,10 +74,10 @@
       (click)="$event.stopPropagation()">
       <div class="p-6 border-b border-gray-100 flex justify-between items-center">
         <h3 class="text-2xl font-bold text-gray-800">
-          <i class="fas fa-car-side mr-2 text-green-500"></i>Selecionar Carro
+            <fa-icon [icon]="['fas', 'car-side']" class="mr-2 text-green-500"></fa-icon>Selecionar Carro
         </h3>
         <button type="button" (click)="showModal = false" class="p-2 rounded-full hover:bg-gray-50 transition-colors">
-          <i class="fas fa-times text-gray-400 hover:text-gray-600 text-lg"></i>
+          <fa-icon [icon]="['fas', 'times']" class="text-gray-400 hover:text-gray-600 text-lg"></fa-icon>
         </button>
       </div>
 
@@ -84,7 +85,7 @@
         <div class="relative mb-6">
           <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterCars()" placeholder="Pesquisar carro..."
             class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <fa-icon [icon]="['fas', 'search']" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
         </div>
 
         <div class="flex-1 overflow-y-auto pr-2 -mr-2">
@@ -95,7 +96,7 @@
             </div>
             <div class="text-sm text-gray-500">{{ car.placa | uppercase }}</div>
             <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="fas fa-check-circle text-green-500 text-xl"></i>
+              <fa-icon [icon]="['fas', 'check-circle']" class="mr-2 text-green-500"></fa-icon>
             </div>
           </div>
         </div>

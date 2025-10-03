@@ -39,6 +39,8 @@ import { LineChartComponent } from './components/line-chart/line-chart.component
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CarStatsComponent } from './components/car-stats/car-stats.component';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faCalendarDay, faCar, faCarSide, faCheckCircle, faChevronDown, faCoins, faGasPump, faGear, faSave, faSearch, faTachographDigital, faTachometer, faTachometerAlt, faTimes, faTools, faWater } from '@fortawesome/free-solid-svg-icons';
 
 
 export function tokenGetter() {
@@ -91,12 +93,12 @@ export function tokenGetter() {
     CommonModule,
     FormsModule,
     SharedModule,
-
+    FontAwesomeModule,
     MatFormFieldModule,
     MatAutocompleteModule,
     MatInputModule,
     MatButtonModule,
-
+    
     BrowserAnimationsModule,
 
   ],
@@ -105,4 +107,10 @@ export function tokenGetter() {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+    constructor(library: FaIconLibrary) {
+    library.addIcons(faCalendarDay, faGear, faTachometerAlt, faWater, faCoins, faCar, 
+      faChevronDown, faSave, faCarSide, faTimes, faSearch,
+       faCheckCircle, faTools, faGasPump);
+  }
+ }

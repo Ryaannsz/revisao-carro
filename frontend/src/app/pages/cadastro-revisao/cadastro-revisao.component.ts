@@ -20,6 +20,7 @@ export class CadastroRevisaoComponent {
   searchTerm = '';
   selectedCar: Carro | null = null;
   loading: boolean = false;
+  kmPuxado: number = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -65,6 +66,9 @@ export class CadastroRevisaoComponent {
     this.selectedCar = car;
     this.revisaoForm.patchValue({ carro: car });
     this.showModal = false;
+    this.carroService.getKmRecente(car.id).subscribe((num) => {
+      this.kmPuxado = num;
+    })
   }
 
   cadastrarRevisao() {
@@ -75,16 +79,17 @@ export class CadastroRevisaoComponent {
           this.toastService.showSuccess('Revisão registrada com sucesso!');
           this.revisaoForm.reset();
           this.selectedCar = null;
-          this.loading = false;
+
         },
         error: (err) => {
           this.toastService.showError('Erro ao registrar revisão!');
-          this.loading = false;
-          console.log(err)
+
+
         }
       });
     } else {
       this.toastService.showWarning('Por favor, preencha todos os campos corretamente.');
     }
+    this.loading = false;
   }
 }

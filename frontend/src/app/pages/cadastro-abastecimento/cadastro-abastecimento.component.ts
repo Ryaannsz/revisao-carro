@@ -10,12 +10,17 @@ import { FormsModule } from '@angular/forms'; // Adicionar para suporte ao ngMod
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 
+
 @Component({
   standalone: false,
   selector: 'app-cadastro-abastecimento',
   templateUrl: './cadastro-abastecimento.component.html',
 })
 export class CadastroAbastecimentoComponent implements OnInit {
+  //----------------------------------Icons----------------------------------
+
+
+  //----------------------------------Icons----------------------------------
   abastForm: FormGroup;
   showModal = false;
   cars: Carro[] = [];
@@ -23,6 +28,7 @@ export class CadastroAbastecimentoComponent implements OnInit {
   searchTerm = '';
   selectedCar: Carro | null = null;
   loading: boolean = false;
+  kmPuxado: number = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -72,6 +78,9 @@ export class CadastroAbastecimentoComponent implements OnInit {
     this.selectedCar = car;
     this.abastForm.patchValue({ carro: car });
     this.showModal = false;
+    this.carroService.getKmRecente(car.id).subscribe((num) => {
+      this.kmPuxado = num;
+    })
   }
 
   cadastrarAbastecimento() {
@@ -82,17 +91,19 @@ export class CadastroAbastecimentoComponent implements OnInit {
           this.toastService.showSuccess('Abastecimento registrado com sucesso!');
           this.abastForm.reset();
           this.selectedCar = null;
-          this.loading = false;
+
         },
         error: (err) => {
           this.toastService.showError('Erro ao registrar abastecimento:');
-          this.loading = false;
+
           console.log(err)
           console.log(this.abastForm.value)
         }
       });
     } else {
-      alert('Por favor, preencha todos os campos corretamente.');
+      this.toastService.showWarning('Por favor, preencha todos os campos corretamente.');
+
     }
+    this.loading = false;
   }
 }
