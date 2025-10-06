@@ -30,7 +30,7 @@ public class DashboardService {
         var litros = abastRepository.litrosMensais(empresaId);
         var km = abastRepository.kmRodadoMensal(empresaId);
 
-        var preco = abastRepository.precoMedioLitroMensalRaw(empresaId)
+        var preco = abastRepository.precoMedioLitroMensalRaw(Integer.parseInt(empresaId))
                 .stream()
                 .map(row -> new MesValorDTO(
                         (String) row[0],

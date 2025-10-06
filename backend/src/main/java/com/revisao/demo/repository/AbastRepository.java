@@ -5,6 +5,9 @@ import java.util.List;
 import com.revisao.demo.dto.dashboards.MesValorDTO;
 import com.revisao.demo.models.Abast;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+
 
 public interface AbastRepository extends BaseRepository<Abast, Integer> {
 
@@ -53,24 +56,27 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
     List<MesValorDTO> kmRodadoMensal(String empresaId);
 
 
-    @Query(value = """
-  with Tot as (
-    select
-      date_format(a.dt_abast, '%Y-%m') as mes,
-      sum(a.valor_comb) as soma_valor,
-      sum(a.litro_comb) as soma_litros
-    from tb_abastecimento a
-    join tb_carro c on c.id = a.carro_id
-    where c.empresa_id = :empresaId
-    group by date_format(a.dt_abast, '%Y-%m')
-  )
-  select
-    t.mes,
-    case when t.soma_litros = 0 then null else t.soma_valor / t.soma_litros end as preco_medio
-  from Tot t
-  order by t.mes
+@Query(value = """
+SELECT
+  t.mes,
+  CASE
+    WHEN t.soma_litros = 0 THEN NULL
+    ELSE t.soma_valor / t.soma_litros
+  END AS preco_medio
+FROM (
+  SELECT
+    DATE_FORMAT(a.dt_abast, '%Y-%m') AS mes,
+    SUM(a.valor_comb)  AS soma_valor,
+    SUM(a.litro_comb)  AS soma_litros
+  FROM tb_abastecimento a
+  JOIN tb_carro c ON c.id = a.carro_id
+  WHERE c.empresa_id = :empresaId
+  GROUP BY DATE_FORMAT(a.dt_abast, '%Y-%m')
+) t
+ORDER BY t.mes
 """, nativeQuery = true)
-    List<Object[]> precoMedioLitroMensalRaw(String empresaId);
+List<Object[]> precoMedioLitroMensalRaw(@Param("empresaId") Integer empresaId);
+
 
 
 

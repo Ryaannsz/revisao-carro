@@ -65,14 +65,7 @@ public class BootstrapSeeder implements CommandLineRunner {
         User user = ensureUserId(empresa,1, bootstrapProperties.getCpf(), bootstrapProperties.getNomeUser());
 
         //teste empresa 2
-        Empresa empresa2 = new Empresa();
-        empresa2.setNome("Empresa 2");
-        empresa2.setCnpj("awdfawd");
-        empresa2.setAtivo(true);
-        empresaRepository.save(empresa2);
 
-        //teste user2
-        User user2 = ensureUserId(empresa2, 2, "09876543210", "User 2");
 
         // 3) Marca & Modelo (sem grande diversidade)
         Marca marca = marcaRepository.findByMarca("Volkswagen").orElseGet(() -> {

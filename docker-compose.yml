@@ -2,22 +2,20 @@ version: "3.8"
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:5.7  # Usando imagem do PostgreSQL
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: mydb  # Nome do banco de dados
+      MYSQL_ROOT_PASSWORD: 1234  # Senha do banco
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     ports:
-      - "3307:3306"  
+      - "3306:3306"  # Expondo a porta 5432 do PostgreSQL
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uuser", "-ppassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
       interval: 5s
       timeout: 3s
-      retries: 10
+      retries: 50
 
   backend:
     build:
@@ -25,11 +23,11 @@ services:
     ports:
       - "8090:8080"
     environment:
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306           
-      MYSQL_DATABASE_APP: mydb
-      USERNAME: user
-      PASSWORD: password
+      MYSQL_HOST: db  # Nome do serviço do banco
+      MYSQL_PORT: 3306  # Porta do PostgreSQL
+      MYSQL_DATABASE_APP: mydb  # Nome do banco de dados
+      USERNAME: root  # Nome de usuário
+      PASSWORD: 1234  # Senha
     depends_on:
       db:
         condition: service_healthy
@@ -43,4 +41,4 @@ services:
       - backend
 
 volumes:
-  mysql-data:
+  postgres-data:
