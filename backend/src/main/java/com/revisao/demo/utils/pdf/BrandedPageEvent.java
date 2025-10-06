@@ -38,18 +38,22 @@ public class BrandedPageEvent extends PdfPageEventHelper {
         com.lowagie.text.Rectangle page = document.getPageSize();
 
         // HEADER: faixa sólida
+        float headerHeight = 34f; // altura da faixa
         float h = page.getTop();
+
         cb.saveState();
         cb.setColorFill(brand);
-        cb.rectangle(page.getLeft(), h - 34, page.getWidth(), 34);
+        cb.rectangle(page.getLeft(), h - headerHeight, page.getWidth(), headerHeight);
         cb.fill();
         cb.restoreState();
 
-        float leftX = document.leftMargin();
+        float leftX  = document.leftMargin();
         float rightX = page.getRight() - document.rightMargin();
 
-        // Logo (opcional)
-        float baseline = h - 26;
+// cálculo automático para centralizar textos dentro da faixa
+        float paddingTop = 8f; // margem interna superior da faixa
+        float textStartY = h - headerHeight + paddingTop;
+
         /*if (logo != null) {
             float targetH = 18f;
             float scale = targetH / logo.getScaledHeight();
@@ -58,11 +62,18 @@ public class BrandedPageEvent extends PdfPageEventHelper {
             try { writer.getDirectContent().addImage(logo); } catch (Exception ignore) {}
             leftX += 26; // dá espaço pro logo
         }*/
-        // “CarrosApp” e subtítulo
+
+// desenha o título principal ("CarrosApp")
         ColumnText.showTextAligned(cb, Element.ALIGN_LEFT,
-                new Phrase(appName, headerTitle), page.getLeft() + leftX, baseline, 0);
+                new Phrase(appName, headerTitle),
+                page.getLeft() + leftX,
+                textStartY + 10f, 0);
+
+// desenha o subtítulo ("Relatório da Dashboard")
         ColumnText.showTextAligned(cb, Element.ALIGN_LEFT,
-                new Phrase(subtitle, headerSub), page.getLeft() + leftX, baseline - 11, 0);
+                new Phrase(subtitle, headerSub),
+                page.getLeft() + leftX,
+                textStartY - 2f, 0);
 
         // FOOTER: linha + página X de Y + data/hora
         cb.saveState();
@@ -90,4 +101,5 @@ public class BrandedPageEvent extends PdfPageEventHelper {
         ColumnText.showTextAligned(total, Element.ALIGN_LEFT,
                 new Phrase(String.valueOf(writer.getPageNumber() - 1), footerFont), 2, 0, 0);
     }
+
 }
