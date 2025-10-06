@@ -47,6 +47,7 @@ public class AuthService {
 	user.setNome(data.getNome());
 	user.setSenha(passwordHash);
 	user.setRoles(data.getRoles());
+    user.setEmpresa(data.getEmpresa());
 	this.userRepository.save(user);
     }
 

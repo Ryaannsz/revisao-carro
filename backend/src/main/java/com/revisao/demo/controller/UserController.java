@@ -3,6 +3,7 @@ package com.revisao.demo.controller;
 
 import java.util.List;
 
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,6 +22,8 @@ import com.revisao.demo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import javax.naming.CannotProceedException;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("user")
@@ -31,18 +34,18 @@ public class UserController {
 	
 	@GetMapping
 	public List<UserDTO> getAll(){
-		return userService.findAll();
+		return userService.getUsersByEmpresa(AuthUtils.getEmpresaId());
 	}
 	
 	@PostMapping
 	public ResponseEntity<Void> saveUser(@Valid @RequestBody UserDTO user){
-		userService.save(user);
+		userService.saveUser(user, AuthUtils.getEmpresaId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@PatchMapping("/{id}")
-	public ResponseEntity<Void> patchUser(@PathVariable Integer id, @RequestBody UpdateRoleDTO role){
-		userService.updateUserRole(id, role.getRoles());
+	public ResponseEntity<Void> patchUser(@PathVariable Integer id, @RequestBody UpdateRoleDTO role) throws CannotProceedException {
+		userService.updateUserRole(id, role.getRoles(), AuthUtils.getEmpresaId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	

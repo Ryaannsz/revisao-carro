@@ -5,6 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.revisao.demo.models.User;
 
+import java.util.List;
+
 public interface UserRepository extends BaseRepository<User, Integer>{
 	
 	UserDetails findByCpf(String cpf);
@@ -14,4 +16,6 @@ public interface UserRepository extends BaseRepository<User, Integer>{
 
 
     UserDetails findByNome(String nome);
+
+    List<User> findByEmpresaId(Integer empresaId);
 }
