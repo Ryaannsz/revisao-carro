@@ -2,6 +2,7 @@ package com.revisao.demo.controller;
 
 import java.util.List;
 
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,12 +28,12 @@ public class ModeloController {
 	
 	@GetMapping
 	public List<ModeloDTO> getAllModelos(){
-		return modeloService.findAll();
+		return modeloService.findAllByEmpresaId(AuthUtils.getEmpresaId());
 	}
 	
 	@PostMapping
 	public ResponseEntity<ModeloDTO> postModelo(@Valid @RequestBody ModeloDTO modelo){
-		return ResponseEntity.status(HttpStatus.CREATED).body(modeloService.salvarModelo(modelo));
+		return ResponseEntity.status(HttpStatus.CREATED).body(modeloService.salvarModelo(modelo, AuthUtils.getEmpresaId()));
 	}
 
 }

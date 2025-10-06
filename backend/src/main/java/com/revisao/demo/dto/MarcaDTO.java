@@ -1,5 +1,6 @@
 package com.revisao.demo.dto;
 
+import com.revisao.demo.models.Empresa;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class MarcaDTO {
     @NotNull
     private String marca;
 
+    private EmpresaDTO empresa;
 }

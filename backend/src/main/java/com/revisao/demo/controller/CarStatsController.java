@@ -32,11 +32,11 @@ public class CarStatsController {
                 .map(Integer::valueOf)
                 .toList();
 
-        return service.getCarStats(carIds, months, mode, Integer.parseInt(AuthUtils.getEmpresaId()));
+        return service.getCarStats(carIds, months, mode, AuthUtils.getEmpresaId());
     }
 @GetMapping("/carros")
 public List<CarOptionDTO> getCarrosByEmpresa(Integer empresaId) {
-        return carroService.getCarOptions(Integer.parseInt(AuthUtils.getEmpresaId()));
+        return carroService.getCarOptions(AuthUtils.getEmpresaId());
 }
 
 

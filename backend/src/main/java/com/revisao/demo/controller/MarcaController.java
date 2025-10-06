@@ -2,6 +2,7 @@ package com.revisao.demo.controller;
 
 import java.util.List;
 
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,12 +28,12 @@ public class MarcaController {
 
     @GetMapping
     public List<MarcaDTO> getAllMarcas() {
-	return marcaService.findAll();
+	return marcaService.findAllByEmpresaId(AuthUtils.getEmpresaId());
     }
 
     @PostMapping
     public ResponseEntity<MarcaDTO> postMarca(@Valid @RequestBody MarcaDTO marca) {
-	return ResponseEntity.status(HttpStatus.CREATED).body(marcaService.salvarMarca(marca));
+	return ResponseEntity.status(HttpStatus.CREATED).body(marcaService.salvarMarca(marca, AuthUtils.getEmpresaId()));
     }
 
 }

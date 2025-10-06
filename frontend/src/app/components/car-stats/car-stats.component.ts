@@ -5,6 +5,7 @@ import { CarOption } from '../../core/models/car.option.model';
 import { CarStatsResponse } from '../../core/models/car.stats.model';
 import { MesValor } from '../../core/models/mes.valor.model';
 import { AppConstants } from '../../core/constants/app.constants';
+import { PdfService } from '../../core/services/pdf.service';
 
 @Component({
   selector: 'app-car-stats',
@@ -27,7 +28,9 @@ export class CarStatsComponent implements OnInit {
   // view model para os 3 gráficos
   vm = { labels: [] as string[], gasto: [] as any[], litros: [] as any[], eficiencia: [] as any[] };
 
-  constructor(private svc: DashboardService) { }
+  constructor(private svc: DashboardService,
+    private pdfService: PdfService
+  ) { }
 
   ngOnInit(): void {
     this.svc.getCarOption().subscribe((car) => {
@@ -64,7 +67,24 @@ export class CarStatsComponent implements OnInit {
     });
   }
 
-    
+  generateReport() {
+    if (!this.selectedIds.length) {
+      return;
+    }
+    this.pdfService.makeCarOptionReport(this.selectedIds, this.months, this.mode).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'relatorio-dashboard.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Erro ao gerar relatório', err)
+    });
+  }
+
+
 
   toggleCarEvt(id: number, ev: Event) {
     const input = ev.target as HTMLInputElement | null;

@@ -15,4 +15,6 @@ public class ModeloDTO {
     @NotNull
     private String modelo;
 
+    private EmpresaDTO empresa;
+
 }
