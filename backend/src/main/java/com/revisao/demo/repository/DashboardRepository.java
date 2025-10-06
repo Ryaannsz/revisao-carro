@@ -11,47 +11,48 @@ import java.util.List;
 public interface DashboardRepository extends Repository<Abast, Integer> {
 
     @Query(value = """
-with base as (
-  select
+SELECT
+  base.carro_id        AS carroId,
+  base.placa           AS placa,
+  base.mes             AS mes,
+  base.soma_valor      AS somaValor,
+  base.soma_litros     AS somaLitros,
+  (base.max_km - base.min_km) AS kmDelta,
+  CASE
+    WHEN base.soma_litros = 0 THEN NULL
+    ELSE (base.max_km - base.min_km) / base.soma_litros
+  END AS eficiencia
+FROM (
+  SELECT
     a.carro_id,
     c.placa,
-    date_format(a.dt_abast, '%Y-%m') as mes,
-    sum(a.valor_comb)   as soma_valor,
-    sum(a.litro_comb)   as soma_litros,
-    max(a.km_atual)     as max_km,
-    min(a.km_atual)     as min_km
-  from tb_abastecimento a
-  join tb_carro c on c.id = a.carro_id
-  where c.empresa_id = :empresaId                          -- << filtro por empresa
-    and a.carro_id in (:carIds)
-    and (:startDate is null or a.dt_abast >= :startDate)
-    and (:endDate   is null or a.dt_abast <  :endDate)
-  group by a.carro_id, c.placa, date_format(a.dt_abast, '%Y-%m')
-)
-select
-  carro_id         as carroId,
-  placa            as placa,
-  mes              as mes,
-  soma_valor       as somaValor,
-  soma_litros      as somaLitros,
-  (max_km - min_km)                      as kmDelta,
-  case when soma_litros = 0 then null
-       else (max_km - min_km) / soma_litros end as eficiencia
-from base
-order by carroId, mes
+    DATE_FORMAT(a.dt_abast, '%Y-%m') AS mes,
+    SUM(a.valor_comb)  AS soma_valor,
+    SUM(a.litro_comb)  AS soma_litros,
+    MAX(a.km_atual)    AS max_km,
+    MIN(a.km_atual)    AS min_km
+  FROM tb_abastecimento a
+  JOIN tb_carro c ON c.id = a.carro_id
+  WHERE c.empresa_id = :empresaId
+    AND a.carro_id IN (:carIds)
+    AND (:startDate IS NULL OR a.dt_abast >= :startDate)
+    AND (:endDate   IS NULL OR a.dt_abast <  :endDate)
+  GROUP BY a.carro_id, c.placa, DATE_FORMAT(a.dt_abast, '%Y-%m')
+) AS base
+ORDER BY base.carro_id, base.mes
 """, nativeQuery = true)
     List<Object[]> carMonthAgg(
             @Param("carIds")    List<Integer> carIds,
-            @Param("startDate") Date startDate,   // inclusive
+            @Param("startDate") Date startDate,   // inclusivo
             @Param("endDate")   Date endDate,     // exclusivo
             @Param("empresaId") Integer empresaId
     );
 
     @Query(value = """
-    select c.id as carroId, c.placa as placa
-    from tb_carro c
-    where c.id in (:carIds)
-    order by c.id
-    """, nativeQuery = true)
+SELECT c.id AS carroId, c.placa AS placa
+FROM tb_carro c
+WHERE c.id IN (:carIds)
+ORDER BY c.id
+""", nativeQuery = true)
     List<Object[]> carOptions(@Param("carIds") List<Integer> carIds);
 }
