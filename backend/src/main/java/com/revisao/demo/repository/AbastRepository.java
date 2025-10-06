@@ -27,7 +27,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
   group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
   order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
-    List<MesValorDTO> gastoMensal(String empresaId);
+    List<MesValorDTO> gastoMensal(Integer empresaId);
 
 
     @Query("""
@@ -41,7 +41,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
   group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
   order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
-    List<MesValorDTO> litrosMensais(String empresaId);
+    List<MesValorDTO> litrosMensais(Integer empresaId);
 
     @Query("""
   select new com.revisao.demo.dto.dashboards.MesValorDTO(
@@ -53,7 +53,7 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
   group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
   order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
 """)
-    List<MesValorDTO> kmRodadoMensal(String empresaId);
+    List<MesValorDTO> kmRodadoMensal(Integer empresaId);
 
 
 @Query(value = """
@@ -75,8 +75,7 @@ FROM (
 ) t
 ORDER BY t.mes
 """, nativeQuery = true)
-List<Object[]> precoMedioLitroMensalRaw(@Param("empresaId") Integer empresaId);
-
+    List<Object[]> precoMedioLitroMensalRaw(Integer empresaId);
 
 
 

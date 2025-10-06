@@ -13,4 +13,8 @@ public class EmpresaService extends BaseServiceImpl<EmpresaDTO, Empresa, Integer
     public EmpresaService(EmpresaRepository repository, EmpresaMapper mapper) {
         super(repository, mapper);
     }
+
+    public EmpresaDTO setEmpresaDTO(Integer empresaId) {
+        return findById(empresaId).orElseThrow(() -> new IllegalStateException("Empresa não achada para o id"));
+    }
 }

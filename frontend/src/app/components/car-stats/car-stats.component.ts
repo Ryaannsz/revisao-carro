@@ -5,6 +5,8 @@ import { CarOption } from '../../core/models/car.option.model';
 import { CarStatsResponse } from '../../core/models/car.stats.model';
 import { MesValor } from '../../core/models/mes.valor.model';
 import { AppConstants } from '../../core/constants/app.constants';
+import { PdfService } from '../../core/services/pdf.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-car-stats',
@@ -16,6 +18,7 @@ export class CarStatsComponent implements OnInit {
   selectedIds: number[] = [];     // seleção atual
   months = 6;                     // 0 = tudo
   mode: 'sum' | 'compare' = 'compare';
+  loading: boolean = false;
 
   // paleta de cores para comparar vários carros
   private palette = ['#2563eb', '#059669', '#9333ea', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#f97316', '#14b8a6'];
@@ -27,7 +30,10 @@ export class CarStatsComponent implements OnInit {
   // view model para os 3 gráficos
   vm = { labels: [] as string[], gasto: [] as any[], litros: [] as any[], eficiencia: [] as any[] };
 
-  constructor(private svc: DashboardService) { }
+  constructor(private svc: DashboardService,
+    private pdfService: PdfService,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.svc.getCarOption().subscribe((car) => {
@@ -42,7 +48,7 @@ export class CarStatsComponent implements OnInit {
       this.vm = { labels: [], gasto: [], litros: [], eficiencia: [] };
       return;
     }
-
+    this.loading=true;
     this.svc.getCarStats(this.selectedIds, this.months, this.mode).subscribe((res: CarStatsResponse) => {
       // options do select (cars com kmAtual)
 
@@ -62,9 +68,31 @@ export class CarStatsComponent implements OnInit {
 
       this.vm = { labels: labelsFmt, gasto: gastoDS, litros: litrosDS, eficiencia: eficDS };
     });
+    this.loading=false;
   }
 
-    
+  generateReport() {
+    if (!this.selectedIds.length) {
+      this.toastService.showInfo('Você precisa selecionar ao menos um.')
+      return;
+    }
+    this.loading=true;
+    this.pdfService.makeCarOptionReport(this.selectedIds, this.months, this.mode).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'relatorio-dashboard.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => this.toastService.showError('Erro ao gerar relatório', err)
+    });
+    this.loading=false;
+    this.toastService.showSuccess('Relatório gerado com sucesos!')
+  }
+
+
 
   toggleCarEvt(id: number, ev: Event) {
     const input = ev.target as HTMLInputElement | null;

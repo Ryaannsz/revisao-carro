@@ -25,7 +25,7 @@ public class DashboardService {
 
     private final CarroService carroService;
 
-    public DashboardResumoDTO resumoDaEmpresa(String empresaId) {
+    public DashboardResumoDTO resumoDaEmpresa(Integer empresaId) {
         var gasto = abastRepository.gastoMensal(empresaId);
         var litros = abastRepository.litrosMensais(empresaId);
         var km = abastRepository.kmRodadoMensal(empresaId);
@@ -65,7 +65,7 @@ public class DashboardService {
         }).toList();
     }
 
-    private List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
+    public List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
         // Exemplo: próxima revisão = última revisão + 10.000 km (ajuste para sua regra real)
 
         return ultimas.stream().map(r -> {

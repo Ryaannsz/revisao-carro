@@ -24,12 +24,12 @@ public class CarroController {
 	
 	@GetMapping
 	public List<CarroDTO> getAllCarros(){
-		return carroService.getCarrosByEmpresa(Integer.parseInt(AuthUtils.getEmpresaId()));
+		return carroService.getCarrosByEmpresa(AuthUtils.getEmpresaId());
 	}
 	
 	@PostMapping
 	public ResponseEntity<Void> postCarro(@Valid @RequestBody CarroDTO carro){
-		carroService.salvarCarro(carro, Integer.parseInt(AuthUtils.getEmpresaId()));
+		carroService.salvarCarro(carro, AuthUtils.getEmpresaId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	

@@ -20,8 +20,8 @@ public class DashboardController {
     @GetMapping("/resumo")
     public DashboardResumoDTO resumo() {
 
-        String empresaId = AuthUtils.getEmpresaId();
 
-        return service.resumoDaEmpresa(empresaId);
+
+        return service.resumoDaEmpresa(AuthUtils.getEmpresaId());
     }
 }

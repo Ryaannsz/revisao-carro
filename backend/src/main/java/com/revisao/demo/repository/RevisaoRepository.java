@@ -25,7 +25,7 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
       group by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
       order by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
     """)
-    List<MesValorDTO> revisoesPorMes(String empresaId);
+    List<MesValorDTO> revisoesPorMes(Integer empresaId);
 
     @Query("""
   select r from Revisao r
@@ -39,6 +39,6 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
       where r3.carro = r.carro and r3.dtRevisao = r.dtRevisao
     )
 """)
-    List<Revisao> ultimaRevisaoPorCarro(String empresaId);
+    List<Revisao> ultimaRevisaoPorCarro(Integer empresaId);
 
 }

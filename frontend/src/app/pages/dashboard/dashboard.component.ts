@@ -34,6 +34,8 @@ export class DashboardComponent implements OnInit {
   periodMonths: number | typeof Infinity = 6;
   fullscreenKey: 'gasto' | 'litros' | 'eficiencia' | 'revisoes' | null = null;
 
+  loading: boolean = false;
+
   // Paleta consistente (tons suaves)
   private colors = {
     gasto:    { border: '#2563eb', background: 'rgba(37, 99, 235, 0.10)' }, // blue-600
@@ -68,6 +70,8 @@ export class DashboardComponent implements OnInit {
   private reloadVM() {
     const cutoff = this.periodMonths;
 
+    this.loading=true;
+
     this.vm$ = this.svc.getResumo().pipe(
       map(r => {
         const gastoArr: MesValor[]     = r.gastoMensal      ?? [];
@@ -91,6 +95,7 @@ export class DashboardComponent implements OnInit {
         return { gasto, litros, eficiencia, revisoes, proximas, proximasSorted };
       })
     );
+    this.loading=false;
   }
 
   private makeChartVM(
