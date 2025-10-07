@@ -54,4 +54,10 @@ export class AuthService {
     const user = this.getUserInfo();
     return user.empresaId;
   }
+
+  isSuperUser(): boolean{
+    if(this.getUserRole()=="ADMIN")
+      return true;
+    return false;
+  }
 }

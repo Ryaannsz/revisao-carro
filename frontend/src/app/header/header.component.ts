@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   abastecimentoAberto = false;
   revisaoAberto = false;
   logado = false;
+  isSuper = false;
   private subscription!: Subscription;
 
   constructor(private router: Router,
@@ -28,6 +29,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscription = this.authService.isLoggedIn$.subscribe(status => {
       this.logado = status;
     });
+    if(this.authService.getUserRole()=="ADMIN"){
+      this.isSuper=true;
+    }
   }
 
   ngOnDestroy(): void {

@@ -85,11 +85,16 @@ export class CarStatsComponent implements OnInit {
         a.download = 'relatorio-dashboard.pdf';
         a.click();
         window.URL.revokeObjectURL(url);
+        this.loading=false;
+        this.toastService.showSuccess('Relatório gerado com sucesos!')
       },
-      error: (err) => this.toastService.showError('Erro ao gerar relatório', err)
+      error: (err) => {
+        this.toastService.showError('Erro ao gerar relatório', err)
+          this.loading=false;
+      }
     });
-    this.loading=false;
-    this.toastService.showSuccess('Relatório gerado com sucesos!')
+  
+
   }
 
 

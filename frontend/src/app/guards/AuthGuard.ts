@@ -15,6 +15,12 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
+
+    if (state.url.includes('/dashboard') && !this.authService.isSuperUser()) {
+      this.router.navigate(['/carros']); 
+      return false;
+    }
+
     if (this.authService.isAuthenticated()) {
       return true;
     }
