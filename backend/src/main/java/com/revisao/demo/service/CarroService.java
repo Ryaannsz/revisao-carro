@@ -4,9 +4,10 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revisao.demo.dto.EmpresaDTO;
-import com.revisao.demo.dto.UserDTO;
 import com.revisao.demo.dto.dashboards.CarOptionDTO;
+import com.revisao.demo.enums.CarroStatus;
+import com.revisao.demo.models.Revisao;
+import com.revisao.demo.utils.AuthUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
     private final RevisaoRepository revisaoRepository;
 
     private final EmpresaService empresaService;
+
 
     public CarroService(CarroRepository carroRepository, CarroMapper carroMapper, AbastRepository abastRepository,
 	    RevisaoRepository revisaoRepository,
@@ -78,5 +80,14 @@ public class CarroService extends BaseServiceImpl<CarroDTO, Carro, Integer> {
         return convertToCarOption(getCarrosByEmpresa(empresaId));
     }
 
-
+    public boolean updateCarroStatus(Integer carroId, CarroStatus status) {
+        try {
+            Carro carro = repository.findById(carroId).orElseThrow();
+            carro.setStatus(status);
+            carroRepository.save(carro);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

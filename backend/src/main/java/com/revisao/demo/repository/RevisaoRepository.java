@@ -1,10 +1,13 @@
 package com.revisao.demo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.revisao.demo.dto.dashboards.MesValorDTO;
+import com.revisao.demo.models.Carro;
 import com.revisao.demo.models.Revisao;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
 
@@ -40,5 +43,22 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
     )
 """)
     List<Revisao> ultimaRevisaoPorCarro(Integer empresaId);
+
+    @Query("""
+  select r from Revisao r
+  where r.carro.id = :carroId
+    and r.dtRevisao = (
+      select max(r2.dtRevisao)
+      from Revisao r2
+      where r2.carro.id = :carroId
+    )
+    and r.id = (
+      select max(r3.id)
+      from Revisao r3
+      where r3.carro.id = :carroId
+        and r3.dtRevisao = r.dtRevisao
+    )
+""")
+    Optional<Revisao> findUltimaRevisaoByCarroId(Integer carroId);
 
 }

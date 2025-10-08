@@ -23,6 +23,8 @@ public class DashboardService {
     private final AbastRepository abastRepository;
     private final RevisaoRepository revisaoRepository;
 
+    private final RevisaoService revisaoService;
+
     private final CarroService carroService;
 
     public DashboardResumoDTO resumoDaEmpresa(Integer empresaId) {
@@ -42,7 +44,7 @@ public class DashboardService {
 
         var eficiencia = calcularEficiencia(km, litros);
 
-        var proximas = estimarProximasRevisoes(revisaoRepository.ultimaRevisaoPorCarro(empresaId));
+        var proximas = revisaoService.calcularProxRevisao();
 
 
         var dto = new DashboardResumoDTO();
@@ -65,18 +67,20 @@ public class DashboardService {
         }).toList();
     }
 
-    public List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
+    /*public List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
         // Exemplo: próxima revisão = última revisão + 10.000 km (ajuste para sua regra real)
 
         return ultimas.stream().map(r -> {
-            var kmRecente = carroService.getKmRecente((r.getCarro().getId()));
+            var kmRevisaoEstimado = carroService.getKmRecente((r.getCarro().getId()));
             var carro = r.getCarro();
             var placa = carro.getPlaca();
             var prox = plusDaysDate(r.getDtRevisao(), 180);
             java.sql.Date sqlDate = new java.sql.Date(prox.getTime());
-            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), kmRecente, sqlDate);
+            var kmAtual = carroService.getKmRecente((r.getCarro().getId()));
+
+            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), kmRevisaoEstimado, kmAtual, sqlDate);
         }).toList();
-    }
+    }*/
 
     public static java.util.Date plusDaysDate(java.util.Date in, long days) {
         Objects.requireNonNull(in, "Data não pode ser nula");
@@ -88,5 +92,7 @@ public class DashboardService {
             return java.util.Date.from(in.toInstant().plusSeconds(days * 24 * 60 * 60));
         }
     }
+
+
 
 }

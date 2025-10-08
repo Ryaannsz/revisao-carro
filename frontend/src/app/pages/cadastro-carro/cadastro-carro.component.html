@@ -1,57 +1,212 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
-    <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">Cadastrar Carro</h2>
-
-    <form [formGroup]="carroForm" (ngSubmit)="cadastrarCarro()">
-
-      <!--Marca -->
-      <div class="mb-4">
-        <app-list-marca (marcaSelecionado)="onMarcaSelecionado($event)"></app-list-marca>
-        <div *ngIf="carroForm.get('marca')?.invalid && carroForm.get('marca')?.touched"
-          class="text-red-500 text-sm mt-1">
-          A marca é obrigatório.
+<!-- Template HTML -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Card Principal -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      
+      <!-- Header do Card com Gradiente -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold mb-2">Registro de Veículo</h1>
+            <p class="text-blue-100 text-sm">Complete os dados para adicionar um novo veículo à frota</p>
+          </div>
+          <div class="hidden md:block">
+            <svg class="w-16 h-16 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+            </svg>
+          </div>
         </div>
       </div>
 
+      <!-- Corpo do Formulário -->
+      <div class="p-8">
+        
+        <!-- Progress Indicator -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Progresso do Cadastro</span>
+            <span class="text-xs font-medium text-blue-600">{{ getProgressPercentage() }}% completo</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" 
+                 [style.width.%]="getProgressPercentage()"></div>
+          </div>
+        </div>
 
-      <!--Modelo -->
-      <div class="mb-4">
-        <app-list-modelos (modeloSelecionado)="onModeloSelecionado($event)"></app-list-modelos>
-        <div *ngIf="carroForm.get('modelo')?.invalid && carroForm.get('modelo')?.touched"
-          class="text-red-500 text-sm mt-1">
-          O modelo é obrigatório.
+        <form [formGroup]="carroForm" (ngSubmit)="cadastrarCarro()">
+          
+          <!-- Grid de Campos -->
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            
+            <!-- Campo Marca -->
+            <div class="relative">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <label class="text-sm font-semibold text-gray-700">Marca do Veículo</label>
+              </div>
+              <div class="relative">
+                <app-list-marca (marcaSelecionado)="onMarcaSelecionado($event)"></app-list-marca>
+                <div *ngIf="carroForm.get('marca')?.value" 
+                     class="absolute right-3 top-3 text-green-500">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              </div>
+              <div *ngIf="carroForm.get('marca')?.invalid && carroForm.get('marca')?.touched"
+                   class="flex items-center mt-2 text-red-500 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                A marca é obrigatória
+              </div>
+            </div>
+
+            <!-- Campo Modelo -->
+            <div class="relative">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                </svg>
+                <label class="text-sm font-semibold text-gray-700">Modelo do Veículo</label>
+              </div>
+              <div class="relative">
+                <app-list-modelos (modeloSelecionado)="onModeloSelecionado($event)"></app-list-modelos>
+                <div *ngIf="carroForm.get('modelo')?.value" 
+                     class="absolute right-3 top-3 text-green-500">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              </div>
+              <div *ngIf="carroForm.get('modelo')?.invalid && carroForm.get('modelo')?.touched"
+                   class="flex items-center mt-2 text-red-500 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                O modelo é obrigatório
+              </div>
+            </div>
+
+            <!-- Campo Kilometragem -->
+            <div class="relative">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                <label class="text-sm font-semibold text-gray-700">Quilometragem</label>
+              </div>
+              <div class="relative">
+                <input formControlName="kmAdicionado" 
+                       type="number"
+                       placeholder="Ex: 50000"
+                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                <span class="absolute right-4 top-3 text-gray-400 font-medium">KM</span>
+              </div>
+              <div *ngIf="carroForm.get('kmAdicionado')?.invalid && carroForm.get('kmAdicionado')?.touched"
+                   class="flex items-center mt-2 text-red-500 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                Informe a quilometragem
+              </div>
+            </div>
+
+            <!-- Campo Placa -->
+            <div class="relative">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <label class="text-sm font-semibold text-gray-700">Placa do Veículo</label>
+              </div>
+              <div class="relative">
+                <input formControlName="placa" 
+                       type="text" 
+                       (input)="sanitizePlaca()"
+                       placeholder="ABC1234"
+                       maxlength="7"
+                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 uppercase font-mono text-lg tracking-wider">
+                <div class="absolute right-4 top-3 flex space-x-1">
+                  <span *ngFor="let i of [0,1,2,3,4,5,6]" 
+                        class="w-2 h-2 rounded-full transition-all duration-300"
+                        [ngClass]="carroForm.get('placa')?.value?.length > i ? 'bg-blue-500' : 'bg-gray-300'">
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="carroForm.get('placa')?.invalid && carroForm.get('placa')?.touched"
+                   class="flex items-center mt-2 text-red-500 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                A placa é obrigatória (7 caracteres)
+              </div>
+            </div>
+          </div>
+
+          <!-- Área de Ações -->
+          <div class="border-t pt-6 mt-8">
+            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+              
+              <!-- Informação de Status -->
+              <div class="flex items-center text-sm text-gray-500">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                Todos os campos são obrigatórios
+              </div>
+
+              <!-- Botões de Ação -->
+              <div class="flex gap-3">
+                <button type="button" 
+                        (click)="limparFormulario()"
+                        class="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-all duration-200 flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Limpar
+                </button>
+                
+                <button type="submit" 
+                        [disabled]="carroForm.invalid"
+                        class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Cadastrar Veículo
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Card de Informações Adicionais -->
+    <div class="mt-6 bg-blue-50 rounded-xl p-6 border border-blue-200">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-900">Dica de cadastro</h3>
+          <p class="mt-1 text-sm text-blue-700">
+            Certifique-se de que todas as informações estejam corretas antes de finalizar o cadastro. 
+            A placa deve conter 7 caracteres alfanuméricos.
+          </p>
         </div>
       </div>
+    </div>
 
-      <!-- Kilometragem -->
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-2">Kilometragem</label>
-        <input formControlName="kmAdicionado" type="number"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
-        <div *ngIf="carroForm.get('km')?.invalid && carroForm.get('km')?.touched" class="text-red-500 text-sm mt-1">
-          Informe a kilometragem.
-        </div>
-      </div>
-
-      <!-- Placa -->
-      <div class="mb-6">
-        <label class="block text-gray-700 mb-2">Placa</label>
-        <input formControlName="placa" type="text" (input)="sanitizePlaca()"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
-        <div *ngIf="carroForm.get('placa')?.invalid && carroForm.get('placa')?.touched"
-          class="text-red-500 text-sm mt-1">
-          A placa é obrigatória.
-        </div>
-      </div>
-
-      <!-- Botão -->
-      <button type="submit" [disabled]="carroForm.invalid"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg disabled:opacity-50">
-        Cadastrar
-      </button>
-    </form>
   </div>
 </div>
 
-
-<app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+<!-- Loading Overlay -->
+<app-loading [visible]="loading" message="Processando cadastro..."></app-loading>

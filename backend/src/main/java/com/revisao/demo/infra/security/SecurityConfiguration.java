@@ -29,7 +29,10 @@ public class SecurityConfiguration {
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/auth/login").permitAll()
+                                .requestMatchers("/dashboard/**").hasRole("ADMIN")
+                                .requestMatchers("/pdf/**").hasRole("ADMIN")
+                                .requestMatchers("/car-stats/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
 						)
 				.addFilterBefore(secutiryFilter, UsernamePasswordAuthenticationFilter.class)

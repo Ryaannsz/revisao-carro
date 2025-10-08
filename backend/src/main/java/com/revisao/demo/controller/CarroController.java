@@ -3,6 +3,9 @@ package com.revisao.demo.controller;
 import java.util.List;
 
 
+import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
+import com.revisao.demo.enums.CarroStatus;
+import com.revisao.demo.service.DashboardService;
 import com.revisao.demo.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class CarroController {
 	
 	private final CarroService carroService;
-	
+
 	@GetMapping
 	public List<CarroDTO> getAllCarros(){
 		return carroService.getCarrosByEmpresa(AuthUtils.getEmpresaId());
@@ -56,5 +59,13 @@ public class CarroController {
 		carroService.deleteCarro(idCarro);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
-	
+
+    @PutMapping("/status/{idCarro}")
+    public ResponseEntity<Void> putCarroStatus(@PathVariable Integer idCarro, @RequestBody CarroStatus status) {
+        carroService.updateCarroStatus(idCarro, status);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+
 }

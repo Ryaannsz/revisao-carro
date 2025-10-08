@@ -13,6 +13,7 @@ public class ProximaRevisaoDTO {
     private Integer carroId;
     private String placa;
     private Date ultimaRevisao;
-    private Double kmAtualEstimado;
+    private Double kmRevisaoEstimado;
+    private Double kmAtual;
     private Date proximaRevisaoEstimada;
 }

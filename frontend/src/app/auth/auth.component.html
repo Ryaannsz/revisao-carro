@@ -17,18 +17,18 @@
             >
               Login
             </button>
-            <button 
+            <!-- <button 
               (click)="isLoginMode = false" 
               [class]="!isLoginMode ? 'text-blue-600 border-b-2 border-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'"
               class="px-4 py-2 focus:outline-none transition-colors duration-300"
             >
               Registro
-            </button>
+            </button>-->
           </div>
           
           <div [@fadeInOut] class="mt-4">
             <app-login *ngIf="isLoginMode"></app-login>
-            <app-registro *ngIf="!isLoginMode"></app-registro>
+            <!--<app-registro *ngIf="!isLoginMode"></app-registro>-->
           </div>
         </div>
       </div>

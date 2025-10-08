@@ -54,4 +54,5 @@ export class AuthService {
     const user = this.getUserInfo();
     return user.empresaId;
   }
+
 }

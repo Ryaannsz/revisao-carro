@@ -12,6 +12,7 @@ import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
 import com.revisao.demo.repository.RevisaoRepository;
 import com.revisao.demo.utils.pdf.BrandedPageEvent;
 
+import com.revisao.demo.utils.pdf.ProgressBarCell;
 import lombok.RequiredArgsConstructor;
 import org.knowm.xchart.*;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,11 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.sql.Date;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-
 
 
 @RequiredArgsConstructor
@@ -29,13 +32,17 @@ import java.util.Objects;
 public class PdfService {
 
     private final CarStatsService carStatsService;
-    private final DashboardService dashboardService;
+
     private final RevisaoRepository revisaoRepository;
+
+    private final RevisaoService revisaoService;
+
+    private final DashboardService dashboardService;
 
     public ByteArrayOutputStream mountPdf(List<Integer> carIds, Integer months, String mode, Integer empresaId) throws Exception {
         var stats = carStatsService.getCarStats(carIds, months, mode, empresaId);
         List<String> placas = stats.getCars().stream().map(CarOptionDTO::getLabel).toList();
-        List<ProximaRevisaoDTO> proximas = dashboardService.estimarProximasRevisoes(revisaoRepository.ultimaRevisaoPorCarro(empresaId));
+        List<ProximaRevisaoDTO> proximas = revisaoService.calcularProxRevisao();
 
         proximas = proximas.stream().filter( p -> placas.contains(p.getPlaca())).toList();
 
@@ -75,6 +82,7 @@ public class PdfService {
         addCharts(doc, imgGasto, imgLitros, imgEfic);
 
 // Próximas revisões
+
         addProximasTable(doc, proximas);
 
 // finalize
@@ -242,9 +250,7 @@ public class PdfService {
     }
 
     private PdfPCell miniHeader(String s){
-        PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9)));
-        c.setBackgroundColor(new Color(245,247,250)); c.setBorderColor(new Color(220,224,230));
-        c.setPadding(6f); return c;
+        return getPdfPCell(s);
     }
     private PdfPCell miniCell(String s){
         PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA, 10)));
@@ -301,34 +307,112 @@ public class PdfService {
 
     private void addProximasTable(Document doc, List<ProximaRevisaoDTO> proximas) throws Exception {
         if (proximas == null || proximas.isEmpty()) return;
-        doc.add(new Paragraph("Próximas revisões", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
-        PdfPTable t = new PdfPTable(new float[]{1.1f, 1f, 1.1f, 0.8f});
+
+        // (Opcional) Ordene por mais urgente primeiro (maior % ou data mais próxima)
+        List<ProximaRevisaoDTO> mutavel = new ArrayList<>(proximas);
+        mutavel.sort(
+                Comparator.comparing(
+                        ProximaRevisaoDTO::getProximaRevisaoEstimada,
+                        Comparator.nullsLast(Comparator.<Date>naturalOrder())
+                ));
+
+        doc.add(new Paragraph("Próximas revisões",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
+
+        // Placa | Última | Próxima | Progresso
+        PdfPTable t = new PdfPTable(new float[]{1.0f, 1.1f, 1.1f, 2.2f});
         t.setWidthPercentage(100f);
-        t.setSpacingBefore(4f);
-        t.addCell(th("Placa")); t.addCell(th("Última")); t.addCell(th("Próxima")); t.addCell(th("Km atual"));
-        var df = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        var nf = java.text.NumberFormat.getNumberInstance(new java.util.Locale("pt","BR"));
+        t.setSpacingBefore(6f);
+        t.addCell(th("Placa"));
+        t.addCell(th("Última"));
+        t.addCell(th("Próxima"));
+        t.addCell(th("Progresso"));
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("pt","BR"));
+
         boolean zebra = false;
-        for (var p : proximas) {
+        for (ProximaRevisaoDTO p : mutavel) {
             Color bg = zebra ? new Color(250, 250, 252) : Color.WHITE; zebra = !zebra;
-            t.addCell(td(p.getPlaca(), bg, Element.ALIGN_LEFT));
-            t.addCell(td(p.getUltimaRevisao()==null?"-":df.format(p.getUltimaRevisao()), bg, Element.ALIGN_LEFT));
-            t.addCell(td(p.getProximaRevisaoEstimada()==null?"-":df.format(p.getProximaRevisaoEstimada()), bg, Element.ALIGN_LEFT));
-            t.addCell(td(p.getKmAtualEstimado()==null?"-":nf.format(p.getKmAtualEstimado()), bg, Element.ALIGN_RIGHT));
+
+            // Dados do DTO
+            String placa = nvl(p.getPlaca(), "-");
+            String ultima = p.getUltimaRevisao() == null ? "-" : df.format(p.getUltimaRevisao());
+            String proxima = p.getProximaRevisaoEstimada() == null ? "-" : df.format(p.getProximaRevisaoEstimada());
+
+            Double kmAlvo  = p.getKmRevisaoEstimado(); // alvo p/ próxima revisão
+            Double kmAtual = p.getKmAtual();           // km atual de fato
+
+            // Percentual (cap em 100). Se passou do alvo, marcamos como 100 mas a cor indica atraso.
+            double perc = 0d;
+            boolean atrasado = false;
+            if (kmAlvo != null && kmAlvo > 0 && kmAtual != null && kmAtual >= 0) {
+                perc = (kmAtual / kmAlvo) * 100d;
+                atrasado = kmAtual >= kmAlvo;
+                perc = Math.min(100d, perc);
+            }
+
+            // Label "65% (12.340 / 20.000 km)" ou "-"
+            String label = (kmAtual != null && kmAlvo != null)
+                    ? String.format("%s%% (%s / %s km)",
+                    nf.format(Math.round(perc)),
+                    nf.format(kmAtual),
+                    nf.format(kmAlvo))
+                    : "-";
+
+            // Cor por status
+            Color fill = new Color(37, 99, 235); // azul padrão
+            if (atrasado) {
+                fill = new Color(239, 68, 68); // vermelho
+            } else if (perc >= 80d) {
+                fill = new Color(245, 158, 11); // laranja
+            } else {
+                fill = new Color(16, 185, 129); // verde
+            }
+
+            // Células
+            t.addCell(td(placa, bg, Element.ALIGN_LEFT));
+            t.addCell(td(ultima, bg, Element.ALIGN_LEFT));
+            t.addCell(td(proxima, bg, Element.ALIGN_LEFT));
+
+            PdfPCell progressCell = new PdfPCell();
+            progressCell.setBackgroundColor(bg);
+            progressCell.setBorderColor(new Color(220,224,230));
+            progressCell.setPadding(6f);
+            progressCell.setMinimumHeight(18f);
+            progressCell.setCellEvent(new ProgressBarCell((float) perc, label, fill));
+            t.addCell(progressCell);
         }
+
         doc.add(t);
+
+        // (Opcional) pequena legenda
+         Paragraph legend = new Paragraph("Legenda: verde < 80% | laranja 80–99% | vermelho ≥ 100% (atrasado)",
+                 FontFactory.getFont(FontFactory.HELVETICA, 8, new Color(107,114,128)));
+         legend.setSpacingBefore(2f);
+         doc.add(legend);
     }
 
     private PdfPCell th(String s){
-        PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9)));
-        c.setBackgroundColor(new Color(245,247,250)); c.setBorderColor(new Color(220,224,230)); c.setPadding(6f);
-        return c;
+        return getPdfPCell(s);
     }
-    private PdfPCell td(String s, Color bg, int align){
-        PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA, 10)));
-        c.setBackgroundColor(bg); c.setBorderColor(new Color(220,224,230)); c.setPadding(6f); c.setHorizontalAlignment(align);
+
+    private PdfPCell getPdfPCell(String s) {
+        PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9)));
+        c.setBackgroundColor(new Color(245,247,250));
+        c.setBorderColor(new Color(220,224,230));
+        c.setPadding(6f);
         return c;
     }
 
+    private PdfPCell td(String s, Color bg, int align){
+        PdfPCell c = new PdfPCell(new Phrase(s, FontFactory.getFont(FontFactory.HELVETICA, 10)));
+        c.setBackgroundColor(bg);
+        c.setBorderColor(new Color(220,224,230));
+        c.setPadding(6f);
+        c.setHorizontalAlignment(align);
+        return c;
+    }
+    private static String nvl(String s, String def) { return (s == null || s.isEmpty()) ? def : s; }
 
 }

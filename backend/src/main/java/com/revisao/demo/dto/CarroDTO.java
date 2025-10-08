@@ -3,6 +3,7 @@ package com.revisao.demo.dto;
 import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.revisao.demo.enums.CarroStatus;
 import com.revisao.demo.models.Empresa;
 import com.revisao.demo.models.Marca;
 import com.revisao.demo.models.Modelo;
@@ -34,4 +35,9 @@ public class CarroDTO {
 
     private EmpresaDTO empresa;
 
+    private Integer alarmeRevisaoMes;
+
+    private Double alarmeRevisaoKm;
+
+    private CarroStatus status;
 }
