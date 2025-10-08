@@ -9,6 +9,7 @@ import { Revisao } from '../../core/models/revisao.model';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
 import { AuthService } from '../../core/services/auth.service';
+import { CarroStatus } from '../../core/models/carro-status.enum';
 
 @Component({
   standalone: false,
@@ -31,6 +32,7 @@ export class CarroUnicoComponent implements OnInit {
   isEditing: boolean = false;
   carroEditado: Partial<Carro> = {};
 
+  carroDisponivel: CarroStatus = CarroStatus.DISPONIVEL
 
 
   constructor(
@@ -230,5 +232,18 @@ export class CarroUnicoComponent implements OnInit {
       }
 
     });
+  }
+
+  updateDisponivel(){
+    this.carroService.updateStatus(this.id, CarroStatus.DISPONIVEL).subscribe((res) => {
+      this.carroDisponivel=CarroStatus.DISPONIVEL;
+      this.toastService.showSuccess("Status alterado com sucesso!")
+    })
+  }
+  updateManutencao(){
+    this.carroService.updateStatus(this.id, CarroStatus.MANUTENCAO).subscribe((res) => {
+            this.carroDisponivel=CarroStatus.MANUTENCAO;
+      this.toastService.showSuccess("Status alterado com sucesso!")
+    })
   }
 }

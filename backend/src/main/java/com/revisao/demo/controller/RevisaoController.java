@@ -3,6 +3,7 @@ package com.revisao.demo.controller;
 import java.util.List;
 
 
+import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -56,5 +57,15 @@ public class RevisaoController {
 		revisaoService.delete(idRevisao);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
+
+    @GetMapping("/alarme")
+    public List<ProximaRevisaoDTO> alarmeRevisao(){
+        return revisaoService.calcularProxRevisao();
+    }
+
+    @GetMapping("/alarme/{carroId}")
+    public ProximaRevisaoDTO alarmeRevisaoPorCarro(@PathVariable Integer carroId){
+        return revisaoService.calcularProxRevisao(carroId);
+    }
 
 }

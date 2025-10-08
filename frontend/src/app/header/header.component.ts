@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscription = this.authService.isLoggedIn$.subscribe(status => {
       this.logado = status;
     });
-    if(this.authService.getUserRole()=="ADMIN"){
+    if(this.authService.getUserRole()){
       this.isSuper=true;
     }
   }

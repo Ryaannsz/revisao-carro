@@ -2,6 +2,7 @@ package com.revisao.demo.models;
 
 import java.sql.Date;
 
+import com.revisao.demo.enums.CarroStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +31,12 @@ public class Carro {
     private Double kmAdicionado;
 
     private String placa;
+
+    private Integer alarmeRevisaoMes;
+
+    private Double alarmeRevisaoKm;
+
+    private CarroStatus status;
 
     @ManyToOne
     @JoinColumn(name = "modelo_id")

@@ -15,6 +15,18 @@
         class="px-4 py-2 bg-red-600 hover:bg-gray-200 text-white rounded-lg transition-all duration-200 shadow-sm">
         <i class="fas fa-print mr-2"></i>Apagar
       </button>
+      @if (carro?.status!=carroDisponivel){
+      <button (click)="updateDisponivel()"
+        class="px-4 py-2 bg-green-600 hover:bg-gray-200 text-white rounded-lg transition-all duration-200 shadow-sm">
+        <i class="fas fa-print mr-2"></i>Mudar para disponível
+      </button>
+      }
+      @else {
+      <button (click)="updateManutencao()"
+        class="px-4 py-2 bg-amber-300 hover:bg-gray-200 text-white rounded-lg transition-all duration-200 shadow-sm">
+        <i class="fas fa-print mr-2"></i>Mudar para manutenção
+      </button>
+      }
     </div>
   </div>
 

@@ -1,3 +1,4 @@
+import { CarroStatus } from "./carro-status.enum";
 import { Marca } from "./marca.model";
 import { Modelo } from "./modelo.model";
 
@@ -8,4 +9,7 @@ export interface Carro {
   kmAdicionado: number,
   placa: string,
   dtAdicionado: number
+  alarmeRevisaoKm: number,
+  alarmeRevisaoMes: number,
+  status: CarroStatus
 }

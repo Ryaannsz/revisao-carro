@@ -1,69 +1,256 @@
-<div class="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-50">
-  <!-- Cabeçalho mantido igual -->
-  <div
-    class="flex justify-between items-center mb-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white/90">
-    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-      Lista de Carros
-    </h1>
-    <button (click)="carregarCarros()"
-      class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-all hover:scale-105 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-          clip-rule="evenodd" />
-      </svg>
-      Atualizar Lista
-    </button>
-  </div>
-
-  <!-- Lista de Carros Corrigida -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    <div *ngFor="let carro of carros; let i = index" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] cursor-pointer border border-gray-100/60
-             animate-fade-in-up opacity-0" (click)="irParaCarro(carro.id)" [style.animation-delay]="i * 0.1 + 's'">
-      <!-- Conteúdo do card mantido igual -->
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Section com Estatísticas -->
+  <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-7xl mx-auto">
+        <!-- Título Principal -->
+        <div class="mb-8">
+          <h1 class="text-4xl md:text-5xl font-light mb-3">
+            Gestão de <span class="font-bold">Frota</span>
+          </h1>
+          <p class="text-slate-300 text-lg">
+            Monitore e gerencie todos os veículos da sua empresa em um só lugar
+          </p>
         </div>
-        <h2 class="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
-          {{ carro.marca.marca | uppercase}} - {{ carro.modelo.modelo | uppercase}}
-        </h2>
-      </div>
 
-      <div class="space-y-2">
-        <p class="text-gray-600 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-              d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2H4a1 1 0 110-2V4zm3 1h2v2H7V5zm4 0h2v2h-2V5zM7 9h2v2H7V9zm4 0h2v2h-2V9zm-4 4h2v2H7v-2zm4 0h2v2h-2v-2z"
-              clip-rule="evenodd" />
-          </svg>
-          Placa: {{ carro.placa | uppercase}}
-        </p>
-        <p class="text-gray-600 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-          </svg>
-          KM: {{ carro.kmAdicionado }} km
-        </p>
+        <!-- Cards de Estatísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-slate-300 text-sm">Total de Veículos</p>
+                <p class="text-2xl font-bold">{{ carros.length }}</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-slate-300 text-sm">Em Operação</p>
+                <p class="text-2xl font-bold text-green-400">{{ carros.length }}</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-slate-300 text-sm">Média KM</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-slate-300 text-sm">Última Atualização</p>
+                <p class="text-2xl font-bold">Agora</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Ações -->
+        <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+          <!-- Busca Avançada -->
+          <div class="w-full md:w-96 relative">
+            <input [(ngModel)]="search" type="text" placeholder="Pesquisar veículos..."
+              class="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur border border-white/20 rounded-lg text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20 transition" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <button *ngIf="search" (click)="clearSearch()"
+              class="absolute right-3 top-3.5 text-slate-400 hover:text-white transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="flex gap-3">
+            <button (click)="carregarCarros()"
+              class="px-6 py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-gray-100 transition flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Sincronizar
+            </button>
+
+            <a href="/carro"><button
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Adicionar Veículo
+              </button></a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Mensagem para lista vazia -->
-  <div *ngIf="carros?.length === 0" class="text-center py-12">
-    <p class="text-gray-500 text-lg">Nenhum carro encontrado. Tente atualizar a lista!</p>
+  <!-- Container Principal -->
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+
+    <!-- Filtros Rápidos -->
+    <div class="mb-6 flex flex-wrap gap-2">
+      <button (click)="updateStatusFilter('TODOS')"
+        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+        Todos os veículos
+      </button>
+      <button (click)="updateStatusFilter(carroDisponivel)"
+        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+        Disponíveis
+      </button>
+      <button (click)="updateStatusFilter(carroManutencao)"
+        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+        Em manutenção
+      </button>
+      <button
+        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+        Em rota
+      </button>
+    </div>
+
+    <!-- Skeleton Loading -->
+    <div *ngIf="loading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div *ngFor="let s of skeletons" class="bg-white rounded-lg shadow-sm p-6 animate-pulse">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-32 h-6 bg-gray-200 rounded"></div>
+          <div class="w-20 h-6 bg-gray-200 rounded-full"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="w-full h-4 bg-gray-200 rounded"></div>
+          <div class="w-3/4 h-4 bg-gray-200 rounded"></div>
+          <div class="w-1/2 h-4 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Veículos -->
+    <div *ngIf="!loading && carrosFiltrados.length > 0" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div *ngFor="let carro of carrosFiltrados; let i = index; trackBy: trackByCarro" (click)="irParaCarro(carro.id)"
+        class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 group animate-fade-in"
+        [style.animation-delay]="i * 0.03 + 's'" tabindex="0" (keyup.enter)="irParaCarro(carro.id)">
+        <!-- Card Header -->
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                {{ carro.marca.marca | uppercase }} {{ carro.modelo.modelo | uppercase }}
+              </h3>
+              <p class="text-sm text-gray-500 mt-1">ID: #{{ carro.id }}</p>
+            </div>
+            @if (carro.status==carroDisponivel){
+              <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                Disponível
+              </span>
+            }@else {
+              <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                Manutenção
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-6 space-y-4">
+          <!-- Informações Principais -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Placa</p>
+              <p class="font-medium text-gray-900">{{ carro.placa | uppercase }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Quilometragem</p>
+              <p class="font-medium text-gray-900">{{ carro.kmAdicionado | number }} km</p>
+            </div>
+          </div>
+
+          <!-- Barra de Progresso KM -->
+          <div>
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Próxima manutenção</span>
+              <span>{{ getProximaRevisaoByCarroId(carro.id)?.kmRevisaoEstimado }} km</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
+                [style.width]="getProgressPercent(carro) + '%'"></div>
+            </div>
+          </div>
+
+          <!-- Ações Rápidas -->
+          <div class="flex gap-2 pt-2">
+            <button (click)="irParaCarro(carro.id)"
+              class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition">
+              Detalhes
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado Vazio -->
+    <div *ngIf="!loading && carrosFiltrados.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum veículo encontrado</h3>
+      <p class="text-gray-500 mb-6">
+        {{ search ? 'Tente ajustar os filtros de busca' : 'Adicione seu primeiro veículo para começar' }}
+      </p>
+      <div class="flex justify-center gap-3">
+        <button *ngIf="search" (click)="clearSearch()"
+          class="px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+          Limpar filtros
+        </button>
+        <button (click)="carregarCarros()"
+          class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+          Recarregar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
-  @keyframes fade-in-up {
+  @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(10px);
     }
 
     to {
@@ -72,10 +259,29 @@
     }
   }
 
-  .animate-fade-in-up {
-    animation: fade-in-up 0.5s ease-out forwards;
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
+  /* Scrollbar customizada */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 </style>
 
-
-<app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+<app-loading [visible]="loading" message="Carregando veículos..."></app-loading>

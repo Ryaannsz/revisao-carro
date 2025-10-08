@@ -1,6 +1,7 @@
 package com.revisao.demo.seeder;
 
 
+import com.revisao.demo.enums.CarroStatus;
 import com.revisao.demo.enums.UserRoles;
 import com.revisao.demo.models.*;
 import com.revisao.demo.repository.*;
@@ -78,24 +79,28 @@ public class BootstrapSeeder implements CommandLineRunner {
         Marca marca = marcaRepository.findByMarca("Volkswagen").orElseGet(() -> {
             Marca m = new Marca();
             m.setMarca("Volkswagen");
+            m.setEmpresa(empresa);
             return marcaRepository.save(m);
         });
 
         Marca marca2 = marcaRepository.findByMarca("Ford").orElseGet(() -> {
             Marca m = new Marca();
             m.setMarca("Ford");
+            m.setEmpresa(empresa);
             return marcaRepository.save(m);
         });
 
         Modelo modelo = modeloRepository.findByModelo("Gol 1.6").orElseGet(() -> {
             Modelo md = new Modelo();
             md.setModelo("Gol 1.6");
+            md.setEmpresa(empresa);
             return modeloRepository.save(md);
         });
 
         Modelo modelo2 = modeloRepository.findByModelo("Ranger").orElseGet(() -> {
             Modelo md = new Modelo();
             md.setModelo("Ranger");
+            md.setEmpresa(empresa);
             return modeloRepository.save(md);
         });
 
@@ -154,6 +159,9 @@ public class BootstrapSeeder implements CommandLineRunner {
             c.setModelo(modelo);
             c.setDtAdicionado(date(LocalDate.now().minusMonths(MESES_RETROATIVOS + 1).withDayOfMonth(1)));
             c.setKmAdicionado(kmInicial);
+            c.setAlarmeRevisaoKm(10000.0);
+            c.setAlarmeRevisaoMes(6);
+            c.setStatus(CarroStatus.DISPONIVEL);
             return carroRepository.save(c);
         });
     }
