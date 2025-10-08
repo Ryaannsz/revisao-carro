@@ -1,54 +1,54 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
 
     <!-- Hero Section com Status Badge -->
-    <div class="relative mb-8">
+    <div class="relative mb-6 sm:mb-8">
       <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl opacity-10 blur-xl"></div>
-      <div class="relative bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div class="flex-1">
-            <div class="flex items-center gap-4 mb-3">
-              <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <div class="relative bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-6">
+          <div class="flex-1 w-full">
+            <div class="flex flex-wrap items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
+              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
                 {{ carro?.marca?.marca | uppercase }} {{ carro?.modelo?.modelo | uppercase }}
               </h1>
               <!-- Status Badge -->
               <span *ngIf="carro?.status === carroDisponivel"
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                 Disponível
               </span>
               <span *ngIf="carro?.status !== carroDisponivel"
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium bg-amber-100 text-amber-800">
                 <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
                 Em Manutenção
               </span>
             </div>
-            <p class="text-gray-600 text-lg">Gestão completa e histórico detalhado do veículo</p>
+            <p class="text-gray-600 text-sm sm:text-base">Gestão completa e histórico detalhado do veículo</p>
           </div>
 
           <!-- Action Buttons Group -->
-          <div class="flex flex-wrap gap-3">
+          <div class="flex w-full lg:w-auto flex-wrap gap-2 sm:gap-3">
             <button (click)="toggleEditar()"
-              class="group relative px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 rounded-xl font-medium transition-all hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5">
+              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 rounded-xl text-sm sm:text-base font-medium transition-all hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5">
               <fa-icon [icon]="['fas', 'edit']" class="mr-2 transition-transform group-hover:rotate-12"></fa-icon>
               {{ isEditing ? 'Cancelar' : 'Editar' }}
             </button>
 
             <button *ngIf="carro?.status !== carroDisponivel" (click)="updateDisponivel()"
-              class="group relative px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-green-600/25 hover:-translate-y-0.5">
+              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-green-600/25 hover:-translate-y-0.5">
               <fa-icon [icon]="['fas', 'check-circle']" class="mr-2"></fa-icon>
               Liberar Veículo
             </button>
 
             <button *ngIf="carro?.status === carroDisponivel" (click)="updateManutencao()"
-              class="group relative px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-orange-600/25 hover:-translate-y-0.5">
-                            <fa-icon [icon]="['fas', 'tools']" class="mr-2"></fa-icon>
+              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-orange-600/25 hover:-translate-y-0.5">
+              <fa-icon [icon]="['fas', 'tools']" class="mr-2"></fa-icon>
               Enviar para Manutenção
             </button>
 
             <button (click)="deleteCarro()"
-              class="group relative px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-red-600/25 hover:-translate-y-0.5">
-                            <fa-icon [icon]="['fas', 'trash-alt']" class="mr-2"></fa-icon>
+              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-red-600/25 hover:-translate-y-0.5">
+              <fa-icon [icon]="['fas', 'trash-alt']" class="mr-2"></fa-icon>
               Excluir
             </button>
           </div>
@@ -57,80 +57,76 @@
     </div>
 
     <!-- KPIs Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
       <!-- Card Placa -->
-      <div
-        class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500 rounded-full opacity-5 -mr-8 -mt-8"></div>
+      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-blue-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-500">Placa do Veículo</span>
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'car']" class="text-blue-600"></fa-icon>
+            <span class="text-xs sm:text-sm font-medium text-gray-500">Placa do Veículo</span>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <fa-icon [icon]="['fas', 'car']" class="text-blue-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
           <ng-container *ngIf="!isEditing; else editPlaca">
-            <p class="text-2xl font-bold text-gray-900">{{ carro?.placa | uppercase }}</p>
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-all">{{ carro?.placa | uppercase }}</p>
           </ng-container>
           <ng-template #editPlaca>
             <input [(ngModel)]="carroEditado.placa"
-              class="w-full px-3 py-2 text-lg font-semibold border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
+              class="w-full px-3 py-2 text-base sm:text-lg font-semibold border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
           </ng-template>
         </div>
       </div>
 
       <!-- Card KM -->
-      <div
-        class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500 rounded-full opacity-5 -mr-8 -mt-8"></div>
+      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-indigo-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-500">Quilometragem</span>
-            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'tachometer-alt']" class="text-indigo-600"></fa-icon>
+            <span class="text-xs sm:text-sm font-medium text-gray-500">Quilometragem</span>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <fa-icon [icon]="['fas', 'tachometer-alt']" class="text-indigo-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
-          <p class="text-2xl font-bold text-gray-900">{{ carro?.kmAdicionado | number }}</p>
-          <p class="text-xs text-gray-500 mt-1">quilômetros rodados</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.kmAdicionado | number }}</p>
+          <p class="text-[11px] sm:text-xs text-gray-500 mt-1">quilômetros rodados</p>
         </div>
       </div>
 
       <!-- Card Data -->
-      <div
-        class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500 rounded-full opacity-5 -mr-8 -mt-8"></div>
+      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-purple-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-500">Em operação desde</span>
-            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'calendar-alt']" class="text-purple-600"></fa-icon>
+            <span class="text-xs sm:text-sm font-medium text-gray-500">Em operação desde</span>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <fa-icon [icon]="['fas', 'calendar-alt']" class="text-purple-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
-          <p class="text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado }}</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado }}</p>
         </div>
       </div>
 
       <!-- Card Economia -->
-      <div
-        class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-green-500 rounded-full opacity-5 -mr-8 -mt-8"></div>
+      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-green-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-500">Média Km/L</span>
-            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'leaf']" class="text-green-600"></fa-icon>
+            <span class="text-xs sm:text-sm font-medium text-gray-500">Média Km/L</span>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <fa-icon [icon]="['fas', 'leaf']" class="text-green-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
-          <p class="text-2xl font-bold text-gray-900">{{ mediaKmPorLitro | number:'1.1-1' }}</p>
-          <p class="text-xs text-gray-500 mt-1">eficiência de combustível</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ mediaKmPorLitro | number:'1.1-1' }}</p>
+          <p class="text-[11px] sm:text-xs text-gray-500 mt-1">eficiência de combustível</p>
         </div>
       </div>
     </div>
 
     <!-- Save Button quando editando -->
-    <div *ngIf="isEditing" class="mb-8 flex justify-center">
+    <div *ngIf="isEditing" class="mb-6 sm:mb-8 flex justify-center">
       <button (click)="salvarAlteracoes()"
-        class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:shadow-green-500/25 transition-all hover:-translate-y-0.5">
+        class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl hover:shadow-green-500/25 transition-all hover:-translate-y-0.5">
         <fa-icon [icon]="['fas', 'save']" class="mr-3"></fa-icon>Salvar Alterações
       </button>
     </div>
@@ -138,15 +134,15 @@
     <!-- Modern Tabs -->
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       <div class="border-b border-gray-200">
-        <nav class="flex">
-          <button class="flex-1 relative py-5 px-6 text-center font-medium transition-all"
+        <nav class="flex flex-col sm:flex-row">
+          <button class="flex-1 relative py-4 sm:py-5 px-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-all"
             [class.bg-gradient-to-r]="activeTab === 'abastecimentos'"
             [class.from-blue-50]="activeTab === 'abastecimentos'" [class.to-indigo-50]="activeTab === 'abastecimentos'"
             [class.text-blue-600]="activeTab === 'abastecimentos'"
             [class.text-gray-500]="activeTab !== 'abastecimentos'"
             [class.hover:bg-gray-50]="activeTab !== 'abastecimentos'" (click)="activeTab = 'abastecimentos'">
             <fa-icon [icon]="['fas', 'gas-pump']" class="mr-2"></fa-icon>Abastecimentos
-            <span class="ml-2 px-2 py-1 text-xs rounded-full" [class.bg-blue-600]="activeTab === 'abastecimentos'"
+            <span class="ml-2 px-2 py-0.5 text-[11px] sm:text-xs rounded-full" [class.bg-blue-600]="activeTab === 'abastecimentos'"
               [class.text-white]="activeTab === 'abastecimentos'" [class.bg-gray-200]="activeTab !== 'abastecimentos'"
               [class.text-gray-600]="activeTab !== 'abastecimentos'">
               {{ abastecimentos.length }}
@@ -155,13 +151,13 @@
               class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
           </button>
 
-          <button class="flex-1 relative py-5 px-6 text-center font-medium transition-all"
+          <button class="flex-1 relative py-4 sm:py-5 px-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-all"
             [class.bg-gradient-to-r]="activeTab === 'revisoes'" [class.from-blue-50]="activeTab === 'revisoes'"
             [class.to-indigo-50]="activeTab === 'revisoes'" [class.text-blue-600]="activeTab === 'revisoes'"
             [class.text-gray-500]="activeTab !== 'revisoes'" [class.hover:bg-gray-50]="activeTab !== 'revisoes'"
             (click)="activeTab = 'revisoes'">
             <fa-icon [icon]="['fas', 'wrench']" class="mr-2"></fa-icon>Revisões
-            <span class="ml-2 px-2 py-1 text-xs rounded-full" [class.bg-blue-600]="activeTab === 'revisoes'"
+            <span class="ml-2 px-2 py-0.5 text-[11px] sm:text-xs rounded-full" [class.bg-blue-600]="activeTab === 'revisoes'"
               [class.text-white]="activeTab === 'revisoes'" [class.bg-gray-200]="activeTab !== 'revisoes'"
               [class.text-gray-600]="activeTab !== 'revisoes'">
               {{ revisoes.length }}
@@ -173,62 +169,61 @@
       </div>
 
       <!-- Conteúdo Abastecimentos -->
-      <div *ngIf="activeTab === 'abastecimentos'" class="p-6">
-        <div class="flex justify-between items-center mb-6">
+      <div *ngIf="activeTab === 'abastecimentos'" class="p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
-            <h3 class="text-xl font-bold text-gray-900">Histórico de Abastecimentos</h3>
-            <p class="text-sm text-gray-500 mt-1">Total gasto: {{ totalGastoAbastecimentos | currency:'BRL' }}</p>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Abastecimentos</h3>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Total gasto: {{ totalGastoAbastecimentos | currency:'BRL' }}</p>
           </div>
-          <a href="/abast">
+          <a href="/abast" class="w-full sm:w-auto">
             <button
-              class="group px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
+              class="w-full sm:w-auto group px-4 sm:px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
               <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Novo Abastecimento
             </button>
           </a>
         </div>
 
         <!-- Tabela Modernizada -->
-        <div class="overflow-hidden rounded-xl border border-gray-200">
-          <table class="min-w-full">
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="min-w-[720px] md:min-w-full">
             <thead>
               <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Litros</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor/L
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">KM</th>
-                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Litros</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor/L</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">KM</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <ng-container *ngFor="let a of paginatedAbastecimentos">
                 <tr class="hover:bg-blue-50/30 transition-colors duration-200">
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                       <span class="text-sm font-medium text-gray-900">{{ a.dtAbast | date:'dd/MM/yyyy' }}</span>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
                     {{ a.litroComb | number:'1.2-2' }} L
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
                     {{ a.valorComb | currency:'BRL' }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <span class="text-sm font-semibold text-gray-900">
                       {{ a.litroComb * a.valorComb | currency:'BRL' }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
                     {{ a.kmAtual | number }} km
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
                     <div class="flex justify-end gap-1">
                       <button (click)="toggleAbast(a.id)"
                         class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
-                       <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
+                        <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
                       </button>
                       <button class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors">
                         <fa-icon [icon]="['fas', 'edit']"></fa-icon>
@@ -240,8 +235,8 @@
                   </td>
                 </tr>
                 <tr *ngIf="expAbastId === a.id" class="bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
-                  <td colspan="6" class="px-6 py-4">
-                    <div class="flex items-center gap-8">
+                  <td colspan="6" class="px-4 sm:px-6 py-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
                       <div class="flex items-center gap-2">
                         <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
                         <div>
@@ -265,7 +260,7 @@
         </div>
 
         <!-- Paginação Moderna -->
-        <div class="mt-6 flex items-center justify-between">
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p class="text-sm text-gray-600">
             Mostrando <span class="font-semibold">{{ (currentPageAbast - 1) * itemsPerPage + 1 }}</span> até
             <span class="font-semibold">{{ Math.min(currentPageAbast * itemsPerPage, abastecimentos.length) }}</span> de
@@ -291,50 +286,49 @@
       </div>
 
       <!-- Conteúdo Revisões -->
-      <div *ngIf="activeTab === 'revisoes'" class="p-6">
-        <div class="flex justify-between items-center mb-6">
+      <div *ngIf="activeTab === 'revisoes'" class="p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
-            <h3 class="text-xl font-bold text-gray-900">Histórico de Revisões</h3>
-            <p class="text-sm text-gray-500 mt-1">Manutenções realizadas no veículo</p>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Revisões</h3>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Manutenções realizadas no veículo</p>
           </div>
-          <a href="/revisao/cadastrar">
+          <a href="/revisao/cadastrar" class="w-full sm:w-auto">
             <button
-              class="group px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
+              class="w-full sm:w-auto group px-4 sm:px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
               <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Nova Revisão
             </button>
           </a>
         </div>
 
         <!-- Tabela Modernizada -->
-        <div class="overflow-hidden rounded-xl border border-gray-200">
-          <table class="min-w-full">
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="min-w-[640px] md:min-w-full">
             <thead>
               <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">KM no
-                  Momento</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tipo</th>
-                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">KM no Momento</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Tipo</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <ng-container *ngFor="let r of paginatedRevisoes">
                 <tr class="hover:bg-blue-50/30 transition-colors duration-200">
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <div class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                       <span class="text-sm font-medium text-gray-900">{{ r.dtRevisao | date:'dd/MM/yyyy' }}</span>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
                     {{ r.kmAtual | number }} km
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <span class="px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
                       Revisão periódica
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
                     <div class="flex justify-end gap-1">
                       <button (click)="toggleRevisao(r.id)"
                         class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
@@ -350,8 +344,8 @@
                   </td>
                 </tr>
                 <tr *ngIf="expRevisaoId === r.id" class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50">
-                  <td colspan="4" class="px-6 py-4">
-                    <div class="flex items-center gap-8">
+                  <td colspan="4" class="px-4 sm:px-6 py-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
                       <div class="flex items-center gap-2">
                         <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
                         <div>
@@ -375,7 +369,7 @@
         </div>
 
         <!-- Paginação Moderna -->
-        <div class="mt-6 flex items-center justify-between">
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p class="text-sm text-gray-600">
             Mostrando <span class="font-semibold">{{ (currentPageRevisoes - 1) * itemsPerPage + 1 }}</span> até
             <span class="font-semibold">{{ Math.min(currentPageRevisoes * itemsPerPage, revisoes.length) }}</span> de
