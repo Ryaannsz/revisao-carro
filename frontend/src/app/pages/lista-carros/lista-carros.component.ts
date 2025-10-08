@@ -20,7 +20,7 @@ export class ListaCarrosComponent implements OnInit {
   loading: boolean = false;
   revisoes: ProximaRevisao[] = [];
 
-  statusFilter: CarroStatus | 'TODOS' = CarroStatus.DISPONIVEL;
+  statusFilter: CarroStatus | 'TODOS' = 'TODOS';
 
   carroDisponivel: CarroStatus= CarroStatus.DISPONIVEL;
 
