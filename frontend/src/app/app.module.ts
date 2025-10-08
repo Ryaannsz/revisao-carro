@@ -40,7 +40,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CarStatsComponent } from './components/car-stats/car-stats.component';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCalendarDay, faCar, faCarSide, faCheckCircle, faChevronDown, faCoins, faGasPump, faGear, faSave, faSearch, faTachographDigital, faTachometer, faTachometerAlt, faTimes, faTools, faWater } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faCalendarDay, faCar, faCarSide, faCheckCircle, faChevronDown, faChevronLeft, faChevronRight, faCoins, faEdit, faGasPump, faGear, faIdBadge, faInfoCircle, faLeaf, faPlus, faSave, faSearch, faTachographDigital, faTachometer, faTachometerAlt, faTimes, faTools, faTrashAlt, faUserCircle, faWater, faWrench } from '@fortawesome/free-solid-svg-icons';
 
 
 export function tokenGetter() {
@@ -111,6 +111,7 @@ export class AppModule {
     constructor(library: FaIconLibrary) {
     library.addIcons(faCalendarDay, faGear, faTachometerAlt, faWater, faCoins, faCar, 
       faChevronDown, faSave, faCarSide, faTimes, faSearch,
-       faCheckCircle, faTools, faGasPump);
+       faCheckCircle, faTools, faGasPump, faLeaf, faWrench, faPlus, faEdit, faTrashAlt, faUserCircle,
+        faIdBadge, faChevronLeft, faChevronRight, faInfoCircle, faCalendarAlt);
   }
  }
