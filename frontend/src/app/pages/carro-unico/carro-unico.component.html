@@ -103,7 +103,7 @@
               <fa-icon [icon]="['fas', 'calendar-alt']" class="text-purple-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
-          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado }}</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado | date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
 
