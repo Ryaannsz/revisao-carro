@@ -11,6 +11,7 @@ import { ConfirmationDialogService } from '../../core/services/confirmationDialo
 import { AuthService } from '../../core/services/auth.service';
 import { CarroStatus } from '../../core/models/carro-status.enum';
 
+
 @Component({
   standalone: false,
   selector: 'app-carro-unico',
@@ -18,6 +19,7 @@ import { CarroStatus } from '../../core/models/carro-status.enum';
   styleUrls: ['./carro-unico.component.css']
 })
 export class CarroUnicoComponent implements OnInit {
+  Math = Math
   carro: Carro | null = null;
   abastecimentos: Abast[] = [];
   revisoes: Revisao[] = [];
@@ -245,5 +247,11 @@ export class CarroUnicoComponent implements OnInit {
             this.carroDisponivel=CarroStatus.MANUTENCAO;
       this.toastService.showSuccess("Status alterado com sucesso!")
     })
+  }
+
+  get shownAbastCount(): number {
+    const end = this.currentPageAbast * this.itemsPerPage;
+    const total = this.abastecimentos?.length ?? 0;
+    return Math.min(end, total);
   }
 }
