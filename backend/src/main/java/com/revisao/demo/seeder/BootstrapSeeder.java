@@ -61,9 +61,12 @@ public class BootstrapSeeder implements CommandLineRunner {
     public void run(String... args) {
         // 1) Garantir Empresa id=1
         Empresa empresa = ensureEmpresaId1();
+        Empresa empresa2 = ensureEmpresaId2();
 
 
         User user = ensureUserId(empresa,1, bootstrapProperties.getCpf(), bootstrapProperties.getNomeUser());
+
+        User user2 = ensureUserId(empresa2,2, "11111111111", "Cordeiro");
 
         //teste empresa 2
 
@@ -116,6 +119,18 @@ public class BootstrapSeeder implements CommandLineRunner {
                     .executeUpdate();
 
             return empresaRepository.findById(1).orElseThrow();
+        });
+    }
+
+
+        private Empresa ensureEmpresaId2() {
+        return empresaRepository.findById(2).orElseGet(() -> {
+            // força id=1 via insert nativo se necessário
+            em.createNativeQuery("INSERT INTO tb_empresa (id, nome) VALUES (2, ?1)")
+                    .setParameter(1, "Empresa Teste")
+                    .executeUpdate();
+
+            return empresaRepository.findById(2).orElseThrow();
         });
     }
 
