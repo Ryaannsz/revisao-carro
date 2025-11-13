@@ -1,0 +1,43 @@
+package com.revisao.demo.dto;
+
+import java.sql.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.revisao.demo.enums.CarroStatus;
+import com.revisao.demo.models.Empresa;
+import com.revisao.demo.models.Marca;
+import com.revisao.demo.models.Modelo;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+
+public class CarroDTO {
+
+    private Integer id;
+
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/Sao_Paulo")
+    private Date dtAdicionado;
+
+    @NotNull
+    private Double kmAdicionado;
+
+    private Marca marca;
+
+    private Modelo modelo;
+
+    private String placa;
+
+    private EmpresaDTO empresa;
+
+    private Integer alarmeRevisaoMes;
+
+    private Double alarmeRevisaoKm;
+
+    private CarroStatus status;
+}
