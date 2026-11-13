@@ -1,16 +1,34 @@
-// src/app/pages/dashboard/dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
+import { catchError, forkJoin, of } from 'rxjs';
 import { DashboardService } from '../../core/services/dashboard.service';
-import { Observable, map } from 'rxjs';
-import { MesValor } from '../../core/models/mes.valor.model';  // ajuste o caminho se necessário
+import { CarroService } from '../../core/services/carro.service';
+import { MaquinaService } from '../../core/services/maquina.service';
+import { RevisaoMaquinaService } from '../../core/services/maquina.revisao.service';
+import { MesValor } from '../../core/models/mes.valor.model';
+import { DashboardResumo } from '../../core/models/dashboard.resumo.model';
+import { Carro } from '../../core/models/carro.model';
+import { Maquina } from '../../core/models/maquina.model';
+import { ProximaRevisaoMaquina } from '../../core/models/proxima.revisao.maquina.model';
 import { AppConstants } from '../../core/constants/app.constants';
+import { SERIES } from '../../components/line-chart/line-chart.component';
+import {
+  SITUACAO_INFO, SituacaoPreventiva, diasAte, kmRestantes, nomeVeiculo, situacaoCarro
+} from '../../core/utils/situacao.utils';
+import { horasRestantes, nomeMaquina, situacaoPreventiva } from '../../core/utils/maquina.utils';
 
-type ChartVM = {
-  labels: string[];
-  data: (number | null)[];
-  labelsFiltered: string[];
-  datasetsColored: any[];
-};
+interface Serie { labels: string[]; datasets: any[]; }
+
+interface Pendencia {
+  tipo: 'carro' | 'maquina';
+  titulo: string;
+  placa: string | null;
+  situacao: SituacaoPreventiva;
+  restante: number | null;
+  unidade: 'km' | 'h';
+  data: string | null;
+  dias: number | null;
+  link: any[];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -19,231 +37,190 @@ type ChartVM = {
   standalone: false
 })
 export class DashboardComponent implements OnInit {
-  vm$!: Observable<{
-    gasto: ChartVM;
-    litros: ChartVM;
-    eficiencia: ChartVM;
-    revisoes: ChartVM;
-    proximas: any[];
-    proximasSorted: any[];
-  }>;
+  readonly periodos = [{ v: 3, l: '3 meses' }, { v: 6, l: '6 meses' }, { v: 12, l: '12 meses' }, { v: 0, l: 'Tudo' }];
+  periodMonths = 6;
+  loading = false;
+  erro = false;
 
-  Infinity = Number.POSITIVE_INFINITY;
+  private resumo: DashboardResumo | null = null;
+  pendencias: Pendencia[] = [];
+  mostrarTodas = false;
 
-  // UI state
-  periodMonths: number | typeof Infinity = 6;
-  fullscreenKey: 'gasto' | 'litros' | 'eficiencia' | 'revisoes' | null = null;
+  gasto: Serie = { labels: [], datasets: [] };
+  litros: Serie = { labels: [], datasets: [] };
+  eficiencia: Serie = { labels: [], datasets: [] };
+  revisoes: Serie = { labels: [], datasets: [] };
 
-  loading: boolean = false;
+  readonly SIT = SITUACAO_INFO;
 
-  // Paleta consistente (tons suaves)
-  private colors = {
-    gasto:    { border: '#2563eb', background: 'rgba(37, 99, 235, 0.10)' }, // blue-600
-    litros:   { border: '#059669', background: 'rgba(5, 150, 105, 0.10)' }, // emerald-600
-    efic:     { border: '#9333ea', background: 'rgba(147, 51, 234, 0.10)' }, // purple-600
-    revisoes: { border: '#f59e0b', background: 'rgba(245, 158, 11, 0.10)' }, // amber-500
-    manutencao: { border: '#dc2626', background: 'rgba(220, 38, 38, 0.08)' } // red-600
+  readonly opcoesMoeda = {
+    plugins: { tooltip: { callbacks: { label: (c: any) => `${c.dataset.label}: ${this.brl(c.parsed.y)}` } } },
+    scales: { y: { ticks: { callback: (v: number) => this.brl(v, 0) } } },
+  };
+  readonly opcoesNumero = {
+    plugins: { tooltip: { callbacks: { label: (c: any) => `${c.dataset.label}: ${c.parsed.y == null ? 'sem dado' : Number(c.parsed.y).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}` } } },
+    scales: { y: { ticks: { callback: (v: number) => Number(v).toLocaleString('pt-BR') } } },
+  };
+  readonly opcoesInteiro = {
+    scales: { y: { ticks: { precision: 0 } } },
   };
 
-  // Opções de gráfico (normais e ampliadas)
-  chartOptionsCurrency      = this.makeChartOptions('R$');
-  chartOptionsNumber        = this.makeChartOptions();
-  chartOptionsCurrencyLarge = this.makeChartOptions('R$', true);
-  chartOptionsNumberLarge   = this.makeChartOptions(undefined, true);
-
-  constructor(private svc: DashboardService) {}
+  constructor(
+    private svc: DashboardService,
+    private carroService: CarroService,
+    private maquinaService: MaquinaService,
+    private revisaoMaquinaService: RevisaoMaquinaService
+  ) { }
 
   ngOnInit(): void {
-    this.reloadVM();
+    this.carregar();
+  }
+
+  carregar() {
+    this.loading = true;
+    this.erro = false;
+    forkJoin({
+      resumo: this.svc.getResumo(),
+      carros: this.carroService.getList<Carro>().pipe(catchError(() => of([] as Carro[]))),
+      maquinas: this.maquinaService.listar().pipe(catchError(() => of([] as Maquina[]))),
+      proxMaq: this.revisaoMaquinaService.proximas().pipe(catchError(() => of([] as ProximaRevisaoMaquina[]))),
+    }).subscribe({
+      next: ({ resumo, carros, maquinas, proxMaq }) => {
+        this.resumo = resumo;
+        this.montarPendencias(resumo, carros, maquinas, proxMaq);
+        this.montarGraficos();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.erro = true;
+      }
+    });
+  }
+
+  setPeriod(m: number) {
+    this.periodMonths = m;
+    this.montarGraficos();
+  }
+
+  /* ---------------- KPIs do mês ---------------- */
+
+  private mesChave(offset = 0): string {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + offset);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private valorMes(arr: MesValor[] | undefined, chave: string): number {
+    return Number(arr?.find(x => x.mes === chave)?.valor ?? 0) || 0;
+  }
+
+  get nomeMesAtual(): string {
+    return new Date().toLocaleDateString('pt-BR', { month: 'long' });
+  }
+
+  get gastoMes(): number {
+    const k = this.mesChave();
+    return this.valorMes(this.resumo?.gastoMensal, k) + this.valorMes(this.resumo?.custoManutencaoMensal, k);
+  }
+
+  get gastoMesAnterior(): number {
+    const k = this.mesChave(-1);
+    return this.valorMes(this.resumo?.gastoMensal, k) + this.valorMes(this.resumo?.custoManutencaoMensal, k);
+  }
+
+  get nomeMesAnterior(): string {
+    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1);
+    return d.toLocaleDateString('pt-BR', { month: 'long' });
+  }
+
+  get litrosMes(): number { return this.valorMes(this.resumo?.litrosMensais, this.mesChave()); }
+
+  /** Consumo do último mês FECHADO (o mês corrente ainda está incompleto). */
+  private get ultimoKmL(): MesValor | null {
+    const atual = this.mesChave();
+    const arr = (this.resumo?.eficienciaMensal ?? []).filter(x => x.mes < atual && x.valor != null && Number(x.valor) > 0);
+    return arr.length ? arr[arr.length - 1] : null;
+  }
+
+  get kmLMes(): number | null { return this.ultimoKmL ? Number(this.ultimoKmL.valor) : null; }
+  get kmLMesLabel(): string { return this.ultimoKmL ? this.formatMes(this.ultimoKmL.mes) : ''; }
+
+  get vencidas(): number { return this.pendencias.filter(p => p.situacao === 'vencida').length; }
+
+  get pendenciasVisiveis(): Pendencia[] {
+    return this.mostrarTodas ? this.pendencias : this.pendencias.slice(0, 6);
+  }
+
+  /* ---------------- Montagem ---------------- */
+
+  private montarPendencias(r: DashboardResumo, carros: Carro[], maquinas: Maquina[], proxMaq: ProximaRevisaoMaquina[]) {
+    const carroPorId = new Map(carros.map(c => [c.id, c]));
+    const maqPorId = new Map(maquinas.map(m => [m.id, m]));
+    const lista: Pendencia[] = [];
+
+    for (const p of r.proximasRevisoes ?? []) {
+      const c = carroPorId.get(p.carroId);
+      const s = situacaoCarro(c, p, p.kmAtual);
+      if (s !== 'vencida' && s !== 'proxima') continue;
+      lista.push({
+        tipo: 'carro', titulo: c ? nomeVeiculo(c.marca?.marca, c.modelo?.modelo) : p.placa, placa: p.placa,
+        situacao: s, restante: kmRestantes(p, p.kmAtual), unidade: 'km',
+        data: p.proximaRevisaoEstimada, dias: diasAte(p.proximaRevisaoEstimada), link: ['/carros/unico', p.carroId],
+      });
+    }
+    for (const p of proxMaq) {
+      const s = situacaoPreventiva(p);
+      if (s !== 'vencida' && s !== 'proxima') continue;
+      lista.push({
+        tipo: 'maquina', titulo: nomeMaquina(maqPorId.get(p.maquinaId)) || p.identificacao || `Máquina #${p.maquinaId}`, placa: null,
+        situacao: s, restante: horasRestantes(p), unidade: 'h',
+        data: p.proximaRevisaoEstimada, dias: diasAte(p.proximaRevisaoEstimada), link: ['/maquinas', p.maquinaId],
+      });
+    }
+    const ordem = { 'vencida': 0, 'proxima': 1, 'ok': 2, 'sem-dados': 3 };
+    this.pendencias = lista.sort((a, b) => ordem[a.situacao] - ordem[b.situacao] || (a.dias ?? 9999) - (b.dias ?? 9999));
+  }
+
+  private montarGraficos() {
+    const r = this.resumo;
+    if (!r) return;
+    this.gasto = this.multi([
+      { arr: r.gastoMensal ?? [], label: 'Combustível', cor: SERIES[0] },
+      { arr: r.custoManutencaoMensal ?? [], label: 'Manutenção', cor: SERIES[1] },
+    ]);
+    this.litros = this.multi([{ arr: r.litrosMensais ?? [], label: 'Litros', cor: SERIES[0] }]);
+    this.eficiencia = this.multi([{ arr: r.eficienciaMensal ?? [], label: 'km/L', cor: SERIES[0] }], true);
+    this.revisoes = this.multi([{ arr: r.revisoesPorMes ?? [], label: 'Revisões', cor: SERIES[0] }]);
+  }
+
+  /** Alinha várias séries mensais no mesmo eixo; mês ausente vira 0 (ou null se `gaps`). */
+  private multi(series: { arr: MesValor[]; label: string; cor: string }[], gaps = false): Serie {
+    let meses = Array.from(new Set(series.flatMap(s => s.arr.map(x => x.mes)))).sort();
+    if (this.periodMonths > 0 && meses.length > this.periodMonths) meses = meses.slice(-this.periodMonths);
+    return {
+      labels: meses.map(m => this.formatMes(m)),
+      datasets: series.filter(s => s.arr.length).map(s => {
+        const por = new Map(s.arr.map(x => [x.mes, x.valor]));
+        return { label: s.label, borderColor: s.cor, data: meses.map(m => {
+          const v = por.get(m);
+          return gaps ? (v != null && Number(v) > 0 ? v : null) : (v ?? 0);
+        }) };
+      }),
+    };
   }
 
   private formatMes(mesStr: string): string {
-  const [ano, mes] = mesStr.split('-').map(Number);
-  if (!ano || !mes) return mesStr; // fallback se não for no formato esperado
-  return `${AppConstants.MESES_ABREV[mes - 1]}/${ano.toString().slice(-2)}`;
-}
-
-  setPeriod(months: number | typeof Infinity) {
-    this.periodMonths = months;
-    this.reloadVM();
+    const [ano, mes] = mesStr.split('-').map(Number);
+    if (!ano || !mes) return mesStr;
+    return `${AppConstants.MESES_ABREV[mes - 1]}/${String(ano).slice(-2)}`;
   }
 
-  private reloadVM() {
-    const cutoff = this.periodMonths;
-
-    this.loading=true;
-
-    this.vm$ = this.svc.getResumo().pipe(
-      map(r => {
-        const gastoArr: MesValor[]     = r.gastoMensal      ?? [];
-        const litrosArr: MesValor[]    = r.litrosMensais    ?? [];
-        const eficArr: MesValor[]      = r.eficienciaMensal ?? [];
-        const revisoesArr: MesValor[]  = r.revisoesPorMes   ?? [];
-
-        const manutArr: MesValor[]     = r.custoManutencaoMensal ?? [];
-
-        // Gasto = combustível + manutenção, alinhados pelo mesmo eixo de meses
-        const gasto      = this.makeMultiChartVM([
-          { arr: gastoArr, label: 'Combustível', color: this.colors.gasto },
-          { arr: manutArr, label: 'Manutenção',  color: this.colors.manutencao },
-        ], cutoff);
-        const litros     = this.makeChartVM(litrosArr,    'Litros',    this.colors.litros,   cutoff);
-        const eficiencia = this.makeChartVM(eficArr,      'km/L',      this.colors.efic,     cutoff);
-        const revisoes   = this.makeChartVM(revisoesArr,  'Revisões',  this.colors.revisoes, cutoff);
-
-        // Próximas revisões: enriquece com status e ordena (dias até a data)
-        const proximas = (r.proximasRevisoes ?? []).map((x: any) => {
-          const days = this.daysFromToday(x.proximaRevisaoEstimada);
-          const { text, klass } = this.statusFromDays(days);
-          return { ...x, _days: days, _statusText: text, _statusClass: klass };
-        });
-        const proximasSorted = [...proximas].sort((a, b) => a._days - b._days);
-
-        return { gasto, litros, eficiencia, revisoes, proximas, proximasSorted };
-      })
-    );
-    this.loading=false;
+  brl(v: number | null | undefined, casas = 2): string {
+    if (v == null) return 'sem dado';
+    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: casas, maximumFractionDigits: casas });
   }
 
-  private makeChartVM(
-    arr: MesValor[],
-    label: string,
-    color: { border: string; background: string },
-    cutoff: number | typeof Infinity
-  ): ChartVM {
-    const allLabels = arr.map(x => this.formatMes(x.mes));
-    const allData   = arr.map(x => x.valor as number | null); // aceita null para “gaps”
-
-    const { labelsFiltered, dataFiltered } = this.sliceByMonths<(number | null)>(allLabels, allData, cutoff);
-
-    return {
-      labels: allLabels,
-      data: allData,
-      labelsFiltered,
-      datasetsColored: [
-        {
-          label,
-          data: dataFiltered,
-          borderColor: color.border,
-          backgroundColor: color.background,
-          pointRadius: 3,
-          tension: 0.3,
-          fill: true,
-          spanGaps: false // mantém quebras quando houver null
-        }
-      ]
-    };
-  }
-
-  /** Várias séries mensais no mesmo gráfico; meses ausentes em uma série viram 0. */
-  private makeMultiChartVM(
-    series: { arr: MesValor[]; label: string; color: { border: string; background: string } }[],
-    cutoff: number | typeof Infinity
-  ): ChartVM {
-    const meses = Array.from(new Set(series.flatMap(s => s.arr.map(x => x.mes)))).sort();
-    const allLabels = meses.map(m => this.formatMes(m));
-    const datasetsColored = series
-      .filter(s => s.arr.length > 0)
-      .map(s => {
-        const byMes = new Map(s.arr.map(x => [x.mes, x.valor]));
-        const data = meses.map(m => byMes.get(m) ?? 0);
-        const { dataFiltered } = this.sliceByMonths<number | null>(allLabels, data, cutoff);
-        return {
-          label: s.label,
-          data: dataFiltered,
-          borderColor: s.color.border,
-          backgroundColor: s.color.background,
-          pointRadius: 3,
-          tension: 0.3,
-          fill: true,
-          spanGaps: false
-        };
-      });
-    const { labelsFiltered } = this.sliceByMonths(allLabels, allLabels, cutoff);
-    return { labels: allLabels, data: [], labelsFiltered, datasetsColored };
-  }
-
-  private sliceByMonths<T>(labels: string[], data: T[], cutoff: number | typeof Infinity) {
-    if (cutoff === Infinity || labels.length <= cutoff) {
-      return { labelsFiltered: labels, dataFiltered: data };
-    }
-    const start = Math.max(0, labels.length - Number(cutoff));
-    return {
-      labelsFiltered: labels.slice(start),
-      dataFiltered: data.slice(start)
-    };
-  }
-
-  private daysFromToday(dateLike: string | Date | null): number {
-    if (!dateLike) return Number.POSITIVE_INFINITY;
-    const target = new Date(dateLike).getTime();
-    const today  = new Date().setHours(0, 0, 0, 0);
-    return Math.round((target - today) / 86400000);
-  }
-
-  private statusFromDays(days: number) {
-    if (!Number.isFinite(days)) return { text: 'Sem dados', klass: 'bg-gray-100 text-gray-600' };
-    if (days < 0)  return { text: `Vencida há ${Math.abs(days)}d`, klass: 'bg-red-100 text-red-700' };
-    if (days === 0) return { text: 'Vence hoje', klass: 'bg-amber-100 text-amber-700' };
-    if (days <= 30) return { text: `Em ${days}d`, klass: 'bg-amber-100 text-amber-700' };
-    return { text: `Em ${days}d`, klass: 'bg-emerald-100 text-emerald-700' };
-  }
-
-  openFullscreen(key: 'gasto' | 'litros' | 'eficiencia' | 'revisoes') {
-    this.fullscreenKey = key;
-  }
-  closeFullscreen() {
-    this.fullscreenKey = null;
-  }
-  get fullscreenTitle(): string {
-    switch (this.fullscreenKey) {
-      case 'gasto': return 'Gasto mensal: combustível + manutenção (R$) – Ampliado';
-      case 'litros': return 'Litros por mês (L) – Ampliado';
-      case 'eficiencia': return 'Eficiência (km/L) – Ampliado';
-      case 'revisoes': return 'Revisões por mês – Ampliado';
-      default: return '';
-    }
-  }
-
-  // Opções de Chart.js com tooltip pt-BR e suporte a null
-  private makeChartOptions(currencySymbol?: string, large = false): any {
-    const ticksFont = large ? 14 : 11;
-
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, labels: { font: { size: ticksFont } } },
-        tooltip: {
-          callbacks: {
-            label: (ctx: any) => {
-              const v = ctx.parsed?.y;
-              if (v == null) return `${ctx.dataset.label}: s/dado`;
-              if (currencySymbol) {
-                return `${ctx.dataset.label}: ${currencySymbol} ${v.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}`;
-              }
-              return `${ctx.dataset.label}: ${Number(v).toLocaleString('pt-BR')}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { font: { size: ticksFont } } },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            font: { size: ticksFont },
-            callback: (value: number) =>
-              currencySymbol
-                ? `${currencySymbol} ${Number(value).toLocaleString('pt-BR')}`
-                : Number(value).toLocaleString('pt-BR')
-          }
-        }
-      },
-      elements: { line: { borderWidth: 2 }, point: { radius: 3 } }
-    };
-  }
+  abs(n: number) { return Math.abs(n); }
 }

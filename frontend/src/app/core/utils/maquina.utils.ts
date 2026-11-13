@@ -1,6 +1,9 @@
 import { ProximaRevisaoMaquina } from '../models/proxima.revisao.maquina.model';
+import { Maquina } from '../models/maquina.model';
+import { SituacaoPreventiva, avaliarSituacao, nomeVeiculo } from './situacao.utils';
 
-export type SituacaoPreventiva = 'vencida' | 'proxima' | 'ok' | 'sem-dados';
+export type { SituacaoPreventiva } from './situacao.utils';
+export { SITUACAO_INFO } from './situacao.utils';
 
 /** % do intervalo de horas já consumido desde a última preventiva (0–100). */
 export function progressoPreventiva(p: ProximaRevisaoMaquina | undefined | null): number {
@@ -18,19 +21,24 @@ export function horasRestantes(p: ProximaRevisaoMaquina | undefined | null): num
 
 /** Vence pelo que chegar primeiro: horas ou data. "Próxima" = 90% das horas ou 15 dias. */
 export function situacaoPreventiva(p: ProximaRevisaoMaquina | undefined | null): SituacaoPreventiva {
-  if (!p || (p.horasRevisaoEstimada == null && !p.proximaRevisaoEstimada)) return 'sem-dados';
-  const restantes = horasRestantes(p);
-  const dias = p.proximaRevisaoEstimada
-    ? Math.round((new Date(p.proximaRevisaoEstimada + 'T00:00:00').getTime() - new Date().setHours(0, 0, 0, 0)) / 86400000)
-    : null;
-  if ((restantes != null && restantes <= 0) || (dias != null && dias < 0)) return 'vencida';
-  if (progressoPreventiva(p) >= 90 || (dias != null && dias <= 15)) return 'proxima';
-  return 'ok';
+  if (!p) return 'sem-dados';
+  return avaliarSituacao(horasRestantes(p), progressoPreventiva(p), p.proximaRevisaoEstimada);
 }
 
-export const SITUACAO_INFO: Record<SituacaoPreventiva, { label: string; badge: string; barra: string }> = {
-  'vencida':   { label: 'Preventiva vencida', badge: 'bg-red-100 text-red-700',     barra: 'from-red-500 to-red-600' },
-  'proxima':   { label: 'Preventiva próxima', badge: 'bg-amber-100 text-amber-700', barra: 'from-amber-400 to-amber-500' },
-  'ok':        { label: 'Em dia',             badge: 'bg-green-100 text-green-700', barra: 'from-emerald-500 to-emerald-600' },
-  'sem-dados': { label: 'Sem dados',          badge: 'bg-gray-100 text-gray-600',   barra: 'from-gray-300 to-gray-400' },
-};
+/** Nome principal da máquina: a identificação da frota ou, na falta, tipo + marca/modelo. */
+export function nomeMaquina(m: Maquina | null | undefined): string {
+  if (!m) return '';
+  if (m.identificacao?.trim()) return m.identificacao.trim();
+  return [m.tipo, nomeVeiculo(m.marca?.marca, m.modelo?.modelo)]
+    .filter(s => s && s !== 'Sem marca/modelo').join(' ') || `Máquina #${m.id}`;
+}
+
+/** Linha secundária: tipo, marca/modelo e ano (o que existir e não estiver no nome). */
+export function detalheMaquina(m: Maquina | null | undefined): string {
+  if (!m) return '';
+  const mm = nomeVeiculo(m.marca?.marca, m.modelo?.modelo);
+  const partes = m.identificacao?.trim()
+    ? [m.tipo, mm !== 'Sem marca/modelo' ? mm : null, m.ano ? String(m.ano) : null]
+    : [m.ano ? String(m.ano) : null, m.chassi ? `Série ${m.chassi}` : null];
+  return partes.filter(Boolean).join(', ');
+}

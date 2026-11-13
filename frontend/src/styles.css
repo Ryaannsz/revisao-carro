@@ -2,22 +2,138 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-    .animate-fade-in {
-      animation: fadeIn 0.8s ease-out forwards;
-    }
-  
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { min-height: 100%; }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
   }
-  
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+  h1, h2, h3 { @apply font-cond text-ink; letter-spacing: .005em; }
+  :focus-visible { outline: 2px solid #22302B; outline-offset: 2px; }
+  input, select, textarea, button { font: inherit; }
+  ::selection { background: #FFF4CC; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+}
+
+@layer components {
+  /* ---------- Página ---------- */
+  .page { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10 pt-5 pb-10 sm:pt-8; }
+  .page-narrow { @apply mx-auto w-full max-w-2xl px-4 sm:px-6 pt-5 pb-10 sm:pt-8; }
+  .page-head { @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6; }
+  .page-title { @apply font-cond font-semibold text-[2rem] leading-none sm:text-[2.5rem]; }
+  .page-sub { @apply mt-2 text-ink-soft max-w-prose; }
+  .back-link { @apply inline-flex items-center gap-2 text-sm font-medium text-ink-soft hover:text-ink mb-3; }
+
+  /* ---------- Superfícies ---------- */
+  .panel { @apply bg-white border border-line rounded-[10px]; }
+  .panel-head { @apply flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-line; }
+  .panel-title { @apply font-cond font-semibold text-xl leading-tight; }
+  .panel-body { @apply p-4 sm:p-5; }
+
+  /* ---------- Botões ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 h-11 text-[15px] font-semibold
+           whitespace-nowrap select-none transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-sm { @apply h-9 px-3 text-sm; }
+  .btn-primary { @apply btn bg-signal text-ink hover:bg-signal-deep; }
+  .btn-dark { @apply btn bg-ink text-white hover:bg-ink-2; }
+  .btn-outline { @apply btn bg-white text-ink border border-line-strong hover:bg-paper; }
+  .btn-ghost { @apply btn text-ink-soft hover:text-ink hover:bg-paper-2; }
+  .btn-danger { @apply btn bg-white text-over border border-over/40 hover:bg-over-soft; }
+  .icon-btn { @apply inline-flex items-center justify-center w-10 h-10 rounded-md text-ink-soft hover:text-ink hover:bg-paper-2 transition-colors; }
+
+  /* ---------- Formulários ---------- */
+  .field { @apply flex flex-col gap-1.5; }
+  .field-label { @apply text-sm font-semibold text-ink; }
+  .field-hint { @apply text-[13px] text-ink-soft; }
+  .field-error { @apply text-[13px] font-medium text-over; }
+  .input {
+    @apply w-full h-12 rounded-md border border-line-strong bg-white px-3.5 text-base text-ink
+           placeholder:text-ink-faint transition-colors
+           focus:outline-none focus:border-ink focus:ring-2 focus:ring-signal/60;
+  }
+  textarea.input { @apply h-auto py-3 leading-relaxed; }
+  .input.ng-invalid.ng-touched { @apply border-over; }
+  .input-suffix { @apply relative; }
+  .input-suffix > span { @apply absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-ink-soft pointer-events-none; }
+  .input-suffix > .input { @apply pr-14; }
+  .picker {
+    @apply w-full min-h-12 rounded-md border border-line-strong bg-white px-3.5 py-2.5 text-left
+           flex items-center justify-between gap-3 hover:border-ink transition-colors
+           focus:outline-none focus:border-ink focus:ring-2 focus:ring-signal/60;
+  }
+
+  /* ---------- Segmentado / filtros ---------- */
+  .seg { @apply inline-flex items-center gap-1 rounded-lg bg-paper-2 p-1 overflow-x-auto max-w-full; }
+  .seg-btn { @apply inline-flex items-center gap-2 rounded-md px-3 h-9 text-sm font-semibold text-ink-soft whitespace-nowrap hover:text-ink; }
+  .seg-btn.is-on { @apply bg-white text-ink shadow-[0_1px_0_rgba(34,48,43,.12)]; }
+  .seg-count { @apply font-cond text-base leading-none tabular-nums; }
+
+  /* ---------- Etiquetas ---------- */
+  .tag { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 h-6 text-[13px] font-semibold whitespace-nowrap; }
+  .tag::before { content: ''; @apply w-1.5 h-1.5 rounded-full bg-current; }
+  /* use sempre junto: class="tag tag-ok" */
+  .tag-ok { @apply bg-ok-soft text-ok; }
+  .tag-due { @apply bg-due-soft text-due; }
+  .tag-over { @apply bg-over-soft text-over; }
+  .tag-idle { @apply bg-paper-2 text-ink-soft; }
+  .tag-info { @apply bg-ink/[.07] text-ink; }
+
+  /* ---------- Placa ---------- */
+  .plate {
+    @apply inline-flex items-center rounded-[4px] border-[1.5px] border-ink bg-white px-2 pt-[3px] pb-[1px]
+           font-cond font-semibold text-[15px] leading-none tracking-[.08em] text-ink uppercase;
+    box-shadow: inset 0 3px 0 #22302B;
+  }
+
+  /* ---------- Números ---------- */
+  .num { @apply font-cond tabular-nums; }
+  .stat-label { @apply text-[13px] font-medium text-ink-soft; }
+  .stat-value { @apply num font-semibold text-2xl leading-tight text-ink; }
+
+  /* ---------- Barra de progresso até a revisão ---------- */
+  .track { @apply relative h-1.5 w-full rounded-full bg-paper-2 overflow-hidden; }
+  .track > i { @apply absolute inset-y-0 left-0 rounded-full; }
+
+  /* ---------- Listas tipo ficha ---------- */
+  .rows { @apply panel divide-y divide-line overflow-hidden; }
+  .row-link { @apply block px-4 sm:px-5 py-4 hover:bg-paper/70 focus-visible:bg-paper/70 transition-colors cursor-pointer; }
+
+  /* ---------- Tabelas ---------- */
+  .table-wrap { @apply overflow-x-auto; }
+  .table { @apply w-full text-[15px]; }
+  .table th { @apply px-4 py-2.5 text-left text-[13px] font-semibold text-ink-soft bg-paper/60 border-b border-line whitespace-nowrap; }
+  .table td { @apply px-4 py-3 border-b border-line align-middle; }
+  .table tr:last-child td { @apply border-b-0; }
+  .table .r { @apply text-right; }
+
+  /* ---------- Modais ---------- */
+  .overlay { @apply fixed inset-0 z-[60] bg-ink/50 flex items-end sm:items-center justify-center sm:p-4 animate-fade; }
+  .sheet {
+    @apply bg-white w-full sm:max-w-lg max-h-[88vh] flex flex-col rounded-t-2xl sm:rounded-xl
+           shadow-[0_20px_60px_-15px_rgba(34,48,43,.45)] animate-sheet-up sm:animate-pop-in;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .sheet-head { @apply flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-line; }
+  .sheet-title { @apply font-cond font-semibold text-2xl leading-tight; }
+
+  /* ---------- Vazio ---------- */
+  .empty { @apply panel px-6 py-12 text-center flex flex-col items-center gap-3; }
+  .empty h3 { @apply text-2xl font-semibold; }
+  .empty p { @apply text-ink-soft max-w-sm; }
+
+  .skeleton { @apply bg-paper-2 rounded animate-pulse; }
+}
+
+/* Diálogo do Angular Material (confirmação) sem a moldura padrão */
+.cdk-overlay-pane.custom-panel .mat-mdc-dialog-surface,
+.cdk-overlay-pane.custom-panel .mdc-dialog__surface { background: transparent !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+.custom-backdrop { background: rgba(34, 48, 43, .5); }

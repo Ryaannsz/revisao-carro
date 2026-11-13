@@ -109,12 +109,12 @@ por **horímetro (horas)**, não por km. Toda métrica de carro tem a equivalent
 | revisão a cada 10.000 km / 6 meses | preventiva a cada **250 h / 500 h / 1000 h / 2000 h** ou meses |
 
 ### 4.1 Fase 1 — tornar utilizável (prioridade alta)
-- [ ] **Front: cadastro de máquina** (rota `/maquina`): identificação/apelido, tipo, marca, modelo, chassi/série, ano, horímetro inicial, intervalo preventiva (horas e meses). Reaproveitar o layout de `cadastro-carro`.
-- [ ] **Front: lista de máquinas + página da máquina** (espelho de `lista-carros` e `carro-unico`), com status e barra de progresso até a próxima preventiva por horas.
-- [ ] **Front: registrar manutenção de máquina** (espelho de `cadastro-revisao`), usando horímetro no lugar de km.
-- [ ] **Backend: próxima preventiva** (`/revisao/maquina/alarme`): `ultimaRevisao.horas + alarmeRevisaoHoras` e `data + alarmeRevisaoMes`, o que vencer primeiro. Mesmo padrão de `RevisaoService.montarProxima`.
-- [ ] **Status da máquina** (disponível / em manutenção / parada / em obra), igual a `CarroStatus`.
-- [ ] Adicionar "Máquinas" no header.
+- [x] **Front: cadastro de máquina** (rota `/maquina`): identificação/apelido, tipo, marca, modelo, chassi/série, ano, horímetro inicial, intervalo preventiva (horas e meses). Reaproveitar o layout de `cadastro-carro`.
+- [x] **Front: lista de máquinas + página da máquina** (espelho de `lista-carros` e `carro-unico`), com status e barra de progresso até a próxima preventiva por horas.
+- [x] **Front: registrar manutenção de máquina** (espelho de `cadastro-revisao`), usando horímetro no lugar de km.
+- [x] **Backend: próxima preventiva** (`/revisao/maquina/alarme`): `ultimaRevisao.horas + alarmeRevisaoHoras` e `data + alarmeRevisaoMes`, o que vencer primeiro. Mesmo padrão de `RevisaoService.montarProxima`.
+- [x] **Status da máquina** (disponível / em manutenção / parada / em obra), igual a `CarroStatus`.
+- [x] Adicionar "Máquinas" no header.
 
 ### 4.2 Fase 2 — combustível e uso
 - [ ] **Abastecimento de máquina**: data, horímetro, litros, valor total, **origem** (posto ou tanque próprio/comboio) e operador. Reaproveitar `Abast` com um `veiculo` genérico, ou criar `AbastMaquina`.
@@ -137,7 +137,7 @@ por **horímetro (horas)**, não por km. Toda métrica de carro tem a equivalent
 - [ ] Horas trabalhadas por mês (por máquina e total)
 - [ ] Consumo L/h por máquina (e alerta quando foge da média)
 - [ ] Custo R$/h (combustível + manutenção) e ranking das máquinas mais caras
-- [ ] Próximas preventivas por horímetro (tabela igual à de carros)
+- [x] Próximas preventivas por horímetro (no painel, junto com os carros em "Precisam de revisão")
 - [ ] Disponibilidade física: % do tempo em que a máquina não está em manutenção
 - [ ] Incluir máquinas no PDF
 
@@ -179,8 +179,8 @@ por **horímetro (horas)**, não por km. Toda métrica de carro tem a equivalent
 5. **Unicidade no banco:** índice único em `tb_user.cpf` e `tb_carro.placa` (hoje só validado no código). Fazer junto com o Flyway, depois de limpar duplicados.
 6. **Limpeza do repositório:** `backend/bin/` (62 arquivos `.class` antigos) e `.idea/` estão versionados. Remover e colocar no `.gitignore`.
 7. **README** desatualizado (fala de PostgreSQL e mostra Dockerfiles antigos). Atualizar com as variáveis da seção 7.
-8. **Lista de carros faz N+1 requisições** (`getKmRecente` por carro). Devolver o km atual junto no `GET /carro`.
-9. Header usa menus por hover (ruim no celular) e o `JwtModule` tem `allowedDomains` fixo em localhost (o interceptor próprio já cobre; dá pra remover o `JwtModule` e usar só o `JwtHelperService`).
+8. ~~**Lista de carros faz N+1 requisições**~~ resolvido: a lista usa o `kmAtual` que já vem em `/revisao/alarme`.
+9. ~~Header usa menus por hover (ruim no celular)~~ resolvido no redesign (menu lateral + barra inferior). Ainda: e o `JwtModule` tem `allowedDomains` fixo em localhost (o interceptor próprio já cobre; dá pra remover o `JwtModule` e usar só o `JwtHelperService`).
 10. Queries usam `DATE_FORMAT` (só MySQL). Tudo bem se o banco for sempre MySQL; tirar a dependência do Postgres do `pom.xml` já foi feito.
 11. Troca de senha pelo próprio usuário (o ADMIN inicial nasce com a senha do seed).
 
@@ -211,3 +211,17 @@ por **horímetro (horas)**, não por km. Toda métrica de carro tem a equivalent
 5. Dashboard de máquinas e KPIs no topo do dashboard.
 6. Documentação/vencimentos de carros (IPVA, licenciamento, seguro).
 7. Flyway + limpeza do repositório + README.
+
+---
+
+## 9. Rodada de 13/11/2026: Máquinas Fase 1 + redesign
+
+- **Máquinas no front:** `/maquinas` (lista com filtros e progresso da preventiva), `/maquinas/nova` (cadastro),
+  `/maquinas/:id` (ficha com horímetro, anotar leitura, manutenções, leituras, situação e edição) e
+  `/manutencao/maquina` (registrar manutenção, com opção de liberar a máquina). Histórico de revisões ganhou a aba Máquinas.
+- **Redesign completo** (identidade "Frota"): menu lateral no desktop, barra inferior com botão "Lançar" no celular,
+  medidor estilo contador mecânico, listas em linhas, formulários pensados para o polegar, locale pt-BR nos números.
+- **Bug corrigido no backend:** o km rodado por mês do painel fazia `max(km) - min(km)` da frota inteira (misturava
+  odômetros de carros diferentes), e o km/L do painel saía em 60–300 km/L. Agora soma carro a carro.
+- **Painel carregado sob demanda:** o chart.js saiu do pacote inicial (960 kB → 901 kB).
+- Lançamentos aceitam `?carro=ID` / `?maquina=ID` para já vir com o veículo escolhido (botões da ficha usam isso).

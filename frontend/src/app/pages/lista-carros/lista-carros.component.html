@@ -1,449 +1,119 @@
-<div class="min-h-screen bg-gray-50">
-  <!-- Hero Section com Estatísticas -->
-  <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-    <div class="container mx-auto px-4 py-12">
-      <div class="max-w-7xl mx-auto">
-        <!-- Título Principal -->
-        <div class="mb-8">
-          <h1 class="text-4xl md:text-5xl font-light mb-3">
-            Gestão de <span class="font-bold">Frota</span>
-          </h1>
-          <p class="text-slate-300 text-lg">
-            Monitore e gerencie todos os veículos da sua empresa em um só lugar
-          </p>
-        </div>
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Carros</h1>
+      <p class="page-sub" *ngIf="!loading">
+        {{ linhas.length }} {{ linhas.length === 1 ? 'carro' : 'carros' }} na frota.
+        <ng-container *ngIf="contar('REVISAO') as n">
+          <strong class="font-semibold text-ink">{{ n }} {{ n === 1 ? 'precisa' : 'precisam' }} de revisão.</strong>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <button class="icon-btn border border-line-strong bg-white" (click)="carregar()" title="Atualizar lista" aria-label="Atualizar lista">
+        <fa-icon [icon]="['fas', 'rotate']" [animation]="loading ? 'spin' : undefined"></fa-icon>
+      </button>
+      <a routerLink="/carro" class="btn-primary flex-1 sm:flex-none">
+        <fa-icon [icon]="['fas', 'plus']"></fa-icon> Cadastrar carro
+      </a>
+    </div>
+  </header>
 
-        <!-- Cards de Estatísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div
-            class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-slate-300 text-sm">Total de Veículos</p>
-                <p class="text-2xl font-bold">{{ carros.length }}</p>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-8 h-8 text-blue-500"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M5 11l1.5-4.5A2 2 0 018.4 5h7.2a2 2 0 011.9 1.5L19 11h1a1 1 0 011 1v6a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1H7v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-6a1 1 0 011-1h1zm2.5 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm9 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
-                />
-              </svg>
-            </div>
-          </div>
-          <div
-            class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-slate-300 text-sm">Disponíveis</p>
-                <p class="text-2xl font-bold text-green-400">
-                  {{ totalDisponiveis }}
-                  <span class="text-sm font-normal text-amber-300" *ngIf="totalManutencao">· {{ totalManutencao }} em manutenção</span>
-                </p>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-8 h-8 text-green-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </div>
+  <!-- Filtros com contagem + busca -->
+  <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+    <div class="seg" role="tablist" aria-label="Filtrar carros">
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === 'TODOS'" (click)="filtro = 'TODOS'">
+        Todos <span class="seg-count">{{ contar('TODOS') }}</span>
+      </button>
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === 'REVISAO'" (click)="filtro = 'REVISAO'">
+        Revisão <span class="seg-count" [class.text-over]="contar('REVISAO') > 0">{{ contar('REVISAO') }}</span>
+      </button>
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === DISPONIVEL" (click)="filtro = DISPONIVEL">
+        Disponíveis <span class="seg-count">{{ contar(DISPONIVEL) }}</span>
+      </button>
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === MANUTENCAO" (click)="filtro = MANUTENCAO">
+        Na oficina <span class="seg-count">{{ contar(MANUTENCAO) }}</span>
+      </button>
+    </div>
+    <label class="relative md:ml-auto md:w-72">
+      <span class="sr-only">Buscar por placa, marca ou modelo</span>
+      <fa-icon [icon]="['fas', 'search']" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"></fa-icon>
+      <input type="search" [(ngModel)]="search" placeholder="Placa, marca ou modelo" class="input h-11 pl-10" />
+    </label>
+  </div>
 
-          <div
-            class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-slate-300 text-sm">Média KM</p>
-                <p class="text-2xl font-bold">{{ mediaKm | number:'1.0-0' }}</p>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-8 h-8 text-yellow-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div
-            class="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/10"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-slate-300 text-sm">Revisão vencida/próxima</p>
-                <p class="text-2xl font-bold" [class.text-red-400]="totalRevisaoAtencao > 0">{{ totalRevisaoAtencao }}</p>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-8 h-8 text-purple-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Barra de Ações -->
-        <div
-          class="flex flex-col md:flex-row gap-4 justify-between items-center"
-        >
-          <!-- Busca Avançada -->
-          <div class="w-full md:w-96 relative">
-            <input
-              [(ngModel)]="search"
-              type="text"
-              placeholder="Pesquisar veículos..."
-              class="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur border border-white/20 rounded-lg text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20 transition"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <button
-              *ngIf="search"
-              (click)="clearSearch()"
-              class="absolute right-3 top-3.5 text-slate-400 hover:text-white transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Botões de Ação -->
-          <div class="flex gap-3">
-            <button
-              (click)="carregarCarros()"
-              class="px-6 py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-gray-100 transition flex items-center gap-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Sincronizar
-            </button>
-
-            <a href="/carro"
-              ><button
-                class="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Adicionar Veículo
-              </button></a
-            >
-          </div>
-        </div>
-      </div>
+  <!-- Carregando -->
+  <div *ngIf="loading && !linhas.length" class="rows" aria-hidden="true">
+    <div *ngFor="let s of skeletons" class="px-5 py-4 flex items-center gap-4">
+      <div class="flex-1 space-y-2"><div class="skeleton h-4 w-40"></div><div class="skeleton h-3 w-24"></div></div>
+      <div class="skeleton h-3 w-32 hidden md:block"></div>
+      <div class="skeleton h-6 w-20 rounded-full"></div>
     </div>
   </div>
 
-  <!-- Container Principal -->
-  <div class="container mx-auto px-4 py-8 max-w-7xl">
-    <!-- Filtros Rápidos -->
-    <div class="mb-6 flex flex-wrap gap-2">
-      <button
-        (click)="updateStatusFilter('TODOS')"
-        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-      >
-        Todos os veículos
-      </button>
-      <button
-        (click)="updateStatusFilter(carroDisponivel)"
-        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-      >
-        Disponíveis
-      </button>
-      <button
-        (click)="updateStatusFilter(carroManutencao)"
-        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-      >
-        Em manutenção
-      </button>
-    </div>
+  <!-- Lista -->
+  <ul *ngIf="filtradas.length" class="rows">
+    <li *ngFor="let l of filtradas; trackBy: trackBy">
+      <a [routerLink]="['/carros/unico', l.carro.id]" class="row-link grid gap-x-6 gap-y-3 items-center
+         grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,1.3fr)_7.5rem_minmax(0,1.5fr)_7rem_1rem]">
 
-    <!-- Skeleton Loading -->
-    <div
-      *ngIf="loading"
-      class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4"
-    >
-      <div
-        *ngFor="let s of skeletons"
-        class="bg-white rounded-lg shadow-sm p-6 animate-pulse"
-      >
-        <div class="flex items-start justify-between mb-4">
-          <div class="w-32 h-6 bg-gray-200 rounded"></div>
-          <div class="w-20 h-6 bg-gray-200 rounded-full"></div>
+        <!-- Identificação -->
+        <div class="min-w-0 flex items-center gap-3">
+          <span class="plate shrink-0">{{ l.carro.placa }}</span>
+          <span class="font-semibold truncate">{{ l.nome }}</span>
         </div>
-        <div class="space-y-3">
-          <div class="w-full h-4 bg-gray-200 rounded"></div>
-          <div class="w-3/4 h-4 bg-gray-200 rounded"></div>
-          <div class="w-1/2 h-4 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Grid de Veículos -->
-    <div
-      *ngIf="!loading && carrosFiltrados.length > 0"
-      class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4"
-    >
-      <div
-        *ngFor="
-          let carro of carrosFiltrados;
-          let i = index;
-          trackBy: trackByCarro
-        "
-        (click)="irParaCarro(carro.id)"
-        class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 group animate-fade-in"
-        [style.animation-delay]="i * 0.03 + 's'"
-        tabindex="0"
-        (keyup.enter)="irParaCarro(carro.id)"
-      >
-        <!-- Card Header -->
-        <div class="p-6 border-b border-gray-100">
-          <div class="flex items-start justify-between mb-3">
-            <div>
-              <h3
-                class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition"
-              >
-                {{ carro.marca.marca | uppercase }}
-                {{ carro.modelo.modelo | uppercase }}
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">ID: #{{ carro.id }}</p>
-            </div>
-            @if (carro.status==carroDisponivel){
-            <span
-              class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full"
-            >
-              Disponível
+        <!-- Status (celular: à direita da 1ª linha) -->
+        <div class="md:order-4 justify-self-end md:justify-self-start">
+          <span *ngIf="l.carro.status === MANUTENCAO" class="tag tag-due">Na oficina</span>
+          <span *ngIf="l.carro.status !== MANUTENCAO" class="tag tag-ok">Disponível</span>
+        </div>
+
+        <!-- Km -->
+        <div class="md:order-2 col-span-2 md:col-span-1 flex md:block items-baseline gap-2 -mt-1 md:mt-0">
+          <span class="num text-lg font-semibold">{{ l.km | number:'1.0-0' }}</span>
+          <span class="text-sm text-ink-soft md:ml-1">km</span>
+        </div>
+
+        <!-- Próxima revisão -->
+        <div class="md:order-3 col-span-2 md:col-span-1">
+          <div class="flex items-baseline justify-between gap-3 text-sm mb-1.5">
+            <span [ngClass]="{ 'text-over font-semibold': l.situacao === 'vencida', 'text-due font-semibold': l.situacao === 'proxima', 'text-ink-soft': l.situacao === 'ok' || l.situacao === 'sem-dados' }">
+              {{ prazo(l) }}
             </span>
-            }@else {
-            <span
-              class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full"
-            >
-              Manutenção
+            <span *ngIf="l.prox?.proximaRevisaoEstimada" class="text-ink-soft whitespace-nowrap"
+                  [class.text-over]="l.dias !== null && l.dias < 0">
+              até {{ l.prox?.proximaRevisaoEstimada | date:'dd/MM/yy' }}
             </span>
-            }
           </div>
+          <div class="track"><i [ngClass]="SIT[l.situacao].barra" [style.width.%]="l.progresso"></i></div>
         </div>
 
-        <!-- Card Body -->
-        <div class="p-6 space-y-4">
-          <!-- Informações Principais -->
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                Placa
-              </p>
-              <p class="font-medium text-gray-900">
-                {{ carro.placa | uppercase }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                Quilometragem
-              </p>
-              <p class="font-medium text-gray-900">
-                {{ carro.kmAdicionado | number }} km
-              </p>
-            </div>
-          </div>
+        <fa-icon [icon]="['fas', 'chevron-right']" class="hidden md:block md:order-5 text-ink-faint"></fa-icon>
+      </a>
+    </li>
+  </ul>
 
-          <!-- Barra de Progresso KM -->
-          <div>
-            <div class="flex justify-between text-xs text-gray-500 mb-1">
-              <span>Próxima manutenção</span>
-              <span
-                >{{
-                  getProximaRevisaoByCarroId(carro.id)?.kmRevisaoEstimado
-                }}
-                km</span
-              >
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
-              <div
-                class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
-                [style.width]="getProgressPercent(carro) + '%'"
-              ></div>
-            </div>
-          </div>
-
-          <!-- Ações Rápidas -->
-          <div class="flex gap-2 pt-2">
-            <button
-              (click)="irParaCarro(carro.id)"
-              class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition"
-            >
-              Detalhes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Estado Vazio -->
-    <div
-      *ngIf="!loading && carrosFiltrados.length === 0"
-      class="bg-white rounded-lg shadow-sm p-12 text-center"
-    >
-      <div
-        class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-10 h-10 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-          />
-        </svg>
-      </div>
-      <h3 class="text-xl font-semibold text-gray-900 mb-2">
-        Nenhum veículo encontrado
-      </h3>
-      <p class="text-gray-500 mb-6">
-        {{
-          search
-            ? "Tente ajustar os filtros de busca"
-            : "Adicione seu primeiro veículo para começar"
-        }}
-      </p>
-      <div class="flex justify-center gap-3">
-        <button
-          *ngIf="search"
-          (click)="clearSearch()"
-          class="px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition"
-        >
-          Limpar filtros
-        </button>
-        <button
-          (click)="carregarCarros()"
-          class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
-        >
-          Recarregar
-        </button>
-      </div>
-    </div>
+  <!-- Vazio -->
+  <div *ngIf="!loading && !filtradas.length" class="empty">
+    <ng-container *ngIf="linhas.length; else nenhumCarro">
+      <h3>Nenhum carro neste filtro</h3>
+      <p>Mude o filtro ou a busca para ver os outros carros.</p>
+      <button class="btn-outline mt-2" (click)="limparFiltros()">Mostrar todos</button>
+    </ng-container>
+    <ng-template #nenhumCarro>
+      <ng-container *ngIf="!erro; else falhou">
+        <h3>Nenhum carro cadastrado</h3>
+        <p>Cadastre o primeiro carro para acompanhar quilometragem, abastecimentos e revisões.</p>
+        <a routerLink="/carro" class="btn-primary mt-2"><fa-icon [icon]="['fas', 'plus']"></fa-icon> Cadastrar carro</a>
+      </ng-container>
+      <ng-template #falhou>
+        <h3>A lista não carregou</h3>
+        <p>Verifique a conexão e tente de novo.</p>
+        <button class="btn-outline mt-2" (click)="carregar()">Tentar de novo</button>
+      </ng-template>
+    </ng-template>
   </div>
 </div>
 
-<style>
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.4s ease-out forwards;
-    opacity: 0;
-  }
-
-  /* Scrollbar customizada */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-</style>
-
-<app-loading [visible]="loading" message="Carregando veículos..."></app-loading>
+<app-loading [visible]="loading" message="Carregando carros"></app-loading>

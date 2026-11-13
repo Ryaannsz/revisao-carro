@@ -14,6 +14,12 @@ import { ToastService } from '../../../core/services/toast.service';
 export class ListModelosComponent implements OnInit {
 
   @Input() label: string = 'Modelo';
+  @Input() inputId = 'campo-modelo';
+  @Input() invalido = false;
+  /** Define o texto exibido (null limpa). Usado ao limpar o formulário ou ao editar. */
+  @Input() set selecionado(v: { modelo: string } | null | undefined) {
+    this.modeloForm?.get('modelo')?.setValue(v?.modelo ?? '', { emitEvent: false });
+  }
   @Output() modeloSelecionado = new EventEmitter<Modelo>();
 
   modeloForm: FormGroup;

@@ -1,0 +1,89 @@
+<div class="page-narrow">
+  <header class="mb-6">
+    <h1 class="page-title">Registrar manutenção de máquina</h1>
+    <p class="page-sub">Use o horímetro do dia do serviço. A próxima preventiva passa a contar a partir dele.</p>
+  </header>
+
+  <div *ngIf="ultimaLancada" class="mb-5 rounded-lg bg-ok-soft text-ok px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-1" role="status">
+    <span class="font-semibold">Manutenção de {{ nome(ultimaLancada) }} registrada.</span>
+    <a [routerLink]="['/maquinas', ultimaLancada.id]" class="font-semibold underline underline-offset-4">Ver máquina</a>
+    <button class="ml-auto text-sm font-semibold opacity-70 hover:opacity-100" (click)="ultimaLancada = null">Fechar</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="flex flex-col gap-5">
+    <section class="panel">
+      <div class="panel-body flex flex-col gap-5">
+        <div class="field">
+          <span class="field-label" id="lbl-maq">Máquina</span>
+          <button type="button" class="picker" (click)="seletorAberto = true" aria-labelledby="lbl-maq" [class.!border-over]="erro('maquina')">
+            <span *ngIf="selecionada; else escolherMaq" class="min-w-0">
+              <span class="block font-semibold truncate">{{ nome(selecionada) }}</span>
+              <span *ngIf="detalhe(selecionada)" class="block text-sm text-ink-soft truncate">{{ detalhe(selecionada) }}</span>
+            </span>
+            <ng-template #escolherMaq><span class="text-ink-faint">Escolha a máquina</span></ng-template>
+            <fa-icon [icon]="['fas', 'chevron-down']" class="text-ink-soft"></fa-icon>
+          </button>
+          <p *ngIf="erro('maquina')" class="field-error">Escolha a máquina.</p>
+          <p *ngIf="!maquinas.length" class="field-hint">Nenhuma máquina cadastrada. <a routerLink="/maquinas/nova" class="font-semibold text-ink underline underline-offset-4">Cadastrar máquina</a></p>
+        </div>
+
+        <div *ngIf="selecionada" class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg bg-paper px-4 py-3">
+          <span class="stat-label">Último horímetro</span>
+          <app-medidor [valor]="horasAtual ?? 0" unidade="h" [digitos]="5" [decimais]="1" size="sm"></app-medidor>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="field">
+            <label class="field-label" for="horas">Horímetro no serviço</label>
+            <div class="input-suffix">
+              <input id="horas" type="number" inputmode="decimal" step="0.1" formControlName="horasAtual" class="input num text-xl h-14"
+                [class.!border-over]="erro('horasAtual') || horasMenor" [placeholder]="horasAtual ?? ''"><span>h</span>
+            </div>
+            <p *ngIf="horasMenor" class="field-error">Menor que o último registro ({{ horasAtual | number:'1.0-1' }} h).</p>
+            <p *ngIf="!horasMenor && erro('horasAtual')" class="field-error">Informe as horas do painel.</p>
+          </div>
+          <div class="field">
+            <label class="field-label" for="data">Data</label>
+            <input id="data" type="date" formControlName="dtRevisao" class="input h-14" [max]="hoje">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="desc">O que foi feito</label>
+          <div class="flex flex-wrap gap-2 mb-1">
+            <button *ngFor="let s of sugestoes" type="button" (click)="adicionarSugestao(s)"
+              class="h-8 px-3 rounded-full border border-line-strong text-sm font-medium hover:bg-paper hover:border-ink">+ {{ s }}</button>
+          </div>
+          <textarea id="desc" formControlName="descricao" rows="3" maxlength="1000" class="input"
+            placeholder="Ex.: troca de óleo do motor e filtro, graxa nos pinos"></textarea>
+        </div>
+
+        <div class="field sm:max-w-xs">
+          <label class="field-label" for="valor">Custo total</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-ink-soft">R$</span>
+            <input id="valor" type="number" inputmode="decimal" step="0.01" min="0" formControlName="valor" class="input num text-lg pl-11" placeholder="0,00">
+          </div>
+          <p class="field-hint">Peças, óleo e mão de obra. Pode deixar em branco.</p>
+        </div>
+
+        <label *ngIf="emManutencao" class="flex items-start gap-3 rounded-lg border border-line px-4 py-3 cursor-pointer">
+          <input type="checkbox" class="mt-1 w-5 h-5 accent-[#22302B]" [(ngModel)]="liberarMaquina" [ngModelOptions]="{ standalone: true }">
+          <span>
+            <span class="block font-semibold">Liberar a máquina</span>
+            <span class="block text-sm text-ink-soft">Ela está marcada como em manutenção. Ao salvar, volta para disponível.</span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <button type="submit" class="btn-primary h-14 text-base" [disabled]="loading">
+      <fa-icon [icon]="['fas', 'tools']"></fa-icon> Registrar manutenção
+    </button>
+  </form>
+</div>
+
+<app-seletor [aberto]="seletorAberto" titulo="Qual máquina passou pela manutenção?" placeholder="Nome, tipo ou marca"
+  vazio="Nenhuma máquina cadastrada ainda." [itens]="itens" (escolher)="escolher($event)" (fechar)="seletorAberto = false"></app-seletor>
+
+<app-loading [visible]="loading" message="Salvando manutenção"></app-loading>

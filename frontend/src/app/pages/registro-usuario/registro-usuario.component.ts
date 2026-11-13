@@ -40,6 +40,15 @@ export class RegistroUsuarioComponent implements OnInit {
     );
   }
 
+  iniciais(nome: string): string {
+    return (nome ?? '').trim().split(/\s+/).slice(0, 2).map(p => p[0] ?? '').join('').toUpperCase() || '?';
+  }
+
+  formatarCpf(cpf: string): string {
+    const d = (cpf ?? '').replace(/\D/g, '');
+    return d.length === 11 ? `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}` : cpf;
+  }
+
   openModal() {
     this.showModal = true;
   }
@@ -59,7 +68,7 @@ export class RegistroUsuarioComponent implements OnInit {
       .patchRole('ADMIN', user.id)
       .subscribe((updatedUser) => {
         this.loadUsers();
-        this.toastService.showSuccess("Usuário promovido com sucesso!")
+        this.toastService.showSuccess(`${user.nome} agora é administrador.`)
       });
   }
 
@@ -67,7 +76,7 @@ export class RegistroUsuarioComponent implements OnInit {
     if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
     this.userService.patchRole('USER', user.id).subscribe((updatedUser) => {
       this.loadUsers();
-      this.toastService.showSuccess("Usuário rebaixado com sucesso!")
+      this.toastService.showSuccess(`${user.nome} agora é operador.`)
     });
   }
 }

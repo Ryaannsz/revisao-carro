@@ -14,6 +14,12 @@ import { ToastService } from '../../../core/services/toast.service';
 export class ListMarcaComponent implements OnInit {
 
   @Input() label: string = 'Marca';
+  @Input() inputId = 'campo-marca';
+  @Input() invalido = false;
+  /** Define o texto exibido (null limpa). Usado ao limpar o formulário ou ao editar. */
+  @Input() set selecionado(v: { marca: string } | null | undefined) {
+    this.marcaForm?.get('marca')?.setValue(v?.marca ?? '', { emitEvent: false });
+  }
   @Output() marcaSelecionado = new EventEmitter<Marca>();
 
   marcaForm: FormGroup;

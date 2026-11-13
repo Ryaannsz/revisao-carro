@@ -15,6 +15,7 @@ export class ConfirmationDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: {
       title: string;
       message: string;
+      confirmLabel?: string;
     }
   ) { }
 
@@ -26,12 +27,12 @@ export class ConfirmationDialogComponent implements OnInit {
   confirm(): void {
     this.isOpen = false;
     // Delay para permitir a animação de saída antes de fechar
-    setTimeout(() => this.dialogRef.close(true), 300);
+    setTimeout(() => this.dialogRef.close(true), 150);
   }
 
   cancel(): void {
     this.isOpen = false;
     // Delay para permitir a animação de saída antes de fechar
-    setTimeout(() => this.dialogRef.close(false), 300);
+    setTimeout(() => this.dialogRef.close(false), 150);
   }
 }

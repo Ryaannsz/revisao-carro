@@ -16,7 +16,6 @@ export class UserService extends BaseService {
 
   patchRole(roles: string, id: number): Observable<User> {
     const url = `${AppConstants.USER_URL}/${id}`;
-    console.log(roles);
     return this.http.patch<User>(url, { roles });
   }
 }

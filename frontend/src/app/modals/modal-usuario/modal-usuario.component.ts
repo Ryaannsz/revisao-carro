@@ -56,16 +56,19 @@ export class ModalUsuarioComponent {
   }
 
   submit() {
-    if (this.userForm.invalid) return;
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
 
     this.userService.post(this.userForm.value).subscribe({
       next: () => {
         this.userCreated.emit();
         this.close.emit();
-        this.toastService.showSuccess('Usuário criado com sucesso!');
+        this.toastService.showSuccess(`Usuário ${this.userForm.value.nome} criado.`);
       },
       error: (err) => {
-        this.toastService.showError('Erro ao criar usuário!');
+        this.toastService.showError(typeof err?.error === 'string' && err.error ? err.error : 'Não foi possível criar o usuário. Confira se o CPF já não está cadastrado.');
       },
     });
   }

@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Abast } from '../../core/models/abast.model';
 import { AbastService } from '../../core/services/abast.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GrupoMes, agruparPorMes } from '../../core/utils/agrupar.utils';
+import { nomeVeiculo } from '../../core/utils/situacao.utils';
 
 @Component({
   selector: 'app-registro-abastecimento',
@@ -11,13 +13,12 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './registro-abastecimento.component.html',
   styleUrl: './registro-abastecimento.component.css'
 })
-export class RegistroAbastecimentoComponent {
-
+export class RegistroAbastecimentoComponent implements OnInit {
   abastecimentos: Abast[] = [];
-  filteredAbastecimentos: Abast[] = [];
-  searchQuery: string = '';
-  selectedAbast: Abast | null = null;
-  loading: boolean = false;
+  searchQuery = '';
+  loading = false;
+  limite = 40;
+  aberto: number | null = null;
 
   constructor(private abastService: AbastService,
     private toastService: ToastService,
@@ -29,53 +30,42 @@ export class RegistroAbastecimentoComponent {
     this.carregarAbast();
   }
 
-  onSearch(): void {
+  get isAdmin() { return this.authService.getUserRole(); }
+
+  nome(a: Abast) { return nomeVeiculo(a.carro?.marca?.marca, a.carro?.modelo?.modelo); }
+  precoLitro(a: Abast) { return a.litroComb > 0 ? a.valorComb / a.litroComb : null; }
+
+  get filtrados(): Abast[] {
     const q = this.searchQuery.trim().toLowerCase();
-    if (!q) {
-      this.filteredAbastecimentos = [...this.abastecimentos];
-      return;
-    }
-    this.filteredAbastecimentos = this.abastecimentos.filter(a =>
-      a.carro.marca.marca.toLowerCase().includes(q) ||
-      a.carro.modelo.modelo.toLowerCase().includes(q) ||
-      a.carro.placa.toLowerCase().includes(q)
-    );
+    if (!q) return this.abastecimentos;
+    return this.abastecimentos.filter(a =>
+      this.nome(a).toLowerCase().includes(q) || (a.carro?.placa ?? '').toLowerCase().includes(q));
   }
 
-  openModal(abast: Abast): void {
-    this.selectedAbast = abast;
+  get grupos(): GrupoMes<Abast>[] {
+    return agruparPorMes(this.filtrados.slice(0, this.limite), a => a.dtAbast as any, a => a.valorComb);
   }
 
-  closeModal(): void {
-    this.selectedAbast = null;
-  }
+  get totalGasto() { return this.filtrados.reduce((t, a) => t + (a.valorComb ?? 0), 0); }
+  get totalLitros() { return this.filtrados.reduce((t, a) => t + (a.litroComb ?? 0), 0); }
 
-  removeAbast(id: number): void {
-    if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
-    this.confirmationService.confirm(
-      'Tem certeza?',
-      'Você deseja realmente excluir este item?'
-    ).subscribe(result => {
-      if (!result) return;
-      this.loading = true;
-      this.abastService.delete(id).subscribe({
-        next: () => {
-          this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
-          this.onSearch();
-          this.closeModal();
-          this.toastService.showSuccess("Abastecimento removido com sucesso!");
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-          this.toastService.showError("Erro ao remover abastecimento.");
-        }
+  removeAbast(a: Abast): void {
+    this.confirmationService.confirm('Excluir abastecimento?', `Abastecimento de ${a.carro?.placa?.toUpperCase()} em ${new Date(String(a.dtAbast).slice(0, 10) + 'T00:00').toLocaleDateString('pt-BR')}.`)
+      .subscribe(ok => {
+        if (!ok) return;
+        this.loading = true;
+        this.abastService.delete(a.id).subscribe({
+          next: () => {
+            this.abastecimentos = this.abastecimentos.filter(x => x.id !== a.id);
+            this.loading = false;
+            this.toastService.showSuccess('Abastecimento excluído.');
+          },
+          error: () => {
+            this.loading = false;
+            this.toastService.showError('Não foi possível excluir o abastecimento.');
+          }
+        });
       });
-    })
-  }
-
-  editAbast(id: number): void {
-
   }
 
   carregarAbast() {
@@ -83,16 +73,11 @@ export class RegistroAbastecimentoComponent {
     this.abastService.getList<Abast>().subscribe({
       next: (list) => {
         this.loading = false;
-        this.abastecimentos = list;
-        this.filteredAbastecimentos = list;
-        if (list.length === 0)
-          this.toastService.showInfo("Nenhum abastecimento registrado.")
-        else
-          this.toastService.showSuccess("Abastecimentos carregados!")
+        this.abastecimentos = [...list].sort((a, b) => String(b.dtAbast).localeCompare(String(a.dtAbast)) || b.id - a.id);
       },
-      error: (err) => {
+      error: () => {
         this.loading = false;
-        this.toastService.showError('Erro ao buscar lista!');
+        this.toastService.showError('Não foi possível carregar os abastecimentos.');
       }
     });
   }

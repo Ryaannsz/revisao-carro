@@ -1,109 +1,83 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-gray-50">
-  <!-- Form Container -->
-  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg transition-all duration-300 hover:shadow-2xl">
-    <h2 class="text-3xl font-bold mb-8 text-center text-green-600 animate-fade-in-down">
-      <fa-icon [icon]="['fas', 'gas-pump']" class="mr-3"></fa-icon>Registrar Abastecimento
-    </h2>
+<div class="page-narrow">
+  <header class="mb-6">
+    <h1 class="page-title">Lançar abastecimento</h1>
+    <p class="page-sub">Anote o km do painel antes de sair do posto. Ele é usado para calcular o consumo.</p>
+  </header>
 
-    <form [formGroup]="abastForm" (ngSubmit)="cadastrarAbastecimento()" class="space-y-6">
-      <!-- Campos do Formulário -->
-      <div class="space-y-4">
-        <div class="form-group animate-fade-in-up delay-100">
-          <label class="block text-gray-600 mb-2 font-medium">
-              <fa-icon [icon]="['fas', 'water']" class="mr-2 text-green-500"></fa-icon>Litros Abastecidos
-          </label>
-          <input type="number" formControlName="litroComb"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-        </div>
-
-        <div class="form-group animate-fade-in-up delay-200">
-          <label class="block text-gray-600 mb-2 font-medium">
-            <fa-icon [icon]="['fas', 'coins']" class="mr-2 text-green-500"></fa-icon>Valor total pago (R$)
-          </label>
-          <input type="number" formControlName="valorComb" step="0.01"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-          <span *ngIf="precoPorLitro" class="text-sm text-gray-500">≈ {{ precoPorLitro | currency:'BRL' }} por litro</span>
-        </div>
-
-        <div class="form-group animate-fade-in-up delay-300">
-          <label class="block text-gray-600 mb-2 font-medium">
-            <fa-icon [icon]="['fas', 'tachometer-alt']" class="mr-2 text-green-500"></fa-icon>KM atual
-          </label>
-          <input type="number" formControlName="kmAtual"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-                  <span>KM atual: {{ kmPuxado }}</span>
-        </div>
-
-        <div class="form-group animate-fade-in-up delay-500">
-          <label class="block text-gray-600 mb-2 font-medium">
-            <fa-icon [icon]="['fas', 'calendar-day']" class="mr-2 text-green-500"></fa-icon>Data do Abastecimento
-          </label>
-          <input type="date" formControlName="dtAbast"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-        </div>
-
-        <div class="form-group animate-fade-in-up delay-600">
-          <label class="block text-gray-600 mb-2 font-medium">
-            <fa-icon [icon]="['fas', 'car']" class="mr-2 text-green-500"></fa-icon>Carro
-          </label>
-          <button type="button" (click)="openModal()"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-left focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all hover:border-green-300 group flex justify-between items-center">
-            <span class="truncate">
-              {{ selectedCar
-              ? (selectedCar.marca.marca | uppercase) + ' ' + (selectedCar.modelo.modelo | uppercase) + ' - ' +
-              (selectedCar.placa | uppercase)
-              : 'Selecione um carro' }}
-            </span>
-            <fa-icon [icon]="['fas', 'chevron-down']" class="text-gray-400 group-hover:text-green-500 transition-transform"></fa-icon>
-          </button>
-        </div>
-      </div>
-
-      <button type="submit"
-        class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-medium transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-green-200/50">
-        <fa-icon [icon]="['fas', 'save']" class="mr-2"></fa-icon>Registrar Abastecimento
-      </button>
-    </form>
+  <div *ngIf="ultimoLancado" class="mb-5 rounded-lg bg-ok-soft text-ok px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-1" role="status">
+    <span class="font-semibold">Abastecimento do {{ ultimoLancado.placa | uppercase }} lançado.</span>
+    <a [routerLink]="['/carros/unico', ultimoLancado.id]" class="font-semibold underline underline-offset-4">Ver carro</a>
+    <button class="ml-auto text-sm font-semibold opacity-70 hover:opacity-100" (click)="ultimoLancado = null">Fechar</button>
   </div>
 
-  <!-- Modal -->
-  <div *ngIf="showModal"
-    class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-    (click)="showModal = false">
-    <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all duration-300"
-      (click)="$event.stopPropagation()">
-      <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-        <h3 class="text-2xl font-bold text-gray-800">
-            <fa-icon [icon]="['fas', 'car-side']" class="mr-2 text-green-500"></fa-icon>Selecionar Carro
-        </h3>
-        <button type="button" (click)="showModal = false" class="p-2 rounded-full hover:bg-gray-50 transition-colors">
-          <fa-icon [icon]="['fas', 'times']" class="text-gray-400 hover:text-gray-600 text-lg"></fa-icon>
-        </button>
-      </div>
-
-      <div class="p-6">
-        <div class="relative mb-6">
-          <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterCars()" placeholder="Pesquisar carro..."
-            class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
-          <fa-icon [icon]="['fas', 'search']" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
+  <form [formGroup]="abastForm" (ngSubmit)="cadastrarAbastecimento()" novalidate class="flex flex-col gap-5">
+    <section class="panel">
+      <div class="panel-body flex flex-col gap-5">
+        <div class="field">
+          <span class="field-label" id="lbl-carro">Carro</span>
+          <button type="button" class="picker" (click)="showModal = true" aria-labelledby="lbl-carro" [class.!border-over]="erro('carro')">
+            <span *ngIf="selectedCar; else escolherCarro" class="flex items-center gap-3 min-w-0">
+              <span class="plate shrink-0">{{ selectedCar.placa }}</span>
+              <span class="font-semibold truncate">{{ nome(selectedCar) }}</span>
+            </span>
+            <ng-template #escolherCarro><span class="text-ink-faint">Escolha o carro</span></ng-template>
+            <fa-icon [icon]="['fas', 'chevron-down']" class="text-ink-soft"></fa-icon>
+          </button>
+          <p *ngIf="erro('carro')" class="field-error">Escolha o carro abastecido.</p>
         </div>
 
-        <div class="flex-1 overflow-y-auto pr-2 -mr-2">
-          <div *ngFor="let car of filteredCars" (click)="selectCar(car)"
-            class="p-4 mb-2 rounded-lg border border-gray-100 hover:border-green-200 cursor-pointer transition-all hover:bg-green-50/50 group relative">
-            <div class="font-medium text-gray-800 group-hover:text-green-600 transition-colors">
-              {{ car.marca.marca | uppercase }} {{ car.modelo.modelo | uppercase }}
-            </div>
-            <div class="text-sm text-gray-500">{{ car.placa | uppercase }}</div>
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <fa-icon [icon]="['fas', 'check-circle']" class="mr-2 text-green-500"></fa-icon>
+        <div *ngIf="selectedCar" class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg bg-paper px-4 py-3">
+          <span class="stat-label">Último km registrado</span>
+          <app-medidor [valor]="kmPuxado ?? 0" unidade="km" size="sm"></app-medidor>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="km">Km do painel agora</label>
+          <div class="input-suffix">
+            <input id="km" type="number" inputmode="numeric" formControlName="kmAtual" class="input num text-xl h-14"
+              [class.!border-over]="erro('kmAtual') || kmMenor" [placeholder]="kmPuxado ?? ''"><span>km</span>
+          </div>
+          <p *ngIf="kmMenor" class="field-error">Menor que o último registro ({{ kmPuxado | number:'1.0-0' }} km). Confira o painel.</p>
+          <p *ngIf="!kmMenor && erro('kmAtual')" class="field-error">Informe o km do painel.</p>
+          <p *ngIf="rodado !== null" class="field-hint">{{ rodado | number:'1.0-0' }} km desde o último registro.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="field">
+            <label class="field-label" for="litros">Litros</label>
+            <div class="input-suffix">
+              <input id="litros" type="number" inputmode="decimal" step="0.01" formControlName="litroComb" class="input num text-lg"
+                [class.!border-over]="erro('litroComb')" placeholder="40"><span>L</span>
             </div>
           </div>
+          <div class="field">
+            <label class="field-label" for="valor">Total pago</label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-ink-soft">R$</span>
+              <input id="valor" type="number" inputmode="decimal" step="0.01" formControlName="valorComb" class="input num text-lg pl-11"
+                [class.!border-over]="erro('valorComb')" placeholder="250,00">
+            </div>
+          </div>
+          <p class="col-span-2 field-hint -mt-2" *ngIf="precoPorLitro; else dicaValor">
+            Deu {{ precoPorLitro | currency:'BRL' }} por litro.
+          </p>
+          <ng-template #dicaValor><p class="col-span-2 field-hint -mt-2">Digite o valor total da nota, não o preço do litro.</p></ng-template>
+        </div>
+
+        <div class="field sm:max-w-xs">
+          <label class="field-label" for="data">Data</label>
+          <input id="data" type="date" formControlName="dtAbast" class="input" [max]="hoje">
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <button type="submit" class="btn-primary h-14 text-base" [disabled]="loading">
+      <fa-icon [icon]="['fas', 'gas-pump']"></fa-icon> Lançar abastecimento
+    </button>
+  </form>
 </div>
 
-<app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+<app-seletor [aberto]="showModal" titulo="Qual carro foi abastecido?" placeholder="Placa, marca ou modelo"
+  vazio="Nenhum carro cadastrado ainda." [itens]="itens" (escolher)="escolher($event)" (fechar)="showModal = false"></app-seletor>
+
+<app-loading [visible]="loading" message="Salvando abastecimento"></app-loading>

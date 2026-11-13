@@ -1,0 +1,106 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Máquinas</h1>
+      <p class="page-sub" *ngIf="!loading">
+        {{ linhas.length }} {{ linhas.length === 1 ? 'máquina' : 'máquinas' }}, controladas por horímetro.
+        <ng-container *ngIf="contar('PREVENTIVA') as n">
+          <strong class="font-semibold text-ink">{{ n }} com preventiva vencendo.</strong>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <button class="icon-btn border border-line-strong bg-white" (click)="carregar()" title="Atualizar lista" aria-label="Atualizar lista">
+        <fa-icon [icon]="['fas', 'rotate']" [animation]="loading ? 'spin' : undefined"></fa-icon>
+      </button>
+      <a routerLink="/maquinas/nova" class="btn-primary flex-1 sm:flex-none">
+        <fa-icon [icon]="['fas', 'plus']"></fa-icon> Cadastrar máquina
+      </a>
+    </div>
+  </header>
+
+  <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+    <div class="seg" role="tablist" aria-label="Filtrar máquinas">
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === 'TODAS'" (click)="filtro = 'TODAS'">
+        Todas <span class="seg-count">{{ contar('TODAS') }}</span>
+      </button>
+      <button role="tab" class="seg-btn" [class.is-on]="filtro === 'PREVENTIVA'" (click)="filtro = 'PREVENTIVA'">
+        Preventiva <span class="seg-count" [class.text-over]="contar('PREVENTIVA') > 0">{{ contar('PREVENTIVA') }}</span>
+      </button>
+      <button *ngFor="let s of statusFiltros" role="tab" class="seg-btn" [class.is-on]="filtro === s" (click)="filtro = s">
+        {{ STATUS[s].label }} <span class="seg-count">{{ contar(s) }}</span>
+      </button>
+    </div>
+    <label class="relative md:ml-auto md:w-72">
+      <span class="sr-only">Buscar máquina</span>
+      <fa-icon [icon]="['fas', 'search']" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"></fa-icon>
+      <input type="search" [(ngModel)]="search" placeholder="Nome, tipo, marca ou série" class="input h-11 pl-10" />
+    </label>
+  </div>
+
+  <div *ngIf="loading && !linhas.length" class="rows" aria-hidden="true">
+    <div *ngFor="let s of skeletons" class="px-5 py-4 flex items-center gap-4">
+      <div class="flex-1 space-y-2"><div class="skeleton h-4 w-44"></div><div class="skeleton h-3 w-28"></div></div>
+      <div class="skeleton h-3 w-32 hidden md:block"></div>
+      <div class="skeleton h-6 w-20 rounded-full"></div>
+    </div>
+  </div>
+
+  <ul *ngIf="filtradas.length" class="rows">
+    <li *ngFor="let l of filtradas; trackBy: trackBy">
+      <a [routerLink]="['/maquinas', l.m.id]" class="row-link grid gap-x-6 gap-y-3 items-center
+         grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,1.3fr)_7.5rem_minmax(0,1.5fr)_7rem_1rem]">
+
+        <div class="min-w-0">
+          <p class="font-semibold truncate">{{ l.nome }}</p>
+          <p class="text-sm text-ink-soft truncate" *ngIf="l.detalhe">{{ l.detalhe }}</p>
+        </div>
+
+        <div class="md:order-4 justify-self-end md:justify-self-start self-start md:self-center">
+          <span class="tag" [ngClass]="STATUS[l.status].tag">{{ STATUS[l.status].label }}</span>
+        </div>
+
+        <div class="md:order-2 col-span-2 md:col-span-1 flex md:block items-baseline gap-2 -mt-1 md:mt-0">
+          <span class="num text-lg font-semibold">{{ l.horas | number:'1.0-1' }}</span>
+          <span class="text-sm text-ink-soft md:ml-1">h</span>
+        </div>
+
+        <div class="md:order-3 col-span-2 md:col-span-1">
+          <div class="flex items-baseline justify-between gap-3 text-sm mb-1.5">
+            <span [ngClass]="{ 'text-over font-semibold': l.situacao === 'vencida', 'text-due font-semibold': l.situacao === 'proxima', 'text-ink-soft': l.situacao === 'ok' || l.situacao === 'sem-dados' }">
+              {{ prazo(l) }}
+            </span>
+            <span *ngIf="l.prox?.proximaRevisaoEstimada" class="text-ink-soft whitespace-nowrap" [class.text-over]="l.dias !== null && l.dias < 0">
+              até {{ l.prox?.proximaRevisaoEstimada | date:'dd/MM/yy' }}
+            </span>
+          </div>
+          <div class="track"><i [ngClass]="SIT[l.situacao].barra" [style.width.%]="l.progresso"></i></div>
+        </div>
+
+        <fa-icon [icon]="['fas', 'chevron-right']" class="hidden md:block md:order-5 text-ink-faint"></fa-icon>
+      </a>
+    </li>
+  </ul>
+
+  <div *ngIf="!loading && !filtradas.length" class="empty">
+    <ng-container *ngIf="linhas.length; else nenhuma">
+      <h3>Nenhuma máquina neste filtro</h3>
+      <p>Mude o filtro ou a busca para ver as outras máquinas.</p>
+      <button class="btn-outline mt-2" (click)="limparFiltros()">Mostrar todas</button>
+    </ng-container>
+    <ng-template #nenhuma>
+      <ng-container *ngIf="!erro; else falhou">
+        <h3>Nenhuma máquina cadastrada</h3>
+        <p>Cadastre retroescavadeiras, tratores e outras máquinas para controlar horímetro e preventivas.</p>
+        <a routerLink="/maquinas/nova" class="btn-primary mt-2"><fa-icon [icon]="['fas', 'plus']"></fa-icon> Cadastrar máquina</a>
+      </ng-container>
+      <ng-template #falhou>
+        <h3>A lista não carregou</h3>
+        <p>Verifique a conexão e tente de novo.</p>
+        <button class="btn-outline mt-2" (click)="carregar()">Tentar de novo</button>
+      </ng-template>
+    </ng-template>
+  </div>
+</div>
+
+<app-loading [visible]="loading" message="Carregando máquinas"></app-loading>

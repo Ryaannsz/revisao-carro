@@ -10,9 +10,10 @@ import { Observable } from "rxjs";
 export class ConfirmationDialogService {
     constructor(private dialog: MatDialog) { }
 
-    confirm(title: string, message: string): Observable<boolean> {
+    confirm(title: string, message: string, confirmLabel = 'Excluir'): Observable<boolean> {
         const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            data: { title, message },
+            data: { title, message, confirmLabel },
+            autoFocus: false,
             disableClose: true,
             backdropClass: 'custom-backdrop',
             panelClass: 'custom-panel'

@@ -1,52 +1,37 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
-  <div>
-    <label for="cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-    <input
-      id="cpf"
-      type="text"
-      formControlName="cpf"
-      class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
-      placeholder="Digite seu CPF (apenas números)"
-      [class.border-red-500]="loginForm.get('cpf')?.invalid && loginForm.get('cpf')?.touched"
-    >
-    <div *ngIf="loginForm.get('cpf')?.invalid && loginForm.get('cpf')?.touched" class="text-red-500 text-xs mt-1">
-      CPF inválido. Digite 11 números.
-    </div>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5" novalidate>
+  <div class="field">
+    <label for="cpf" class="field-label">CPF</label>
+    <input id="cpf" type="text" inputmode="numeric" autocomplete="username" maxlength="11"
+      formControlName="cpf" class="input num text-lg tracking-wider" placeholder="Somente números" (input)="somenteDigitos($event)">
+    <p *ngIf="loginForm.get('cpf')?.invalid && loginForm.get('cpf')?.touched" class="field-error">
+      O CPF tem 11 números.
+    </p>
   </div>
 
-  <div>
-    <label for="senha" class="block text-sm font-medium text-gray-700">Senha</label>
-    <input
-      id="senha"
-      type="password"
-      formControlName="senha"
-      class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
-      placeholder="Digite sua senha"
-      [class.border-red-500]="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched"
-    >
-    <div *ngIf="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" class="text-red-500 text-xs mt-1">
-      Senha deve ter pelo menos 6 caracteres.
+  <div class="field">
+    <label for="senha" class="field-label">Senha</label>
+    <div class="relative">
+      <input id="senha" [type]="mostrarSenha ? 'text' : 'password'" autocomplete="current-password"
+        formControlName="senha" class="input pr-20" placeholder="Mínimo de 6 caracteres">
+      <button type="button" (click)="mostrarSenha = !mostrarSenha"
+        class="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 px-3 rounded text-sm font-semibold text-ink-soft hover:text-ink hover:bg-paper">
+        {{ mostrarSenha ? 'Ocultar' : 'Mostrar' }}
+      </button>
     </div>
+    <p *ngIf="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" class="field-error">
+      A senha tem pelo menos 6 caracteres.
+    </p>
   </div>
 
-  <div *ngIf="error" class="text-red-500 text-sm text-center animate-shake">
+  <p *ngIf="error" class="rounded-md bg-over-soft text-over px-3.5 py-3 text-[15px] font-medium" role="alert">
     {{ error }}
-  </div>
+  </p>
 
-  <div>
-    <button
-      type="submit"
-      class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 disabled:opacity-50"
-      [disabled]="loginForm.invalid || isLoading"
-    >
-      <span *ngIf="!isLoading">Entrar</span>
-      <span *ngIf="isLoading" class="flex items-center">
-        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Carregando...
-      </span>
-    </button>
-  </div>
+  <button type="submit" class="btn-primary h-12 text-base mt-1" [disabled]="isLoading">
+    <svg *ngIf="isLoading" class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".3" stroke-width="3" />
+      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+    </svg>
+    {{ isLoading ? 'Entrando…' : 'Entrar' }}
+  </button>
 </form>

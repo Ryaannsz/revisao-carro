@@ -1,25 +1,18 @@
-<div class="w-full max-w-md mx-auto">
-    <label class="block text-sm font-medium text-gray-700 mb-1">{{ label }}</label>
+<div class="field relative">
+  <label class="field-label" [for]="inputId">{{ label }}</label>
+  <input type="text" class="input" [id]="inputId" [class.!border-over]="invalido" [formControl]="marcaField"
+    (focus)="isDropdownOpen = true" (blur)="onBlur()" (input)="isDropdownOpen = true" autocomplete="off"
+    role="combobox" aria-autocomplete="list" [attr.aria-expanded]="isDropdownOpen" placeholder="Digite para buscar ou criar" />
 
-    <input type="text" class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" [formControl]="marcaField"
-        (focus)="isDropdownOpen = true" (blur)="onBlur()" (input)="isDropdownOpen = true" autocomplete="off"
-        aria-autocomplete="list" aria-haspopup="listbox" />
-
-    <ul *ngIf="(filteredMarca$ | async)?.length && isDropdownOpen"
-        class="mt-1 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white shadow-lg" role="listbox">
-        <li *ngFor="let marca of filteredMarca$ | async" (mousedown)="$event.preventDefault()"
-            (click)="selectMarca(marca)" class="cursor-pointer px-4 py-2 hover:bg-blue-600 hover:text-white"
-            role="option" [attr.aria-selected]="marca.marca === marcaField.value">
-            {{ marca.marca | uppercase}}
-        </li>
-    </ul>
-
-    <div *ngIf="showCreateButton" class="mt-3">
-        <button
-            class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            (click)="criarNovaMarca()" type="button">
-            Criar "{{ marcaField.value }}"
-        </button>
-    </div>
+  <ul *ngIf="isDropdownOpen && ((filteredMarca$ | async)?.length || showCreateButton)"
+    class="absolute z-30 top-full mt-1 inset-x-0 max-h-64 overflow-auto rounded-md border border-line-strong bg-white py-1 shadow-[0_12px_30px_-12px_rgba(34,48,43,.35)]" role="listbox">
+    <li *ngFor="let item of filteredMarca$ | async" (mousedown)="$event.preventDefault()" (click)="selectMarca(item)"
+      class="cursor-pointer px-3.5 py-2.5 capitalize hover:bg-paper" role="option" [attr.aria-selected]="item.marca === marcaField.value">
+      {{ item.marca }}
+    </li>
+    <li *ngIf="showCreateButton" (mousedown)="$event.preventDefault()" (click)="criarNovaMarca()"
+      class="cursor-pointer px-3.5 py-2.5 border-t border-line font-semibold hover:bg-signal-soft flex items-center gap-2" role="option">
+      <fa-icon [icon]="['fas', 'plus']" class="text-ink-soft"></fa-icon> Cadastrar “{{ marcaField.value }}”
+    </li>
+  </ul>
 </div>

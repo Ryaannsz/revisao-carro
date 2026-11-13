@@ -28,22 +28,24 @@ export class CadastrarModeloComponent implements OnInit {
   ngOnInit() { }
 
   cadastrarModelo() {
+    if (this.modeloForm.invalid) {
+      this.modeloForm.markAllAsTouched();
+      return;
+    }
     this.loading = true;
-    if (this.modeloForm.valid) {
+    {
       const novoModelo = { modelo: this.modeloForm.value.modelo };
 
       this.modeloService.post(novoModelo).subscribe({
         next: (res) => {
-          this.toastService.showSuccess('Modelo cadastrado com sucesso!');
+          this.toastService.showSuccess('Modelo cadastrado.');
           this.modeloForm.reset();
           this.loading = false;
         },
         error: (err) => {
-          if (err.status == 409) {
-            this.toastService.showWarning('Modelo já cadastrado!');
-            this.loading = false;
-          }
-          this.toastService.showError('Erro ao cadastrar modelo', err);
+          this.loading = false;
+          if (err.status == 409 || err.status == 400) this.toastService.showWarning(typeof err?.error === 'string' && err.error ? err.error : 'Esse modelo já existe.');
+          else this.toastService.showError('Não foi possível cadastrar.');
           this.loading = false;
         }
       });

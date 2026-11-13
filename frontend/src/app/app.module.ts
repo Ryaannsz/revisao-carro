@@ -1,4 +1,6 @@
-import { NgModule } from '@angular/core';
+import { DEFAULT_CURRENCY_CODE, LOCALE_ID, NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -8,7 +10,6 @@ import { CommonModule } from '@angular/common';
 import { CadastrarModeloComponent } from './pages/cadastro-modelo/cadastro-modelo.component';
 import { CadastrarCarroComponent } from './pages/cadastro-carro/cadastro-carro.component';
 import { HeaderComponent } from './header/header.component';
-import { FooterComponent } from './footer/footer.component';
 import { CarroUnicoComponent } from './pages/carro-unico/carro-unico.component';
 import { CadastroRevisaoComponent } from './pages/cadastro-revisao/cadastro-revisao.component';
 import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revisao.component';
@@ -25,23 +26,26 @@ import { ListaCarrosComponent } from './pages/lista-carros/lista-carros.componen
 
 import { ListMarcaComponent } from './shared/shared-consult/list-marca/list-marca.component';
 import { ListModelosComponent } from './shared/shared-consult/list-modelos/list-modelos.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 
 import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usuario.component';
 import { ModalUsuarioComponent } from './modals/modal-usuario/modal-usuario.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
-import { LineChartComponent } from './components/line-chart/line-chart.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { CarStatsComponent } from './components/car-stats/car-stats.component';
+import { ListaMaquinasComponent } from './pages/lista-maquinas/lista-maquinas.component';
+import { MaquinaUnicaComponent } from './pages/maquina-unica/maquina-unica.component';
+import { CadastroRevisaoMaquinaComponent } from './pages/cadastro-revisao-maquina/cadastro-revisao-maquina.component';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCalendarAlt, faCalendarDay, faCar, faCarSide, faCheckCircle, faChevronDown, faChevronLeft, faChevronRight, faCoins, faEdit, faGasPump, faGear, faIdBadge, faInfoCircle, faLeaf, faPlus, faSave, faSearch, faTachographDigital, faTachometer, faTachometerAlt, faTimes, faTools, faTrashAlt, faUserCircle, faWater, faWrench } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowLeft, faBars, faCalendarAlt, faCalendarDay, faCar, faCarSide, faChartLine, faCheckCircle, faChevronDown, faChevronLeft,
+  faChevronRight, faClock, faClockRotateLeft, faCoins, faEdit, faExpand, faFilePdf, faGasPump, faGear, faIdBadge, faInfoCircle,
+  faLeaf, faPen, faPlus, faRightFromBracket, faRotate, faSave, faSearch, faTachometerAlt, faTimes, faTools, faTractor,
+  faTrashAlt, faUserCircle, faUserPlus, faUsers, faWater, faWrench
+} from '@fortawesome/free-solid-svg-icons';
 
+
+registerLocaleData(localePt, 'pt-BR');
 
 export function tokenGetter() {
   return localStorage.getItem('auth_token');
@@ -59,7 +63,6 @@ export function tokenGetter() {
     RegistroAbastecimentoComponent,
     AuthComponent,
     HeaderComponent,
-    FooterComponent,
     CadastroMarcaComponent,
     CadastroAbastecimentoComponent,
     CadastrarCarroComponent,
@@ -71,9 +74,9 @@ export function tokenGetter() {
     ModalUsuarioComponent,
     ConfirmationDialogComponent,
     CadastroMaquinaComponent,
-    LineChartComponent,
-    DashboardComponent,
-    CarStatsComponent,
+    ListaMaquinasComponent,
+    MaquinaUnicaComponent,
+    CadastroRevisaoMaquinaComponent,
 
   ],
   imports: [
@@ -94,24 +97,22 @@ export function tokenGetter() {
     FormsModule,
     SharedModule,
     FontAwesomeModule,
-    MatFormFieldModule,
-    MatAutocompleteModule,
-    MatInputModule,
-    MatButtonModule,
     
     BrowserAnimationsModule,
 
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' },
   ],
   bootstrap: [AppComponent],
 })
 export class AppModule {
     constructor(library: FaIconLibrary) {
-    library.addIcons(faCalendarDay, faGear, faTachometerAlt, faWater, faCoins, faCar, 
-      faChevronDown, faSave, faCarSide, faTimes, faSearch,
-       faCheckCircle, faTools, faGasPump, faLeaf, faWrench, faPlus, faEdit, faTrashAlt, faUserCircle,
-        faIdBadge, faChevronLeft, faChevronRight, faInfoCircle, faCalendarAlt);
+    library.addIcons(faArrowLeft, faBars, faCalendarAlt, faCalendarDay, faCar, faCarSide, faChartLine, faCheckCircle,
+      faChevronDown, faChevronLeft, faChevronRight, faClock, faClockRotateLeft, faCoins, faEdit, faExpand, faFilePdf, faGasPump,
+      faGear, faIdBadge, faInfoCircle, faLeaf, faPen, faPlus, faRightFromBracket, faRotate, faSave, faSearch, faTachometerAlt,
+      faTimes, faTools, faTractor, faTrashAlt, faUserCircle, faUserPlus, faUsers, faWater, faWrench);
   }
  }

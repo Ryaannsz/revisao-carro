@@ -12,7 +12,10 @@ import { RegistroRevisaoComponent } from './pages/registro-revisao/registro-revi
 import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './guards/AuthGuard';
 import { RegistroUsuarioComponent } from './pages/registro-usuario/registro-usuario.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ListaMaquinasComponent } from './pages/lista-maquinas/lista-maquinas.component';
+import { CadastroMaquinaComponent } from './pages/cadastro-maquina/cadastro-maquina.component';
+import { MaquinaUnicaComponent } from './pages/maquina-unica/maquina-unica.component';
+import { CadastroRevisaoMaquinaComponent } from './pages/cadastro-revisao-maquina/cadastro-revisao-maquina.component';
 
 const routes: Routes = [
   {
@@ -64,16 +67,20 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardModule),
     canActivate: [AuthGuard]
   },
+  { path: 'maquinas', component: ListaMaquinasComponent, canActivate: [AuthGuard] },
+  { path: 'maquinas/nova', component: CadastroMaquinaComponent, canActivate: [AuthGuard] },
+  { path: 'maquinas/:id', component: MaquinaUnicaComponent, canActivate: [AuthGuard] },
+  { path: 'manutencao/maquina', component: CadastroRevisaoMaquinaComponent, canActivate: [AuthGuard] },
   { path: 'login', component: AuthComponent },
-  { path: 'registro', component: AuthComponent },
-  
+  { path: 'registro', redirectTo: 'login' },
+  { path: '**', redirectTo: 'carros' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'top' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

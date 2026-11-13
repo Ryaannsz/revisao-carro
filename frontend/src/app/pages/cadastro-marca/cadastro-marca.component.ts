@@ -25,29 +25,28 @@ export class CadastroMarcaComponent {
   }
 
   cadastrarMarca() {
+    if (this.marcaForm.invalid) {
+      this.marcaForm.markAllAsTouched();
+      return;
+    }
     this.loading = true;
-    if (this.marcaForm.valid) {
+    {
       const novaMarca = { marca: this.marcaForm.value.marca };
 
 
       this.marcaService.post(novaMarca).subscribe({
         next: () => {
-          this.toastService.showSuccess("Marca cadastrada com sucesso!");
+          this.toastService.showSuccess('Marca cadastrada.');
           this.marcaForm.reset();
           this.loading = false;
         },
         error: (err) => {
-          if (err.status == 409) {
-            this.toastService.showWarning('Marca já cadastrado!')
-            this.loading = false;
-          }
-
-          this.toastService.showError('Erro ao cadastrar marca:', err);
+          this.loading = false;
+          if (err.status == 409 || err.status == 400) this.toastService.showWarning(typeof err?.error === 'string' && err.error ? err.error : 'Essa marca já existe.');
+          else this.toastService.showError('Não foi possível cadastrar.');
           this.loading = false;
         }
       });
-    } else {
-      alert('Por favor, preencha todos os campos.');
     }
   }
 }

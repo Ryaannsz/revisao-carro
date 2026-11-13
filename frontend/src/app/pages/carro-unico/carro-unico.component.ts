@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
 import { CarroService } from '../../core/services/carro.service';
 import { AbastService } from '../../core/services/abast.service';
 import { RevisaoService } from '../../core/services/revisao.service';
 import { Carro } from '../../core/models/carro.model';
 import { Abast } from '../../core/models/abast.model';
 import { Revisao } from '../../core/models/revisao.model';
+import { ProximaRevisao } from '../../core/models/proxima.revisao.model';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmationDialogService } from '../../core/services/confirmationDialog.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CarroStatus } from '../../core/models/carro-status.enum';
-
+import {
+  SITUACAO_INFO, SituacaoPreventiva, diasAte, intervaloKm, kmRestantes, nomeVeiculo, progressoRevisaoCarro, situacaoCarro
+} from '../../core/utils/situacao.utils';
 
 @Component({
   standalone: false,
@@ -19,23 +23,23 @@ import { CarroStatus } from '../../core/models/carro-status.enum';
   styleUrls: ['./carro-unico.component.css']
 })
 export class CarroUnicoComponent implements OnInit {
-  Math = Math
   carro: Carro | null = null;
   abastecimentos: Abast[] = [];
   revisoes: Revisao[] = [];
-  expAbastId: number | null = null;
-  expRevisaoId: number | null = null;
+  proxima: ProximaRevisao | null = null;
+  kmAtual = 0;
   id!: number;
-  loading: boolean = false;
+  loading = false;
   activeTab: 'abastecimentos' | 'revisoes' = 'abastecimentos';
-  currentPageAbast: number = 1;
-  currentPageRevisoes: number = 1;
-  itemsPerPage: number = 10;
-  isEditing: boolean = false;
-  carroEditado: Partial<Carro> = {};
+  limiteAbast = 10;
+  limiteRev = 10;
+  expandido: string | null = null;
 
-  carroDisponivel: CarroStatus = CarroStatus.DISPONIVEL
+  isEditing = false;
+  edit = { placa: '', alarmeRevisaoKm: null as number | null, alarmeRevisaoMes: null as number | null };
 
+  readonly SIT = SITUACAO_INFO;
+  readonly MANUTENCAO = CarroStatus.MANUTENCAO;
 
   constructor(
     private route: ActivatedRoute,
@@ -49,177 +53,54 @@ export class CarroUnicoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadData();
   }
 
   loadData(): void {
     this.loading = true;
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.carroService.getWithId<Carro>(this.id).subscribe({
-      next: (c) => {
-        this.carro = c;
-        this.getKm();
-      },
-      error: (err) => {
-        this.toastService.showError('Erro ao carregar dados do veículo');
-        this.loading = false;
-      }
-    });
-
-    this.abastService.getListWithId<Abast>(this.id, '/carro').subscribe({
-      next: (a) => this.abastecimentos = a,
-      error: (err) => this.toastService.showError('Erro ao carregar abastecimentos')
-    });
-
-    this.revisaoService.getListWithId<Revisao>(this.id, '/carro').subscribe({
-      next: (r) => {
-        this.revisoes = r;
+    forkJoin({
+      carro: this.carroService.getWithId<Carro>(this.id),
+      km: this.carroService.getKmRecente(this.id).pipe(catchError(() => of(0))),
+      abast: this.abastService.getListWithId<Abast>(this.id, '/carro').pipe(catchError(() => of([] as Abast[]))),
+      rev: this.revisaoService.getListWithId<Revisao>(this.id, '/carro').pipe(catchError(() => of([] as Revisao[]))),
+      prox: this.revisaoService.calcularRevisaoById(this.id).pipe(catchError(() => of(null))),
+    }).subscribe({
+      next: ({ carro, km, abast, rev, prox }) => {
+        this.carro = carro;
+        this.kmAtual = km || carro.kmAdicionado || 0;
+        this.abastecimentos = [...abast].sort((a, b) => String(b.dtAbast).localeCompare(String(a.dtAbast)) || b.kmAtual - a.kmAtual);
+        this.revisoes = [...rev].sort((a, b) => String(b.dtRevisao).localeCompare(String(a.dtRevisao)) || b.kmAtual - a.kmAtual);
+        this.proxima = prox;
         this.loading = false;
       },
       error: (err) => {
-        this.toastService.showError('Erro ao carregar revisões');
         this.loading = false;
+        this.toastService.showError(err?.status === 404 ? 'Carro não encontrado.' : 'Não foi possível carregar o carro.');
+        if (err?.status === 404) this.router.navigate(['/carros']);
       }
     });
   }
 
-  toggleAbast(id: number): void {
-    this.expAbastId = this.expAbastId === id ? null : id;
-  }
+  /* ---------- Derivados ---------- */
 
-  toggleRevisao(id: number): void {
-    this.expRevisaoId = this.expRevisaoId === id ? null : id;
-  }
-
-  getKm(): void {
-    this.carroService.getKmRecente(this.carro?.id ?? 0).subscribe({
-      next: (res) => {
-        if (this.carro) {
-          this.carro.kmAdicionado = res;
-        }
-      },
-      error: (err) => {
-        this.toastService.showError('Erro ao carregar quilometragem atual');
-      }
-    });
-  }
-
-  // Novas funcionalidades
-
-  changeTab(tab: 'abastecimentos' | 'revisoes'): void {
-    this.activeTab = tab;
-  }
-
-  changePageAbast(page: number): void {
-    this.currentPageAbast = page;
-  }
-
-  changePageRevisoes(page: number): void {
-    this.currentPageRevisoes = page;
-  }
-
-  get paginatedAbastecimentos(): Abast[] {
-    const start = (this.currentPageAbast - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.abastecimentos.slice(start, end);
-  }
-
-  get paginatedRevisoes(): Revisao[] {
-    const start = (this.currentPageRevisoes - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.revisoes.slice(start, end);
-  }
-
-  confirmDeleteAbastecimento(id: number): void {
-    this.confirmationDialogService.confirm(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir este abastecimento?'
-    ).subscribe(confirmed => {
-      if (confirmed) {
-        this.deleteAbastecimento(id);
-      }
-    });
-  }
-
-  confirmDeleteRevisao(id: number): void {
-    this.confirmationDialogService.confirm(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir esta revisão?'
-    ).subscribe(confirmed => {
-      if (confirmed) {
-        this.deleteRevisao(id);
-      }
-    });
-  }
-
-  deleteCarro() {
-    if (!this.authService.getUserRole()) return this.toastService.showError("Permissões insuficientes.")
-    this.confirmationDialogService.confirm(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir este carro?'
-    ).subscribe(confirmed => {
-      if (!confirmed) return;
-      this.loading = true;
-      this.carroService.delete(this.id.toString()).subscribe({
-        next: (res) => {
-          this.toastService.showSuccess("Carro deletado com sucesso!");
-          this.loading = false;
-          this.router.navigate(['/carros'])
-        },
-        error: (err) => {
-          this.toastService.showError("Erro ao deletar o carro!");
-          this.loading = false;
-          console.log(err)
-        }
-      })
-    })
-    this.loading = false;
-  }
-
-  get isAdmin(): boolean {
-    return this.authService.getUserRole();
-  }
-
-  private deleteAbastecimento(id: number): void {
-    this.abastService.delete(id).subscribe({
-      next: () => {
-        this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
-        if (this.currentPageAbast > this.totalPagesAbast) this.currentPageAbast = Math.max(1, this.totalPagesAbast);
-        this.getKm();
-        this.toastService.showSuccess('Abastecimento excluído!');
-      },
-      error: () => this.toastService.showError('Erro ao excluir abastecimento.')
-    });
-  }
-
-  private deleteRevisao(id: number): void {
-    this.revisaoService.delete(id).subscribe({
-      next: () => {
-        this.revisoes = this.revisoes.filter(r => r.id !== id);
-        if (this.currentPageRevisoes > this.totalPagesRevisoes) this.currentPageRevisoes = Math.max(1, this.totalPagesRevisoes);
-        this.getKm();
-        this.toastService.showSuccess('Revisão excluída!');
-      },
-      error: () => this.toastService.showError('Erro ao excluir revisão.')
-    });
-  }
-
-  get totalPagesAbast(): number {
-    return Math.ceil(this.abastecimentos.length / this.itemsPerPage);
-  }
-
-  get totalPagesRevisoes(): number {
-    return Math.ceil(this.revisoes.length / this.itemsPerPage);
-  }
+  get nome(): string { return nomeVeiculo(this.carro?.marca?.marca, this.carro?.modelo?.modelo); }
+  get situacao(): SituacaoPreventiva { return situacaoCarro(this.carro, this.proxima, this.kmAtual); }
+  get progresso(): number { return progressoRevisaoCarro(this.carro, this.proxima, this.kmAtual); }
+  get restante(): number | null { return kmRestantes(this.proxima, this.kmAtual); }
+  get dias(): number | null { return diasAte(this.proxima?.proximaRevisaoEstimada); }
+  get intervalo(): number { return intervaloKm(this.carro); }
+  get mesesIntervalo(): number { return this.carro?.alarmeRevisaoMes && this.carro.alarmeRevisaoMes > 0 ? this.carro.alarmeRevisaoMes : 6; }
+  get isAdmin(): boolean { return this.authService.getUserRole(); }
+  get emOficina(): boolean { return this.carro?.status === CarroStatus.MANUTENCAO; }
 
   /** valorComb já é o TOTAL pago no abastecimento. */
-  get totalGastoAbastecimentos(): number {
-    return this.abastecimentos.reduce((total, a) => total + (a.valorComb ?? 0), 0);
+  get totalCombustivel(): number {
+    return this.abastecimentos.reduce((t, a) => t + (a.valorComb ?? 0), 0);
   }
 
-  get totalGastoRevisoes(): number {
-    return this.revisoes.reduce((total, r) => total + (r.valor ?? 0), 0);
+  get totalManutencao(): number {
+    return this.revisoes.reduce((t, r) => t + (r.valor ?? 0), 0);
   }
 
   precoPorLitro(a: Abast): number | null {
@@ -227,74 +108,120 @@ export class CarroUnicoComponent implements OnInit {
   }
 
   /**
-   * Média km/L pelo método "tanque a tanque": km rodado entre o primeiro e o último
-   * abastecimento dividido pelos litros abastecidos DEPOIS do primeiro
-   * (o combustível do 1º abastecimento foi gasto antes do período medido).
+   * Média km/L "tanque a tanque": km entre o primeiro e o último abastecimento dividido
+   * pelos litros abastecidos DEPOIS do primeiro (o 1º foi gasto antes do período medido).
    */
   get mediaKmPorLitro(): number {
     if (this.abastecimentos.length < 2) return 0;
-    const ordenados = [...this.abastecimentos].sort((a, b) => a.kmAtual - b.kmAtual);
-    const km = ordenados[ordenados.length - 1].kmAtual - ordenados[0].kmAtual;
-    const litros = ordenados.slice(1).reduce((t, a) => t + (a.litroComb ?? 0), 0);
+    const ord = [...this.abastecimentos].sort((a, b) => a.kmAtual - b.kmAtual);
+    const km = ord[ord.length - 1].kmAtual - ord[0].kmAtual;
+    const litros = ord.slice(1).reduce((t, a) => t + (a.litroComb ?? 0), 0);
     return litros > 0 ? km / litros : 0;
   }
 
-  /** Custo por km rodado considerando combustível + manutenção. */
+  /** Custo por km rodado: combustível + manutenção. */
   get custoPorKm(): number {
     if (this.abastecimentos.length < 2) return 0;
     const kms = this.abastecimentos.map(a => a.kmAtual);
     const rodado = Math.max(...kms) - Math.min(...kms);
-    return rodado > 0 ? (this.totalGastoAbastecimentos + this.totalGastoRevisoes) / rodado : 0;
+    return rodado > 0 ? (this.totalCombustivel + this.totalManutencao) / rodado : 0;
+  }
+
+  get abastVisiveis(): Abast[] { return this.abastecimentos.slice(0, this.limiteAbast); }
+  get revVisiveis(): Revisao[] { return this.revisoes.slice(0, this.limiteRev); }
+
+  alternar(chave: string) { this.expandido = this.expandido === chave ? null : chave; }
+  abs(n: number) { return Math.abs(n); }
+
+  /* ---------- Ações ---------- */
+
+  confirmDeleteAbastecimento(id: number): void {
+    this.confirmationDialogService.confirm('Excluir abastecimento?', 'O registro sai do histórico e dos cálculos de consumo.')
+      .subscribe(ok => ok && this.abastService.delete(id).subscribe({
+        next: () => {
+          this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
+          this.toastService.showSuccess('Abastecimento excluído.');
+        },
+        error: () => this.toastService.showError('Não foi possível excluir o abastecimento.')
+      }));
+  }
+
+  confirmDeleteRevisao(id: number): void {
+    this.confirmationDialogService.confirm('Excluir revisão?', 'A próxima revisão volta a ser calculada pela revisão anterior.')
+      .subscribe(ok => ok && this.revisaoService.delete(id).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Revisão excluída.');
+          this.loadData();
+        },
+        error: () => this.toastService.showError('Não foi possível excluir a revisão.')
+      }));
+  }
+
+  deleteCarro() {
+    if (!this.isAdmin) return this.toastService.showError('Só administradores podem excluir carros.');
+    this.confirmationDialogService.confirm(
+      `Excluir ${this.carro?.placa?.toUpperCase() ?? 'o carro'}?`,
+      'Todos os abastecimentos e revisões deste carro também serão apagados. Não dá para desfazer.',
+      'Excluir carro'
+    ).subscribe(ok => {
+      if (!ok) return;
+      this.loading = true;
+      this.carroService.delete(this.id).subscribe({
+        next: () => {
+          this.loading = false;
+          this.toastService.showSuccess('Carro excluído.');
+          this.router.navigate(['/carros']);
+        },
+        error: () => {
+          this.loading = false;
+          this.toastService.showError('Não foi possível excluir o carro.');
+        }
+      });
+    });
   }
 
   toggleEditar(): void {
     if (!this.isEditing && this.carro) {
-      // Criar uma cópia editável
-      this.carroEditado = {
-        ...this.carro,
-        marca: { ...this.carro.marca },
-        modelo: { ...this.carro.modelo }
+      this.edit = {
+        placa: (this.carro.placa ?? '').toUpperCase(),
+        alarmeRevisaoKm: this.carro.alarmeRevisaoKm ?? null,
+        alarmeRevisaoMes: this.carro.alarmeRevisaoMes ?? null,
       };
     }
     this.isEditing = !this.isEditing;
   }
 
+  sanitizePlaca() {
+    this.edit.placa = (this.edit.placa ?? '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 7).toUpperCase();
+  }
+
   salvarAlteracoes(): void {
     if (!this.carro) return;
-
-    const carroAtualizado: Carro = {
-      ...this.carro,
-      ...this.carroEditado
+    if (this.edit.placa.length !== 7) return this.toastService.showWarning('A placa tem 7 caracteres.');
+    const dados: Partial<Carro> = {
+      placa: this.edit.placa,
+      ...(this.edit.alarmeRevisaoKm ? { alarmeRevisaoKm: Number(this.edit.alarmeRevisaoKm) } : {}),
+      ...(this.edit.alarmeRevisaoMes ? { alarmeRevisaoMes: Number(this.edit.alarmeRevisaoMes) } : {}),
     };
-    this.carroService.put(carroAtualizado, `/${this.id}`).subscribe({
-      next: (res) => {
-        this.toastService.showSuccess('Carro atualizado com sucesso!');
-        this.loadData();
+    this.carroService.put(dados, `/${this.id}`).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Alterações salvas.');
         this.isEditing = false;
+        this.loadData();
       },
-      error: (err) => {
-        this.toastService.showError('Erro ao atualizar o carro')
-      }
-
+      error: (err) => this.toastService.showError(typeof err?.error === 'string' && err.error ? err.error : 'Não foi possível salvar as alterações.')
     });
   }
 
-  updateDisponivel(){
-    this.carroService.updateStatus(this.id, CarroStatus.DISPONIVEL).subscribe((res) => {
-      this.carroDisponivel=CarroStatus.DISPONIVEL;
-      this.toastService.showSuccess("Status alterado com sucesso!")
-    })
-  }
-  updateManutencao(){
-    this.carroService.updateStatus(this.id, CarroStatus.MANUTENCAO).subscribe((res) => {
-            this.carroDisponivel=CarroStatus.MANUTENCAO;
-      this.toastService.showSuccess("Status alterado com sucesso!")
-    })
-  }
-
-  get shownAbastCount(): number {
-    const end = this.currentPageAbast * this.itemsPerPage;
-    const total = this.abastecimentos?.length ?? 0;
-    return Math.min(end, total);
+  alternarStatus() {
+    if (!this.carro) return;
+    const novo = this.emOficina ? CarroStatus.DISPONIVEL : CarroStatus.MANUTENCAO;
+    this.carroService.updateStatus(this.id, novo).subscribe({
+      next: () => {
+        if (this.carro) this.carro.status = novo;
+        this.toastService.showSuccess(novo === CarroStatus.MANUTENCAO ? 'Carro marcado como na oficina.' : 'Carro liberado para uso.');
+      },
+      error: () => this.toastService.showError('Não foi possível mudar o status.')
+    });
   }
 }

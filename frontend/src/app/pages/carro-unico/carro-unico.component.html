@@ -1,402 +1,235 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+<div class="page">
+  <a routerLink="/carros" class="back-link"><fa-icon [icon]="['fas', 'arrow-left']"></fa-icon> Carros</a>
 
-    <!-- Hero Section com Status Badge -->
-    <div class="relative mb-6 sm:mb-8">
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl opacity-10 blur-xl"></div>
-      <div class="relative bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-6">
-          <div class="flex-1 w-full">
-            <div class="flex flex-wrap items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
-              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
-                {{ carro?.marca?.marca | uppercase }} {{ carro?.modelo?.modelo | uppercase }}
-              </h1>
-              <!-- Status Badge -->
-              <span *ngIf="carro?.status === carroDisponivel"
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
-                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                Disponível
-              </span>
-              <span *ngIf="carro?.status !== carroDisponivel"
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium bg-amber-100 text-amber-800">
-                <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
-                Em Manutenção
-              </span>
-            </div>
-            <p class="text-gray-600 text-sm sm:text-base">Gestão completa e histórico detalhado do veículo</p>
-          </div>
-
-          <!-- Action Buttons Group -->
-          <div class="flex w-full lg:w-auto flex-wrap gap-2 sm:gap-3">
-            <button (click)="toggleEditar()"
-              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 rounded-xl text-sm sm:text-base font-medium transition-all hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'edit']" class="mr-2 transition-transform group-hover:rotate-12"></fa-icon>
-              {{ isEditing ? 'Cancelar' : 'Editar' }}
-            </button>
-
-            <button *ngIf="carro?.status !== carroDisponivel" (click)="updateDisponivel()"
-              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-green-600/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'check-circle']" class="mr-2"></fa-icon>
-              Liberar Veículo
-            </button>
-
-            <button *ngIf="carro?.status === carroDisponivel" (click)="updateManutencao()"
-              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-orange-600/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'tools']" class="mr-2"></fa-icon>
-              Enviar para Manutenção
-            </button>
-
-            <button (click)="deleteCarro()"
-              class="group relative flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-red-600/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'trash-alt']" class="mr-2"></fa-icon>
-              Excluir
-            </button>
-          </div>
+  <ng-container *ngIf="carro; else carregando">
+    <!-- Cabeçalho -->
+    <header class="page-head !items-start">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-3 mb-2">
+          <span class="plate !text-lg">{{ carro.placa }}</span>
+          <span class="tag" [ngClass]="emOficina ? 'tag-due' : 'tag-ok'">{{ emOficina ? 'Na oficina' : 'Disponível' }}</span>
         </div>
+        <h1 class="page-title">{{ nome }}</h1>
+        <p class="page-sub">Na frota desde {{ carro.dtAdicionado | date:'dd/MM/yyyy' }}</p>
       </div>
-    </div>
+      <div class="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+        <a routerLink="/abast" [queryParams]="{ carro: carro.id }" class="btn-primary">
+          <fa-icon [icon]="['fas', 'gas-pump']"></fa-icon> Abastecer
+        </a>
+        <a routerLink="/revisao/cadastrar" [queryParams]="{ carro: carro.id }" class="btn-outline">
+          <fa-icon [icon]="['fas', 'wrench']"></fa-icon> Revisão
+        </a>
+      </div>
+    </header>
 
-    <!-- KPIs Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-      <!-- Card Placa -->
-      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-blue-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs sm:text-sm font-medium text-gray-500">Placa do Veículo</span>
-            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'car']" class="text-blue-600 text-sm sm:text-base"></fa-icon>
-            </div>
+    <!-- Painel principal: odômetro + próxima revisão -->
+    <section class="panel overflow-hidden mb-6">
+      <div class="grid lg:grid-cols-[auto_1fr]">
+        <div class="p-5 sm:p-6 lg:pr-10 border-b lg:border-b-0 lg:border-r border-line">
+          <p class="stat-label mb-3">Odômetro</p>
+          <app-medidor [valor]="kmAtual" unidade="km" size="lg"></app-medidor>
+          <p class="text-sm text-ink-soft mt-3">Maior km entre cadastro, abastecimentos e revisões.</p>
+        </div>
+
+        <div class="p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <p class="stat-label">Próxima revisão</p>
+            <span class="tag" [ngClass]="SIT[situacao].tag">{{ SIT[situacao].label }}</span>
           </div>
-          <ng-container *ngIf="!isEditing; else editPlaca">
-            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-all">{{ carro?.placa | uppercase }}</p>
-          </ng-container>
-          <ng-template #editPlaca>
-            <input [(ngModel)]="carroEditado.placa"
-              class="w-full px-3 py-2 text-base sm:text-lg font-semibold border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
-          </ng-template>
+          <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-3">
+            <p *ngIf="restante !== null" class="num text-[2rem] leading-none font-semibold"
+               [class.text-over]="situacao === 'vencida'" [class.text-due]="situacao === 'proxima'">
+              <ng-container *ngIf="restante > 0 && !(dias !== null && dias < 0)">faltam {{ restante | number:'1.0-0' }} km</ng-container>
+              <ng-container *ngIf="restante > 0 && dias !== null && dias < 0">venceu pela data</ng-container>
+              <ng-container *ngIf="restante <= 0">{{ abs(restante) | number:'1.0-0' }} km atrasada</ng-container>
+            </p>
+            <p *ngIf="proxima?.proximaRevisaoEstimada" class="text-ink-soft">
+              ou até <strong class="text-ink" [class.text-over]="dias !== null && dias < 0">{{ proxima?.proximaRevisaoEstimada | date:'dd/MM/yyyy' }}</strong>
+              <span *ngIf="dias !== null"> ({{ dias >= 0 ? 'em ' + dias + ' dias' : 'há ' + abs(dias) + ' dias' }})</span>
+            </p>
+          </div>
+          <div class="track !h-2.5 mb-2"><i [ngClass]="SIT[situacao].barra" [style.width.%]="progresso"></i></div>
+          <p class="text-sm text-ink-soft">
+            Revisão a cada {{ intervalo | number:'1.0-0' }} km ou {{ mesesIntervalo }} meses, o que vier primeiro.
+            <span *ngIf="proxima?.ultimaRevisao">Última em {{ proxima?.ultimaRevisao | date:'dd/MM/yyyy' }}.</span>
+            <span *ngIf="!proxima?.ultimaRevisao">Ainda sem revisão registrada; a conta parte do cadastro.</span>
+          </p>
         </div>
       </div>
 
-      <!-- Card KM -->
-      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-indigo-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs sm:text-sm font-medium text-gray-500">Quilometragem</span>
-            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'tachometer-alt']" class="text-indigo-600 text-sm sm:text-base"></fa-icon>
-            </div>
-          </div>
-          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.kmAdicionado | number }}</p>
-          <p class="text-[11px] sm:text-xs text-gray-500 mt-1">quilômetros rodados</p>
+      <!-- Números -->
+      <dl class="grid grid-cols-2 md:grid-cols-4 gap-px bg-line border-t border-line [&>div]:bg-white [&>div]:p-4 sm:[&>div]:px-6">
+        <div>
+          <dt class="stat-label">Consumo médio</dt>
+          <dd class="stat-value">{{ mediaKmPorLitro ? (mediaKmPorLitro | number:'1.1-1') : '—' }} <span class="text-base text-ink-soft">km/L</span></dd>
         </div>
-      </div>
-
-      <!-- Card Data -->
-      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-purple-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs sm:text-sm font-medium text-gray-500">Em operação desde</span>
-            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'calendar-alt']" class="text-purple-600 text-sm sm:text-base"></fa-icon>
-            </div>
-          </div>
-          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado | date:'dd/MM/yyyy' }}</p>
+        <div>
+          <dt class="stat-label">Custo por km</dt>
+          <dd class="stat-value">{{ custoPorKm ? (custoPorKm | currency:'BRL':'symbol':'1.2-2') : '—' }}</dd>
         </div>
-      </div>
-
-      <!-- Card Economia -->
-      <div class="group relative bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-        <div class="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-green-500 rounded-full opacity-5 -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs sm:text-sm font-medium text-gray-500">Média Km/L</span>
-            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="['fas', 'leaf']" class="text-green-600 text-sm sm:text-base"></fa-icon>
-            </div>
-          </div>
-          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ mediaKmPorLitro | number:'1.1-1' }}</p>
-          <p class="text-[11px] sm:text-xs text-gray-500 mt-1">eficiência de combustível</p>
+        <div>
+          <dt class="stat-label">Combustível</dt>
+          <dd class="stat-value">{{ totalCombustivel | currency:'BRL':'symbol':'1.0-0' }}</dd>
         </div>
-      </div>
-    </div>
+        <div>
+          <dt class="stat-label">Manutenção</dt>
+          <dd class="stat-value">{{ totalManutencao | currency:'BRL':'symbol':'1.0-0' }}</dd>
+        </div>
+      </dl>
+    </section>
 
-    <!-- Save Button quando editando -->
-    <div *ngIf="isEditing" class="mb-6 sm:mb-8 flex justify-center">
-      <button (click)="salvarAlteracoes()"
-        class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl hover:shadow-green-500/25 transition-all hover:-translate-y-0.5">
-        <fa-icon [icon]="['fas', 'save']" class="mr-3"></fa-icon>Salvar Alterações
-      </button>
-    </div>
-
-    <!-- Modern Tabs -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-      <div class="border-b border-gray-200">
-        <nav class="flex flex-col sm:flex-row">
-          <button class="flex-1 relative py-4 sm:py-5 px-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-all"
-            [class.bg-gradient-to-r]="activeTab === 'abastecimentos'"
-            [class.from-blue-50]="activeTab === 'abastecimentos'" [class.to-indigo-50]="activeTab === 'abastecimentos'"
-            [class.text-blue-600]="activeTab === 'abastecimentos'"
-            [class.text-gray-500]="activeTab !== 'abastecimentos'"
-            [class.hover:bg-gray-50]="activeTab !== 'abastecimentos'" (click)="activeTab = 'abastecimentos'">
-            <fa-icon [icon]="['fas', 'gas-pump']" class="mr-2"></fa-icon>Abastecimentos
-            <span class="ml-2 px-2 py-0.5 text-[11px] sm:text-xs rounded-full" [class.bg-blue-600]="activeTab === 'abastecimentos'"
-              [class.text-white]="activeTab === 'abastecimentos'" [class.bg-gray-200]="activeTab !== 'abastecimentos'"
-              [class.text-gray-600]="activeTab !== 'abastecimentos'">
-              {{ abastecimentos.length }}
-            </span>
-            <div *ngIf="activeTab === 'abastecimentos'"
-              class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+    <!-- Histórico -->
+    <section class="panel mb-6">
+      <div class="flex items-center justify-between gap-3 px-3 sm:px-4 pt-3 border-b border-line">
+        <div class="flex" role="tablist">
+          <button role="tab" class="tab" [class.is-on]="activeTab === 'abastecimentos'" (click)="activeTab = 'abastecimentos'">
+            Abastecimentos <span class="num text-ink-soft">{{ abastecimentos.length }}</span>
           </button>
-
-          <button class="flex-1 relative py-4 sm:py-5 px-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-all"
-            [class.bg-gradient-to-r]="activeTab === 'revisoes'" [class.from-blue-50]="activeTab === 'revisoes'"
-            [class.to-indigo-50]="activeTab === 'revisoes'" [class.text-blue-600]="activeTab === 'revisoes'"
-            [class.text-gray-500]="activeTab !== 'revisoes'" [class.hover:bg-gray-50]="activeTab !== 'revisoes'"
-            (click)="activeTab = 'revisoes'">
-            <fa-icon [icon]="['fas', 'wrench']" class="mr-2"></fa-icon>Revisões
-            <span class="ml-2 px-2 py-0.5 text-[11px] sm:text-xs rounded-full" [class.bg-blue-600]="activeTab === 'revisoes'"
-              [class.text-white]="activeTab === 'revisoes'" [class.bg-gray-200]="activeTab !== 'revisoes'"
-              [class.text-gray-600]="activeTab !== 'revisoes'">
-              {{ revisoes.length }}
-            </span>
-            <div *ngIf="activeTab === 'revisoes'"
-              class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+          <button role="tab" class="tab" [class.is-on]="activeTab === 'revisoes'" (click)="activeTab = 'revisoes'">
+            Revisões <span class="num text-ink-soft">{{ revisoes.length }}</span>
           </button>
-        </nav>
+        </div>
       </div>
 
-      <!-- Conteúdo Abastecimentos -->
-      <div *ngIf="activeTab === 'abastecimentos'" class="p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-          <div>
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Abastecimentos</h3>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Total gasto: {{ totalGastoAbastecimentos | currency:'BRL' }}<span *ngIf="custoPorKm"> · {{ custoPorKm | currency:'BRL' }}/km (comb. + manutenção)</span></p>
-          </div>
-          <a href="/abast" class="w-full sm:w-auto">
-            <button
-              class="w-full sm:w-auto group px-4 sm:px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Novo Abastecimento
-            </button>
-          </a>
+      <!-- Abastecimentos -->
+      <div *ngIf="activeTab === 'abastecimentos'">
+        <div *ngIf="!abastecimentos.length" class="px-5 py-10 text-center text-ink-soft">
+          Nenhum abastecimento ainda.
+          <a routerLink="/abast" [queryParams]="{ carro: carro.id }" class="font-semibold text-ink underline underline-offset-4">Lançar o primeiro</a>
         </div>
 
-        <!-- Tabela Modernizada -->
-        <div class="overflow-x-auto rounded-xl border border-gray-200">
-          <table class="min-w-[720px] md:min-w-full">
-            <thead>
-              <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Litros</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor/L</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">KM</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
+        <div *ngIf="abastecimentos.length" class="table-wrap hidden md:block">
+          <table class="table">
+            <thead><tr><th>Data</th><th class="r">Km</th><th class="r">Litros</th><th class="r">Preço/L</th><th class="r">Total</th><th>Lançado por</th><th class="w-12"></th></tr></thead>
+            <tbody>
+              <tr *ngFor="let a of abastVisiveis">
+                <td class="whitespace-nowrap">{{ a.dtAbast | date:'dd/MM/yyyy' }}</td>
+                <td class="r num">{{ a.kmAtual | number:'1.0-0' }}</td>
+                <td class="r num">{{ a.litroComb | number:'1.0-2' }} L</td>
+                <td class="r num text-ink-soft">{{ precoPorLitro(a) | currency:'BRL' }}</td>
+                <td class="r num font-semibold">{{ a.valorComb | currency:'BRL' }}</td>
+                <td class="text-ink-soft">{{ a.user?.nome || '—' }}</td>
+                <td class="r">
+                  <button *ngIf="isAdmin" class="icon-btn hover:!text-over" (click)="confirmDeleteAbastecimento(a.id)" title="Excluir" aria-label="Excluir abastecimento">
+                    <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <ng-container *ngFor="let a of paginatedAbastecimentos">
-                <tr class="hover:bg-blue-50/30 transition-colors duration-200">
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                      <span class="text-sm font-medium text-gray-900">{{ a.dtAbast | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ a.litroComb | number:'1.2-2' }} L
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ precoPorLitro(a) | currency:'BRL' }}
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <span class="text-sm font-semibold text-gray-900">
-                      {{ a.valorComb | currency:'BRL' }}
-                    </span>
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ a.kmAtual | number }} km
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
-                    <div class="flex justify-end gap-1">
-                      <button (click)="toggleAbast(a.id)"
-                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
-                      </button>
-                      <button *ngIf="isAdmin" (click)="confirmDeleteAbastecimento(a.id)" title="Excluir"
-                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngIf="expAbastId === a.id" class="bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
-                  <td colspan="6" class="px-4 sm:px-6 py-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                      <div class="flex items-center gap-2">
-                        <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
-                        <div>
-                          <p class="text-xs font-medium text-gray-500">Responsável</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ a.user?.nome || '—' }}</p>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <fa-icon [icon]="['fas', 'id-badge']" class="text-gray-400"></fa-icon>
-                        <div>
-                          <p class="text-xs font-medium text-gray-500">ID do Usuário</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ a.user?.id || '—' }}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </ng-container>
             </tbody>
           </table>
         </div>
 
-        <!-- Paginação Moderna -->
-        <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p class="text-sm text-gray-600">
-            Mostrando <span class="font-semibold">{{ (currentPageAbast - 1) * itemsPerPage + 1 }}</span> até
-            <span class="font-semibold">{{ Math.min(currentPageAbast * itemsPerPage, abastecimentos.length) }}</span> de
-            <span class="font-semibold">{{ abastecimentos.length }}</span> registros
-          </p>
-          <div class="flex gap-2">
-            <button (click)="changePageAbast(currentPageAbast - 1)" [disabled]="currentPageAbast === 1"
-              class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 transition-all"
-              [class.hover:bg-gray-50]="currentPageAbast !== 1" [class.opacity-50]="currentPageAbast === 1"
-              [class.cursor-not-allowed]="currentPageAbast === 1">
-              <fa-icon [icon]="['fas', 'chevron-left']" class="mr-1"></fa-icon>Anterior
+        <ul *ngIf="abastecimentos.length" class="md:hidden divide-y divide-line">
+          <li *ngFor="let a of abastVisiveis" class="px-4 py-3">
+            <button class="w-full text-left flex items-center gap-3" (click)="alternar('a' + a.id)" [attr.aria-expanded]="expandido === 'a' + a.id">
+              <span class="flex-1">
+                <span class="block font-semibold">{{ a.dtAbast | date:'dd/MM/yyyy' }}</span>
+                <span class="flex gap-3 text-sm text-ink-soft num"><span>{{ a.kmAtual | number:'1.0-0' }} km</span><span>{{ a.litroComb | number:'1.0-2' }} L</span></span>
+              </span>
+              <span class="num text-lg font-semibold">{{ a.valorComb | currency:'BRL' }}</span>
             </button>
-            <button (click)="changePageAbast(currentPageAbast + 1)"
-              [disabled]="currentPageAbast * itemsPerPage >= abastecimentos.length"
-              class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 transition-all"
-              [class.hover:bg-gray-50]="currentPageAbast * itemsPerPage < abastecimentos.length"
-              [class.opacity-50]="currentPageAbast * itemsPerPage >= abastecimentos.length"
-              [class.cursor-not-allowed]="currentPageAbast * itemsPerPage >= abastecimentos.length">
-              Próximo <fa-icon [icon]="['fas', 'chevron-right']" class="ml-1"></fa-icon>
-            </button>
-          </div>
+            <div *ngIf="expandido === 'a' + a.id" class="mt-2 flex items-center justify-between text-sm text-ink-soft">
+              <span>{{ precoPorLitro(a) | currency:'BRL' }} por litro, lançado por {{ a.user?.nome || 'usuário removido' }}</span>
+              <button *ngIf="isAdmin" class="btn-danger btn-sm" (click)="confirmDeleteAbastecimento(a.id)">Excluir</button>
+            </div>
+          </li>
+        </ul>
+
+        <div *ngIf="abastecimentos.length > limiteAbast" class="p-3 border-t border-line text-center">
+          <button class="btn-ghost btn-sm" (click)="limiteAbast = limiteAbast + 10">
+            Mostrar mais ({{ abastecimentos.length - limiteAbast }} restantes)
+          </button>
         </div>
       </div>
 
-      <!-- Conteúdo Revisões -->
-      <div *ngIf="activeTab === 'revisoes'" class="p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-          <div>
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Revisões</h3>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Manutenções realizadas no veículo<span *ngIf="totalGastoRevisoes"> · Total gasto: {{ totalGastoRevisoes | currency:'BRL' }}</span></p>
-          </div>
-          <a href="/revisao/cadastrar" class="w-full sm:w-auto">
-            <button
-              class="w-full sm:w-auto group px-4 sm:px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm sm:text-base font-medium transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5">
-              <fa-icon [icon]="['fas', 'plus']" class="mr-2"></fa-icon>Nova Revisão
-            </button>
-          </a>
+      <!-- Revisões -->
+      <div *ngIf="activeTab === 'revisoes'">
+        <div *ngIf="!revisoes.length" class="px-5 py-10 text-center text-ink-soft">
+          Nenhuma revisão ainda.
+          <a routerLink="/revisao/cadastrar" [queryParams]="{ carro: carro.id }" class="font-semibold text-ink underline underline-offset-4">Registrar a primeira</a>
         </div>
-
-        <!-- Tabela Modernizada -->
-        <div class="overflow-x-auto rounded-xl border border-gray-200">
-          <table class="min-w-[640px] md:min-w-full">
-            <thead>
-              <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">KM no Momento</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Serviço</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Custo</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <ng-container *ngFor="let r of paginatedRevisoes">
-                <tr class="hover:bg-blue-50/30 transition-colors duration-200">
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                      <span class="text-sm font-medium text-gray-900">{{ r.dtRevisao | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ r.kmAtual | number }} km
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <span class="px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full inline-block max-w-[16rem] truncate align-middle"
-                      [title]="r.descricao || 'Revisão periódica'">
-                      {{ r.descricao || 'Revisão periódica' }}
-                    </span>
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}
-                  </td>
-                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
-                    <div class="flex justify-end gap-1">
-                      <button (click)="toggleRevisao(r.id)"
-                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
-                      </button>
-                      <button *ngIf="isAdmin" (click)="confirmDeleteRevisao(r.id)" title="Excluir"
-                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngIf="expRevisaoId === r.id" class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50">
-                  <td colspan="5" class="px-4 sm:px-6 py-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                      <div class="flex items-center gap-2">
-                        <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
-                        <div>
-                          <p class="text-xs font-medium text-gray-500">Responsável</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ r.user?.nome || '—' }}</p>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <fa-icon [icon]="['fas', 'id-badge']" class="text-gray-400"></fa-icon>
-                        <div>
-                          <p class="text-xs font-medium text-gray-500">ID do Usuário</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ r.user?.id || '—' }}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </ng-container>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Paginação Moderna -->
-        <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p class="text-sm text-gray-600">
-            Mostrando <span class="font-semibold">{{ (currentPageRevisoes - 1) * itemsPerPage + 1 }}</span> até
-            <span class="font-semibold">{{ Math.min(currentPageRevisoes * itemsPerPage, revisoes.length) }}</span> de
-            <span class="font-semibold">{{ revisoes.length }}</span> registros
-          </p>
-          <div class="flex gap-2">
-            <button (click)="changePageRevisoes(currentPageRevisoes - 1)" [disabled]="currentPageRevisoes === 1"
-              class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 transition-all"
-              [class.hover:bg-gray-50]="currentPageRevisoes !== 1" [class.opacity-50]="currentPageRevisoes === 1"
-              [class.cursor-not-allowed]="currentPageRevisoes === 1">
-              <fa-icon [icon]="['fas', 'chevron-left']" class="mr-1"></fa-icon>Anterior
-            </button>
-            <button (click)="changePageRevisoes(currentPageRevisoes + 1)"
-              [disabled]="currentPageRevisoes * itemsPerPage >= revisoes.length"
-              class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 transition-all"
-              [class.hover:bg-gray-50]="currentPageRevisoes * itemsPerPage < revisoes.length"
-              [class.opacity-50]="currentPageRevisoes * itemsPerPage >= revisoes.length"
-              [class.cursor-not-allowed]="currentPageRevisoes * itemsPerPage >= revisoes.length">
-              Próximo <fa-icon [icon]="['fas', 'chevron-right']" class="ml-1"></fa-icon>
-            </button>
-          </div>
+        <ul *ngIf="revisoes.length" class="divide-y divide-line">
+          <li *ngFor="let r of revVisiveis" class="px-4 sm:px-5 py-4 flex gap-4">
+            <div class="w-20 shrink-0">
+              <p class="font-semibold">{{ r.dtRevisao | date:'dd/MM/yy' }}</p>
+              <p class="text-sm text-ink-soft num">{{ r.kmAtual | number:'1.0-0' }} km</p>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="leading-snug" [class.text-ink-soft]="!r.descricao">{{ r.descricao || 'Revisão sem descrição' }}</p>
+              <p class="text-sm text-ink-soft mt-0.5">Lançado por {{ r.user?.nome || 'usuário removido' }}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="num text-lg font-semibold">{{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}</p>
+              <button *ngIf="isAdmin" class="text-sm font-medium text-ink-soft hover:text-over mt-1" (click)="confirmDeleteRevisao(r.id)">Excluir</button>
+            </div>
+          </li>
+        </ul>
+        <div *ngIf="revisoes.length > limiteRev" class="p-3 border-t border-line text-center">
+          <button class="btn-ghost btn-sm" (click)="limiteRev = limiteRev + 10">Mostrar mais ({{ revisoes.length - limiteRev }} restantes)</button>
         </div>
       </div>
+    </section>
+
+    <!-- Ajustes do carro -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Dados do carro</h2>
+        <button *ngIf="!isEditing" class="btn-ghost btn-sm" (click)="toggleEditar()"><fa-icon [icon]="['fas', 'pen']"></fa-icon> Editar</button>
+      </div>
+
+      <div *ngIf="!isEditing" class="panel-body grid sm:grid-cols-3 gap-5">
+        <div><p class="stat-label">Km no cadastro</p><p class="num text-xl font-semibold">{{ carro.kmAdicionado | number:'1.0-0' }} km</p></div>
+        <div><p class="stat-label">Revisar a cada</p><p class="num text-xl font-semibold">{{ intervalo | number:'1.0-0' }} km</p></div>
+        <div><p class="stat-label">ou a cada</p><p class="num text-xl font-semibold">{{ mesesIntervalo }} meses</p></div>
+      </div>
+
+      <form *ngIf="isEditing" class="panel-body grid sm:grid-cols-3 gap-4" (ngSubmit)="salvarAlteracoes()">
+        <div class="field">
+          <label class="field-label" for="ed-placa">Placa</label>
+          <input id="ed-placa" name="placa" class="input num uppercase tracking-widest text-lg" maxlength="7" [(ngModel)]="edit.placa" (ngModelChange)="sanitizePlaca()" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="ed-km">Revisar a cada</label>
+          <div class="input-suffix"><input id="ed-km" name="km" type="number" min="500" step="500" inputmode="numeric" class="input" [(ngModel)]="edit.alarmeRevisaoKm" placeholder="10000" /><span>km</span></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="ed-mes">ou a cada</label>
+          <div class="input-suffix"><input id="ed-mes" name="mes" type="number" min="1" max="36" inputmode="numeric" class="input" [(ngModel)]="edit.alarmeRevisaoMes" placeholder="6" /><span>meses</span></div>
+        </div>
+        <div class="sm:col-span-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
+          <button type="button" class="btn-ghost" (click)="toggleEditar()">Cancelar</button>
+          <button type="submit" class="btn-dark">Salvar alterações</button>
+        </div>
+      </form>
+
+      <div class="border-t border-line px-4 sm:px-5 py-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div class="flex-1">
+          <p class="font-semibold">{{ emOficina ? 'O carro voltou da oficina?' : 'O carro foi para a oficina?' }}</p>
+          <p class="text-sm text-ink-soft">{{ emOficina ? 'Libere para aparecer como disponível.' : 'Marque para ninguém contar com ele.' }}</p>
+        </div>
+        <button class="btn-outline" (click)="alternarStatus()">
+          <fa-icon [icon]="['fas', emOficina ? 'check-circle' : 'tools']"></fa-icon>
+          {{ emOficina ? 'Liberar carro' : 'Mandar para a oficina' }}
+        </button>
+      </div>
+
+      <div *ngIf="isAdmin" class="border-t border-line px-4 sm:px-5 py-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div class="flex-1">
+          <p class="font-semibold">Excluir carro</p>
+          <p class="text-sm text-ink-soft">Apaga o carro e todo o histórico dele.</p>
+        </div>
+        <button class="btn-danger" (click)="deleteCarro()"><fa-icon [icon]="['fas', 'trash-alt']"></fa-icon> Excluir carro</button>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-template #carregando>
+    <div class="space-y-4" aria-hidden="true">
+      <div class="skeleton h-6 w-24"></div>
+      <div class="skeleton h-10 w-64"></div>
+      <div class="skeleton h-56 w-full !rounded-[10px]"></div>
     </div>
-  </div>
-
-  <!-- Loading Overlay Modernizado -->
-  <app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+  </ng-template>
 </div>
+
+<app-loading [visible]="loading" message="Carregando carro"></app-loading>

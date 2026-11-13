@@ -25,9 +25,9 @@ export class RevisaoService extends BaseService{
         const url = `${AppConstants.REVISAO_URL}/alarme`
         return this.http.get<ProximaRevisao[]>(url);
     }
-    calcularRevisaoById(carroId: number): Observable<ProximaRevisao[]>{
+    calcularRevisaoById(carroId: number): Observable<ProximaRevisao>{
         const url = `${AppConstants.REVISAO_URL}/alarme/${carroId}`
-        return this.http.get<ProximaRevisao[]>(url);
+        return this.http.get<ProximaRevisao>(url);
     }
 
 }

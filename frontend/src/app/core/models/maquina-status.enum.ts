@@ -5,12 +5,12 @@ export enum MaquinaStatus {
   PARADA = 'PARADA',
 }
 
-/** Rótulo e classes Tailwind de cada status (máquina sem status = disponível). */
-export const MAQUINA_STATUS_INFO: Record<MaquinaStatus, { label: string; badge: string }> = {
-  [MaquinaStatus.DISPONIVEL]: { label: 'Disponível', badge: 'bg-green-100 text-green-700' },
-  [MaquinaStatus.EM_OBRA]: { label: 'Em obra', badge: 'bg-blue-100 text-blue-700' },
-  [MaquinaStatus.MANUTENCAO]: { label: 'Manutenção', badge: 'bg-amber-100 text-amber-700' },
-  [MaquinaStatus.PARADA]: { label: 'Parada', badge: 'bg-gray-200 text-gray-700' },
+/** Rótulo e classe de etiqueta (usar com "tag") de cada status (máquina sem status = disponível). */
+export const MAQUINA_STATUS_INFO: Record<MaquinaStatus, { label: string; tag: string }> = {
+  [MaquinaStatus.DISPONIVEL]: { label: 'Disponível', tag: 'tag-ok' },
+  [MaquinaStatus.EM_OBRA]: { label: 'Em obra', tag: 'tag-info' },
+  [MaquinaStatus.MANUTENCAO]: { label: 'Manutenção', tag: 'tag-due' },
+  [MaquinaStatus.PARADA]: { label: 'Parada', tag: 'tag-idle' },
 };
 
 export const TIPOS_MAQUINA = [

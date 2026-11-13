@@ -1,4 +1,3 @@
-// src/app/pages/dashboard/car-stats/car-stats.component.ts
 import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { CarOption } from '../../core/models/car.option.model';
@@ -7,6 +6,10 @@ import { MesValor } from '../../core/models/mes.valor.model';
 import { AppConstants } from '../../core/constants/app.constants';
 import { PdfService } from '../../core/services/pdf.service';
 import { ToastService } from '../../core/services/toast.service';
+import { SERIES } from '../line-chart/line-chart.component';
+
+/** Máximo de carros no modo comparar: uma cor da paleta validada para cada. */
+const MAX_COMPARAR = SERIES.length;
 
 @Component({
   selector: 'app-car-stats',
@@ -14,20 +17,26 @@ import { ToastService } from '../../core/services/toast.service';
   standalone: false
 })
 export class CarStatsComponent implements OnInit {
-  allCars: CarOption[] = [];      // opções disponíveis (retornadas pelo endpoint conforme carIds)
-  selectedIds: number[] = [];     // seleção atual
+  allCars: CarOption[] = [];
+  selectedIds: number[] = [];
   months = 6;                     // 0 = tudo
   mode: 'sum' | 'compare' = 'compare';
-  loading: boolean = false;
+  loading = false;
+  gerandoPdf = false;
+  readonly max = MAX_COMPARAR;
+  readonly periodos = [{ v: 3, l: '3m' }, { v: 6, l: '6m' }, { v: 12, l: '12m' }, { v: 0, l: 'Tudo' }];
 
-  // paleta de cores para comparar vários carros
-  private palette = ['#2563eb', '#059669', '#9333ea', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#f97316', '#14b8a6'];
+  /** A cor segue o carro enquanto ele estiver selecionado (não muda quando outro sai). */
+  private corPorId = new Map<number, string>();
 
-  // chart options
-  chartOptionsCurrency = this.makeChartOptions('R$');
-  chartOptionsNumber = this.makeChartOptions();
+  readonly opcoesMoeda = {
+    plugins: { tooltip: { callbacks: { label: (c: any) => `${c.dataset.label}: ${c.parsed.y == null ? 'sem dado' : Number(c.parsed.y).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}` } } },
+    scales: { y: { ticks: { callback: (v: number) => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }) } } },
+  };
+  readonly opcoesNumero = {
+    plugins: { tooltip: { callbacks: { label: (c: any) => `${c.dataset.label}: ${c.parsed.y == null ? 'sem dado' : Number(c.parsed.y).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}` } } },
+  };
 
-  // view model para os 3 gráficos
   vm = { labels: [] as string[], gasto: [] as any[], litros: [] as any[], eficiencia: [] as any[] };
 
   constructor(private svc: DashboardService,
@@ -36,158 +45,129 @@ export class CarStatsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.svc.getCarOption().subscribe((car) => {
-      this.allCars = car
+    this.svc.getCarOption().subscribe({
+      next: (cars) => this.allCars = [...cars].sort((a, b) => a.label.localeCompare(b.label)),
+      error: () => this.toastService.showError('Não foi possível carregar a lista de carros.')
     });
-    this.selectedIds = this.selectedIds.length ? this.selectedIds : [];
+  }
+
+  isSel(id: number) { return this.selectedIds.includes(id); }
+  cor(id: number) { return this.corPorId.get(id) ?? null; }
+
+  get limiteAtingido() { return this.mode === 'compare' && this.selectedIds.length >= MAX_COMPARAR; }
+
+  toggle(id: number) {
+    if (this.isSel(id)) {
+      this.selectedIds = this.selectedIds.filter(x => x !== id);
+      this.corPorId.delete(id);
+    } else {
+      if (this.limiteAtingido) {
+        this.toastService.showInfo(`Para comparar, escolha até ${MAX_COMPARAR} carros. Para mais, use “Somar”.`);
+        return;
+      }
+      this.selectedIds = [...this.selectedIds, id];
+      this.atribuirCor(id);
+    }
     this.load();
   }
+
+  private atribuirCor(id: number) {
+    const usadas = new Set(this.corPorId.values());
+    const livre = SERIES.find(c => !usadas.has(c));
+    if (livre) this.corPorId.set(id, livre);
+  }
+
+  selectAll() {
+    const ids = this.allCars.map(c => c.id);
+    if (this.mode === 'compare' && ids.length > MAX_COMPARAR) {
+      this.mode = 'sum';
+      this.toastService.showInfo(`Com mais de ${MAX_COMPARAR} carros o gráfico mostra a soma.`);
+    }
+    this.selectedIds = ids;
+    ids.forEach(id => this.corPorId.has(id) || this.atribuirCor(id));
+    this.load();
+  }
+
+  clearAll() {
+    this.selectedIds = [];
+    this.corPorId.clear();
+    this.load();
+  }
+
+  setMode(m: 'sum' | 'compare') {
+    if (m === 'compare' && this.selectedIds.length > MAX_COMPARAR) {
+      this.toastService.showInfo(`Para comparar, deixe no máximo ${MAX_COMPARAR} carros selecionados.`);
+      return;
+    }
+    this.mode = m;
+    this.load();
+  }
+
+  setMonths(m: number) { this.months = m; this.load(); }
+  labelDoCarro(id: number) { return this.allCars.find(c => c.id === id)?.label?.toUpperCase() ?? `#${id}`; }
 
   load(): void {
     if (!this.selectedIds.length) {
       this.vm = { labels: [], gasto: [], litros: [], eficiencia: [] };
       return;
     }
-    this.loading=true;
-    this.svc.getCarStats(this.selectedIds, this.months, this.mode).subscribe((res: CarStatsResponse) => {
-      // options do select (cars com kmAtual)
-
-      // labels formatadas para Jan/25
-      const labelsFmt = res.labels.map(this.formatMes);
-
-      // monta datasets de acordo com o modo
-      const gastoDS = (this.mode === 'sum')
-        ? [this.makeDS('Gasto', this.palette[0], res.gasto.sum)]
-        : this.makeCompareDatasets(res.gasto.byCar);
-      const litrosDS = (this.mode === 'sum')
-        ? [this.makeDS('Litros', this.palette[1], res.litros.sum)]
-        : this.makeCompareDatasets(res.litros.byCar, 1);
-      const eficDS = (this.mode === 'sum')
-        ? [this.makeDS('km/L', this.palette[2], res.eficiencia.sum)]
-        : this.makeCompareDatasets(res.eficiencia.byCar, 2);
-
-      this.vm = { labels: labelsFmt, gasto: gastoDS, litros: litrosDS, eficiencia: eficDS };
+    this.loading = true;
+    this.svc.getCarStats(this.selectedIds, this.months, this.mode).subscribe({
+      next: (res: CarStatsResponse) => {
+        const labels = res.labels.map(m => this.formatMes(m));
+        const soma = this.mode === 'sum';
+        this.vm = {
+          labels,
+          gasto: soma ? [this.ds('Gasto', SERIES[0], res.gasto.sum)] : this.compare(res.gasto.byCar),
+          litros: soma ? [this.ds('Litros', SERIES[0], res.litros.sum)] : this.compare(res.litros.byCar),
+          eficiencia: soma ? [this.ds('km/L', SERIES[0], res.eficiencia.sum)] : this.compare(res.eficiencia.byCar),
+        };
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.toastService.showError('Não foi possível carregar a comparação.');
+      }
     });
-    this.loading=false;
   }
 
   generateReport() {
     if (!this.selectedIds.length) {
-      this.toastService.showInfo('Você precisa selecionar ao menos um.')
+      this.toastService.showInfo('Escolha pelo menos um carro para o relatório.');
       return;
     }
-    this.loading=true;
+    this.gerandoPdf = true;
     this.pdfService.makeCarOptionReport(this.selectedIds, this.months, this.mode).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'relatorio-dashboard.pdf';
+        a.download = 'relatorio-frota.pdf';
         a.click();
         window.URL.revokeObjectURL(url);
-        this.loading=false;
-        this.toastService.showSuccess('Relatório gerado com sucesos!')
+        this.gerandoPdf = false;
+        this.toastService.showSuccess('Relatório baixado.');
       },
-      error: (err) => {
-        this.toastService.showError('Erro ao gerar relatório', err)
-          this.loading=false;
+      error: () => {
+        this.gerandoPdf = false;
+        this.toastService.showError('Não foi possível gerar o relatório.');
       }
     });
-  
-
   }
 
-
-
-  toggleCarEvt(id: number, ev: Event) {
-    const input = ev.target as HTMLInputElement | null;
-    const checked = !!input?.checked; // evita "possibly null"
-    if (checked) {
-      if (!this.selectedIds.includes(id)) this.selectedIds = [...this.selectedIds, id];
-    } else {
-      this.selectedIds = this.selectedIds.filter(x => x !== id);
-    }
-    this.onSelectChange(this.selectedIds);
+  private ds(label: string, color: string, arr: MesValor[]) {
+    return { label, borderColor: color, data: arr.map(p => p.valor) };
   }
 
-  // ================= UI handlers =================
-
-  selectAll() { this.selectedIds = this.allCars.map(c => c.id); this.onSelectChange(this.selectedIds); }
-  clearAll() { this.selectedIds = []; this.onSelectChange(this.selectedIds); }
-  onSelectChange(ids: number[]) { this.selectedIds = ids; }
-  setMode(m: 'sum' | 'compare') { this.mode = m; this.load(); }
-  setMonths(m: number) { this.months = m; this.load(); }
-  remove(id: number) { this.selectedIds = this.selectedIds.filter(x => x !== id); this.load(); }
-  labelDoCarro(id: number) { return this.allCars.find(c => c.id === id)?.label ?? `#${id}`; }
-
-  // ================= helpers =================
-  private makeDS(label: string, color: string, arr: MesValor[]) {
-    const data = arr.map(p => p.valor); // aceita null => gaps
-    return {
-      label,
-      data,
-      borderColor: color,
-      backgroundColor: this.hexToRgba(color, 0.10),
-      tension: 0.3,
-      pointRadius: 3,
-      fill: true,
-      spanGaps: false
-    };
-  }
-
-  private makeCompareDatasets(byCar: Record<number, MesValor[]>, colorOffset = 0) {
-    const ids = Object.keys(byCar).map(Number).sort((a, b) => a - b);
-    return ids.map((id, idx) => {
-      const color = this.palette[(idx + colorOffset) % this.palette.length];
-      return this.makeDS(`${this.labelDoCarro(id)}`, color, byCar[id] ?? []);
-    });
-  }
-
-  private makeChartOptions(currencySymbol?: string): any {
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true },
-        tooltip: {
-          callbacks: {
-            label: (ctx: any) => {
-              const v = ctx.parsed?.y;
-              if (v == null) return `${ctx.dataset.label}: s/dado`;
-              if (currencySymbol) {
-                return `${ctx.dataset.label}: ${currencySymbol} ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-              }
-              return `${ctx.dataset.label}: ${Number(v).toLocaleString('pt-BR')}`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: (value: number) => currencySymbol
-              ? `${currencySymbol} ${Number(value).toLocaleString('pt-BR')}`
-              : Number(value).toLocaleString('pt-BR')
-          }
-        }
-      }
-    };
+  private compare(byCar: Record<number, MesValor[]>) {
+    return this.selectedIds
+      .filter(id => byCar[id])
+      .map(id => this.ds(this.labelDoCarro(id), this.cor(id) ?? SERIES[0], byCar[id] ?? []));
   }
 
   private formatMes(m: string): string {
-    // m = "YYYY-MM"
-    const mesesAbrev = AppConstants.MESES_ABREV;
     const [ano, mes] = m.split('-').map(Number);
     if (!ano || !mes) return m;
-    return `${mesesAbrev[mes - 1]}/${String(ano).slice(-2)}`;
-  }
-
-  private hexToRgba(hex: string, alpha = 0.15) {
-    const h = hex.replace('#', '');
-    const r = parseInt(h.substring(0, 2), 16);
-    const g = parseInt(h.substring(2, 4), 16);
-    const b = parseInt(h.substring(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `${AppConstants.MESES_ABREV[mes - 1]}/${String(ano).slice(-2)}`;
   }
 }

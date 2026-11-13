@@ -1,0 +1,251 @@
+<div class="page">
+  <a routerLink="/maquinas" class="back-link"><fa-icon [icon]="['fas', 'arrow-left']"></fa-icon> Máquinas</a>
+
+  <ng-container *ngIf="maquina; else carregando">
+    <header class="page-head !items-start">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="tag" [ngClass]="STATUS[status].tag">{{ STATUS[status].label }}</span>
+          <span *ngIf="maquina.tipo" class="text-sm font-semibold text-ink-soft">{{ maquina.tipo }}</span>
+        </div>
+        <h1 class="page-title">{{ nome }}</h1>
+        <p class="page-sub">
+          <span *ngIf="detalhe">{{ detalhe }}. </span>Na frota desde {{ maquina.dtAdicionado | date:'dd/MM/yyyy' }}.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+        <button class="btn-primary" (click)="abrirLeitura()">
+          <fa-icon [icon]="['fas', 'clock']"></fa-icon> Anotar horímetro
+        </button>
+        <a routerLink="/manutencao/maquina" [queryParams]="{ maquina: maquina.id }" class="btn-outline">
+          <fa-icon [icon]="['fas', 'tools']"></fa-icon> Manutenção
+        </a>
+      </div>
+    </header>
+
+    <!-- Horímetro + preventiva -->
+    <section class="panel overflow-hidden mb-6">
+      <div class="grid lg:grid-cols-[auto_1fr]">
+        <div class="p-5 sm:p-6 lg:pr-10 border-b lg:border-b-0 lg:border-r border-line">
+          <p class="stat-label mb-3">Horímetro</p>
+          <app-medidor [valor]="horasAtual" unidade="h" [digitos]="5" [decimais]="1" size="lg"></app-medidor>
+          <p class="text-sm text-ink-soft mt-3">
+            <ng-container *ngIf="leituras.length">Última leitura em {{ leituras[0].dtLeitura | date:'dd/MM/yyyy' }}.</ng-container>
+            <ng-container *ngIf="!leituras.length">Nenhuma leitura anotada ainda.</ng-container>
+          </p>
+        </div>
+
+        <div class="p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <p class="stat-label">Próxima preventiva</p>
+            <span class="tag" [ngClass]="SIT[situacao].tag">{{ situacao === 'vencida' ? 'Preventiva vencida' : situacao === 'proxima' ? 'Preventiva próxima' : SIT[situacao].label }}</span>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-3">
+            <p *ngIf="restante !== null" class="num text-[2rem] leading-none font-semibold"
+               [class.text-over]="situacao === 'vencida'" [class.text-due]="situacao === 'proxima'">
+              <ng-container *ngIf="restante > 0 && !(dias !== null && dias < 0)">faltam {{ restante | number:'1.0-1' }} h</ng-container>
+              <ng-container *ngIf="restante > 0 && dias !== null && dias < 0">venceu pela data</ng-container>
+              <ng-container *ngIf="restante <= 0">{{ abs(restante) | number:'1.0-1' }} h atrasada</ng-container>
+            </p>
+            <p *ngIf="proxima?.horasRevisaoEstimada != null" class="text-ink-soft">
+              <ng-container *ngIf="restante !== null && restante > 0 && dias !== null && dias < 0">faltavam {{ restante | number:'1.0-1' }} h, </ng-container>
+              no horímetro <strong class="text-ink num">{{ proxima?.horasRevisaoEstimada | number:'1.0-1' }} h</strong>
+            </p>
+          </div>
+          <div class="track !h-2.5 mb-2"><i [ngClass]="SIT[situacao].barra" [style.width.%]="progresso"></i></div>
+          <p class="text-sm text-ink-soft">
+            A cada {{ intervaloHoras | number:'1.0-0' }} h ou {{ intervaloMeses }} meses<ng-container *ngIf="proxima?.proximaRevisaoEstimada">
+              (limite por data: <strong class="text-ink" [class.text-over]="dias !== null && dias < 0">{{ proxima?.proximaRevisaoEstimada | date:'dd/MM/yyyy' }}</strong>)</ng-container>.
+            <ng-container *ngIf="previsaoPorHoras">No ritmo atual, as horas chegam lá por volta de {{ previsaoPorHoras | date:'dd/MM' }}.</ng-container>
+          </p>
+        </div>
+      </div>
+
+      <dl class="grid grid-cols-2 md:grid-cols-4 gap-px bg-line border-t border-line [&>div]:bg-white [&>div]:p-4 sm:[&>div]:px-6">
+        <div>
+          <dt class="stat-label">Horas desde o cadastro</dt>
+          <dd class="stat-value">{{ horasTrabalhadas | number:'1.0-1' }} <span class="text-base text-ink-soft">h</span></dd>
+        </div>
+        <div>
+          <dt class="stat-label">Ritmo de uso</dt>
+          <dd class="stat-value">{{ horasPorMes ? (horasPorMes | number:'1.0-0') : '—' }} <span class="text-base text-ink-soft">h/mês</span></dd>
+        </div>
+        <div>
+          <dt class="stat-label">Manutenções</dt>
+          <dd class="stat-value">{{ revisoes.length }}</dd>
+        </div>
+        <div>
+          <dt class="stat-label">Gasto em manutenção</dt>
+          <dd class="stat-value">{{ gastoManutencao | currency:'BRL':'symbol':'1.0-0' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Histórico -->
+    <section class="panel mb-6">
+      <div class="flex px-3 sm:px-4 pt-3 border-b border-line" role="tablist">
+        <button role="tab" class="tab" [class.is-on]="aba === 'manutencoes'" (click)="aba = 'manutencoes'; limite = 10">
+          Manutenções <span class="num text-ink-soft">{{ revisoes.length }}</span>
+        </button>
+        <button role="tab" class="tab" [class.is-on]="aba === 'leituras'" (click)="aba = 'leituras'; limite = 10">
+          Leituras <span class="num text-ink-soft">{{ leituras.length }}</span>
+        </button>
+      </div>
+
+      <ng-container *ngIf="aba === 'manutencoes'">
+        <div *ngIf="!revisoes.length" class="px-5 py-10 text-center text-ink-soft">
+          Nenhuma manutenção registrada.
+          <a routerLink="/manutencao/maquina" [queryParams]="{ maquina: maquina.id }" class="font-semibold text-ink underline underline-offset-4">Registrar a primeira</a>
+        </div>
+        <ul *ngIf="revisoes.length" class="divide-y divide-line">
+          <li *ngFor="let r of revVisiveis" class="px-4 sm:px-5 py-4 flex gap-4">
+            <div class="w-24 shrink-0">
+              <p class="font-semibold">{{ r.dtRevisao | date:'dd/MM/yy' }}</p>
+              <p class="text-sm text-ink-soft num">{{ r.horasAtual | number:'1.0-1' }} h</p>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="leading-snug" [class.text-ink-soft]="!r.descricao">{{ r.descricao || 'Manutenção sem descrição' }}</p>
+              <p class="text-sm text-ink-soft mt-0.5">Lançado por {{ r.user?.nome || 'usuário removido' }}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="num text-lg font-semibold">{{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}</p>
+              <button *ngIf="isAdmin" class="text-sm font-medium text-ink-soft hover:text-over mt-1" (click)="excluirManutencao(r)">Excluir</button>
+            </div>
+          </li>
+        </ul>
+        <div *ngIf="revisoes.length > limite" class="p-3 border-t border-line text-center">
+          <button class="btn-ghost btn-sm" (click)="limite = limite + 10">Mostrar mais ({{ revisoes.length - limite }} restantes)</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="aba === 'leituras'">
+        <div *ngIf="!leituras.length" class="px-5 py-10 text-center text-ink-soft">
+          Anote o horímetro no fim do dia para a previsão da preventiva ficar certa.
+          <button class="font-semibold text-ink underline underline-offset-4" (click)="abrirLeitura()">Anotar agora</button>
+        </div>
+        <ul *ngIf="leituras.length" class="divide-y divide-line">
+          <li *ngFor="let l of leitVisiveis; let i = index" class="px-4 sm:px-5 py-3 flex items-center gap-4">
+            <span class="w-24 shrink-0 font-semibold">{{ l.dtLeitura | date:'dd/MM/yy' }}</span>
+            <span class="flex-1 text-sm text-ink-soft truncate">{{ l.usuario || '—' }}</span>
+            <span *ngIf="leituras[i + 1] as ant" class="text-sm text-ink-soft num hidden sm:inline">+{{ l.horas - ant.horas | number:'1.0-1' }} h</span>
+            <span class="num text-lg font-semibold w-24 text-right">{{ l.horas | number:'1.0-1' }} h</span>
+          </li>
+        </ul>
+        <div *ngIf="leituras.length > limite" class="p-3 border-t border-line text-center">
+          <button class="btn-ghost btn-sm" (click)="limite = limite + 10">Mostrar mais ({{ leituras.length - limite }} restantes)</button>
+        </div>
+      </ng-container>
+    </section>
+
+    <!-- Dados da máquina -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Dados da máquina</h2>
+        <button *ngIf="!editando" class="btn-ghost btn-sm" (click)="abrirEdicao()"><fa-icon [icon]="['fas', 'pen']"></fa-icon> Editar</button>
+      </div>
+
+      <div *ngIf="!editando" class="panel-body grid grid-cols-2 sm:grid-cols-4 gap-5">
+        <div><p class="stat-label">Horímetro no cadastro</p><p class="num text-xl font-semibold">{{ maquina.horas | number:'1.0-1' }} h</p></div>
+        <div><p class="stat-label">Preventiva a cada</p><p class="num text-xl font-semibold">{{ intervaloHoras | number:'1.0-0' }} h</p></div>
+        <div><p class="stat-label">ou a cada</p><p class="num text-xl font-semibold">{{ intervaloMeses }} meses</p></div>
+        <div><p class="stat-label">Chassi / série</p><p class="font-semibold uppercase break-all">{{ maquina.chassi || '—' }}</p></div>
+      </div>
+
+      <form *ngIf="editando" class="panel-body grid sm:grid-cols-2 gap-4" (ngSubmit)="salvarEdicao()">
+        <div class="field sm:col-span-2">
+          <label class="field-label" for="e-ident">Nome na frota</label>
+          <input id="e-ident" name="ident" class="input" maxlength="60" [(ngModel)]="edit.identificacao">
+        </div>
+        <div class="field">
+          <label class="field-label" for="e-tipo">Tipo</label>
+          <select id="e-tipo" name="tipo" class="input" [(ngModel)]="edit.tipo">
+            <option value="">Não informado</option>
+            <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="e-ano">Ano</label>
+          <input id="e-ano" name="ano" type="number" inputmode="numeric" class="input num" [(ngModel)]="edit.ano">
+        </div>
+        <div class="field sm:col-span-2">
+          <label class="field-label" for="e-chassi">Chassi ou número de série</label>
+          <input id="e-chassi" name="chassi" class="input uppercase" maxlength="40" [(ngModel)]="edit.chassi">
+        </div>
+        <div class="field">
+          <label class="field-label" for="e-h">Preventiva a cada</label>
+          <div class="input-suffix"><input id="e-h" name="h" type="number" inputmode="numeric" min="10" class="input num" [(ngModel)]="edit.alarmeRevisaoHoras" placeholder="250"><span>horas</span></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="e-m">ou a cada</label>
+          <div class="input-suffix"><input id="e-m" name="m" type="number" inputmode="numeric" min="1" max="36" class="input num" [(ngModel)]="edit.alarmeRevisaoMes" placeholder="6"><span>meses</span></div>
+        </div>
+        <div class="sm:col-span-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
+          <button type="button" class="btn-ghost" (click)="editando = false">Cancelar</button>
+          <button type="submit" class="btn-dark">Salvar alterações</button>
+        </div>
+      </form>
+
+      <div class="border-t border-line px-4 sm:px-5 py-4">
+        <p class="font-semibold mb-2">Situação agora</p>
+        <div class="seg !grid grid-cols-2 sm:!inline-flex w-full sm:w-auto" role="radiogroup" aria-label="Situação da máquina">
+          <button *ngFor="let s of statusLista" type="button" role="radio" class="seg-btn justify-center"
+            [class.is-on]="status === s" [attr.aria-checked]="status === s" (click)="mudarStatus(s)">
+            {{ STATUS[s].label }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="isAdmin" class="border-t border-line px-4 sm:px-5 py-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div class="flex-1">
+          <p class="font-semibold">Excluir máquina</p>
+          <p class="text-sm text-ink-soft">Apaga a máquina, as manutenções e as leituras de horímetro.</p>
+        </div>
+        <button class="btn-danger" (click)="excluirMaquina()"><fa-icon [icon]="['fas', 'trash-alt']"></fa-icon> Excluir máquina</button>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-template #carregando>
+    <div class="space-y-4" aria-hidden="true">
+      <div class="skeleton h-6 w-24"></div>
+      <div class="skeleton h-10 w-64"></div>
+      <div class="skeleton h-56 w-full !rounded-[10px]"></div>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Anotar horímetro -->
+<div *ngIf="leituraAberta" class="overlay" (click)="leituraAberta = false">
+  <form class="sheet" role="dialog" aria-modal="true" aria-label="Anotar horímetro" (click)="$event.stopPropagation()" (ngSubmit)="salvarLeitura()">
+    <div class="sheet-head">
+      <h2 class="sheet-title">Anotar horímetro</h2>
+      <button type="button" class="icon-btn -mr-2" (click)="leituraAberta = false" aria-label="Fechar"><fa-icon [icon]="['fas', 'times']"></fa-icon></button>
+    </div>
+    <div class="p-5 flex flex-col gap-5 overflow-y-auto">
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg bg-paper px-4 py-3">
+        <span class="stat-label">Último registro</span>
+        <app-medidor [valor]="horasAtual" unidade="h" [digitos]="5" [decimais]="1" size="sm"></app-medidor>
+      </div>
+      <div class="field">
+        <label class="field-label" for="l-h">Horas no painel agora</label>
+        <div class="input-suffix">
+          <input id="l-h" name="horas" type="number" inputmode="decimal" step="0.1" min="0" class="input num text-2xl h-16"
+            [(ngModel)]="leituraHoras" [placeholder]="horasAtual" [class.!border-over]="leituraMenor" autofocus><span>h</span>
+        </div>
+        <p *ngIf="leituraMenor" class="field-error">Menor que o último registro ({{ horasAtual | number:'1.0-1' }} h).</p>
+        <p *ngIf="!leituraMenor && leituraHoras" class="field-hint">{{ (leituraHoras - horasAtual) | number:'1.0-1' }} h trabalhadas desde o último registro.</p>
+      </div>
+      <div class="field">
+        <label class="field-label" for="l-d">Data</label>
+        <input id="l-d" name="data" type="date" class="input" [(ngModel)]="leituraData" [max]="hoje">
+      </div>
+    </div>
+    <div class="px-5 pb-5 pt-1">
+      <button type="submit" class="btn-primary w-full h-14 text-base" [disabled]="salvandoLeitura">
+        {{ salvandoLeitura ? 'Salvando…' : 'Salvar leitura' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<app-loading [visible]="loading" message="Carregando máquina"></app-loading>

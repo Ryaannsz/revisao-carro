@@ -49,17 +49,24 @@ public interface AbastRepository extends BaseRepository<Abast, Integer> {
 """)
     List<MesValorDTO> litrosMensais(Integer empresaId);
 
-    @Query("""
-  select new com.revisao.demo.dto.dashboards.MesValorDTO(
-    concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m')),
-    ( coalesce(max(a.kmAtual), 0d) - coalesce(min(a.kmAtual), 0d) ) * 1.0
-  )
-  from Abast a
-  where a.carro.empresa.id = :empresaId
-  group by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
-  order by concat('', function('DATE_FORMAT', a.dtAbast, '%Y-%m'))
-""")
-    List<MesValorDTO> kmRodadoMensal(Integer empresaId);
+    /**
+     * Km rodado no mês = soma, carro a carro, de (maior km - menor km) no mês.
+     * Antes o max/min era da frota inteira, misturando odômetros de carros diferentes
+     * (e o km/L do painel saía em 60-300 km/L).
+     */
+    @Query(value = """
+  select t.mes, sum(t.delta) from (
+    select date_format(a.dt_abast, '%Y-%m') as mes, a.carro_id,
+           max(a.km_atual) - min(a.km_atual) as delta
+    from tb_abastecimento a
+    join tb_carro c on c.id = a.carro_id
+    where c.empresa_id = :empresaId
+    group by date_format(a.dt_abast, '%Y-%m'), a.carro_id
+  ) t
+  group by t.mes
+  order by t.mes
+""", nativeQuery = true)
+    List<Object[]> kmRodadoMensalRaw(Integer empresaId);
 
 
     @Query(value = """

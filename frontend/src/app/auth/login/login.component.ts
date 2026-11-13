@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../core/services/login.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,14 +10,16 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
- loginForm: FormGroup;
+  loginForm: FormGroup;
   isLoading = false;
+  mostrarSenha = false;
   error: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
@@ -25,24 +27,32 @@ export class LoginComponent {
     });
   }
 
+  somenteDigitos(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const v = input.value.replace(/\D/g, '').slice(0, 11);
+    if (v !== input.value) this.loginForm.get('cpf')?.setValue(v);
+  }
+
   onSubmit() {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
     this.error = null;
 
-
     this.loginService.login(this.loginForm.value).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
-        this.router.navigate(['/carros']);
+        const destino = this.route.snapshot.queryParamMap.get('returnUrl') || '/carros';
+        this.router.navigateByUrl(destino);
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = 'CPF ou senha inválidos. Por favor, tente novamente.';
-        console.error('Erro no login:', err);
+        this.error = err?.status === 0
+          ? 'Sem conexão com o servidor. Verifique a internet e tente de novo.'
+          : 'CPF ou senha incorretos.';
       }
     });
   }

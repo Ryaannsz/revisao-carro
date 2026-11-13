@@ -1,60 +1,68 @@
-<!-- pages/revisoes/revisoes.component.html -->
-<div class="max-w-6xl mx-auto p-6">
-  <h1 class="text-3xl font-bold mb-6">Revisões</h1>
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Revisões e manutenções</h1>
+      <p class="page-sub" *ngIf="!loading">
+        {{ filtradas.length }} {{ filtradas.length === 1 ? 'registro' : 'registros' }}, {{ totalGasto | currency:'BRL':'symbol':'1.0-0' }} em serviços.
+      </p>
+    </div>
+    <a [routerLink]="aba === 'carro' ? '/revisao/cadastrar' : '/manutencao/maquina'" class="btn-primary">
+      <fa-icon [icon]="['fas', 'plus']"></fa-icon> {{ aba === 'carro' ? 'Registrar revisão' : 'Registrar manutenção' }}
+    </a>
+  </header>
 
-  <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Pesquisar por marca, modelo ou placa"
-    class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200" />
-
-  <div class="overflow-x-auto bg-white shadow rounded-lg">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">KM Atual</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Custo</th>
-          <th class="px-6 py-3"></th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-100">
-        <tr *ngFor="let r of filteredRevisoes">
-          <td class="px-6 py-4 whitespace-nowrap">
-            {{ r.carro.marca.marca | uppercase}} {{ r.carro.modelo.modelo | uppercase}} — {{ r.carro.placa | uppercase}}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ r.dtRevisao | date:'dd/MM/yyyy' }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ r.kmAtual | number }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-right">
-            <button (click)="openModal(r)" class="text-blue-600 hover:text-blue-900">
-              Detalhes
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="flex flex-col md:flex-row md:items-center gap-3 mb-5">
+    <div class="seg" role="tablist">
+      <button role="tab" class="seg-btn" [class.is-on]="aba === 'carro'" (click)="trocarAba('carro')">
+        <fa-icon [icon]="['fas', 'car']"></fa-icon> Carros <span class="seg-count">{{ carros.length }}</span>
+      </button>
+      <button role="tab" class="seg-btn" [class.is-on]="aba === 'maquina'" (click)="trocarAba('maquina')">
+        <fa-icon [icon]="['fas', 'tractor']"></fa-icon> Máquinas <span class="seg-count">{{ maquinas.length }}</span>
+      </button>
+    </div>
+    <label class="relative md:ml-auto md:w-80">
+      <span class="sr-only">Buscar</span>
+      <fa-icon [icon]="['fas', 'search']" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"></fa-icon>
+      <input type="search" [(ngModel)]="searchQuery" [placeholder]="aba === 'carro' ? 'Placa, carro ou serviço' : 'Máquina ou serviço'" class="input h-11 pl-10" />
+    </label>
   </div>
 
-  <!-- Modal de Detalhes -->
-  <div *ngIf="selectedRevisao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-    (click)="closeModal()">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative" (click)="$event.stopPropagation()">
-      <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-        ✕
-      </button>
-      <h2 class="text-2xl font-bold mb-4">Detalhes da Revisão</h2>
-      <p><strong>Carro:</strong> {{ selectedRevisao.carro.marca.marca | uppercase}}
-        {{ selectedRevisao.carro.modelo.modelo | uppercase}} — {{ selectedRevisao.carro.placa | uppercase}}</p>
-      <p><strong>Data:</strong> {{ selectedRevisao.dtRevisao | date:'dd/MM/yyyy' }}</p>
-      <p><strong>KM Atual:</strong> {{ selectedRevisao.kmAtual | number }}</p>
-      <p><strong>Custo:</strong> {{ selectedRevisao.valor != null ? (selectedRevisao.valor | currency:'BRL') : '—' }}</p>
-      <p *ngIf="selectedRevisao.descricao"><strong>Serviço:</strong> {{ selectedRevisao.descricao }}</p>
-      <p><strong>Registrado por:</strong> {{ selectedRevisao.user?.nome || '—' }}</p>
-      <div class="mt-6 flex justify-end space-x-2">
-        <button (click)="removeRevisao(selectedRevisao.id)"
-          class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Remover</button>
-      </div>
+  <div *ngIf="!loading && !filtradas.length" class="empty">
+    <h3>{{ searchQuery ? 'Nada encontrado' : (aba === 'carro' ? 'Nenhuma revisão de carro ainda' : 'Nenhuma manutenção de máquina ainda') }}</h3>
+    <p>{{ searchQuery ? 'Tente outra palavra.' : 'Os serviços registrados aparecem aqui, separados por mês.' }}</p>
+  </div>
+
+  <section *ngFor="let g of grupos" class="mb-6">
+    <div class="flex items-baseline justify-between gap-3 px-1 mb-2">
+      <h2 class="font-cond font-semibold text-xl first-letter:uppercase">{{ g.titulo }}</h2>
+      <span class="num text-lg font-semibold text-ink-soft">{{ g.total | currency:'BRL':'symbol':'1.0-0' }}</span>
     </div>
+    <ul class="rows">
+      <li *ngFor="let r of g.itens" class="px-4 sm:px-5 py-4 grid grid-cols-[3rem_minmax(0,1fr)_auto] sm:grid-cols-[4rem_minmax(0,14rem)_minmax(0,1fr)_auto] gap-x-4 gap-y-1 items-start">
+        <span class="num font-semibold text-lg leading-6">{{ r.data | date:'dd/MM' }}</span>
+
+        <a [routerLink]="r.link" class="min-w-0 hover:underline underline-offset-4">
+          <span *ngIf="r.placa" class="plate mr-2 align-[1px]">{{ r.placa }}</span>
+          <span class="font-semibold" [class.block]="!r.placa">{{ r.titulo }}</span>
+          <span class="block text-sm text-ink-soft num">{{ r.medidor | number:(r.unidade === 'h' ? '1.0-1' : '1.0-0') }} {{ r.unidade }}</span>
+        </a>
+
+        <div class="col-start-2 sm:col-start-auto row-start-2 sm:row-start-auto min-w-0">
+          <p class="leading-snug" [class.text-ink-soft]="!r.descricao">{{ r.descricao || 'Sem descrição' }}</p>
+          <p class="text-sm text-ink-soft mt-0.5">Lançado por {{ r.usuario || 'usuário removido' }}</p>
+        </div>
+
+        <div class="col-start-3 sm:col-start-auto row-start-1 text-right">
+          <p class="num text-lg font-semibold leading-6">{{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}</p>
+          <button *ngIf="isAdmin" class="text-sm font-medium text-ink-soft hover:text-over" (click)="remover(r)">Excluir</button>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <div *ngIf="filtradas.length > limite" class="text-center">
+    <button class="btn-outline" (click)="limite = limite + 40">Mostrar mais ({{ filtradas.length - limite }} restantes)</button>
   </div>
 </div>
 
-<app-loading [visible]="loading" message="Carregando dados..."></app-loading>
+<app-loading [visible]="loading" message="Carregando revisões"></app-loading>

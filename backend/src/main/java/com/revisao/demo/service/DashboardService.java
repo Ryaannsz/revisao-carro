@@ -29,7 +29,9 @@ public class DashboardService {
     public DashboardResumoDTO resumoDaEmpresa(Integer empresaId) {
         var gasto = abastRepository.gastoMensal(empresaId);
         var litros = abastRepository.litrosMensais(empresaId);
-        var km = abastRepository.kmRodadoMensal(empresaId);
+        var km = abastRepository.kmRodadoMensalRaw(empresaId).stream()
+                .map(row -> new MesValorDTO((String) row[0], row[1] != null ? ((Number) row[1]).doubleValue() : 0d))
+                .toList();
 
         var preco = abastRepository.precoMedioLitroMensalRaw(empresaId)
                 .stream()

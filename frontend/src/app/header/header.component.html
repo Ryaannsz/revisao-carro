@@ -1,143 +1,125 @@
-<header class="bg-blue-600 shadow-md fixed w-full z-50 h-16">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-    <div class="flex justify-between items-center h-full">
+<ng-container *ngIf="logado">
 
-      <!-- Logo -->
-      <div class="flex-shrink-0 text-white font-bold text-2xl">
-        <a routerLink="/carros">CarrosApp</a>
+  <!-- ============ Desktop: menu lateral ============ -->
+  <aside class="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-ink text-white">
+    <a routerLink="/carros" class="flex items-center gap-3 px-6 h-20 shrink-0">
+      <ng-container *ngTemplateOutlet="marca"></ng-container>
+    </a>
+
+    <nav class="flex-1 overflow-y-auto px-3 pb-6" aria-label="Principal">
+      <div *ngFor="let g of gruposVisiveis" class="mt-5 first:mt-1">
+        <p class="px-3 mb-1.5 text-[13px] font-medium text-white/45">{{ g.titulo }}</p>
+        <a *ngFor="let i of g.itens" [routerLink]="i.link" routerLinkActive="is-on"
+           class="nav-link">
+          <fa-icon [icon]="['fas', i.icon]" class="w-5 text-center text-white/55" [fixedWidth]="true"></fa-icon>
+          <span>{{ i.label }}</span>
+        </a>
       </div>
+    </nav>
 
-      <!-- Menu Desktop -->
-      <nav class="hidden md:flex space-x-6 text-white items-center">
-
-        <!-- Carro -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Carro</span>
-          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
-           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-           transition-opacity duration-200 z-50">
-            <a routerLink="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
-          </div>
+    <div class="border-t border-white/10 p-3">
+      <div class="flex items-center gap-3 px-3 py-2">
+        <span class="w-9 h-9 rounded-full bg-white/10 grid place-items-center font-cond font-semibold">{{ iniciais }}</span>
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold truncate">{{ nome || 'Usuário' }}</p>
+          <p class="text-[13px] text-white/50">{{ isSuper ? 'Administrador' : 'Operador' }}</p>
         </div>
+        <button (click)="logout()" class="w-9 h-9 rounded-md text-white/60 hover:text-white hover:bg-white/10" title="Sair" aria-label="Sair">
+          <fa-icon [icon]="['fas', 'right-from-bracket']"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </aside>
 
-        <span *ngIf="isSuper"><a routerLink="/usuario/cadastrados">Usuários</a></span>
+  <!-- ============ Celular/tablet: barra superior ============ -->
+  <header class="lg:hidden fixed top-0 inset-x-0 z-40 bg-ink text-white" style="padding-top: env(safe-area-inset-top, 0px)">
+    <div class="h-14 flex items-center justify-between px-4">
+      <a routerLink="/carros" class="flex items-center gap-2.5">
+        <ng-container *ngTemplateOutlet="marca"></ng-container>
+      </a>
+      <span class="w-9 h-9 rounded-full bg-white/10 grid place-items-center font-cond font-semibold text-sm" [title]="nome">{{ iniciais }}</span>
+    </div>
+  </header>
 
-        <!-- Abastecimento -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200">Abastecimento</span>
-          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
-           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-           transition-opacity duration-200 z-50">
-            <a routerLink="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
-            <a routerLink="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
-          </div>
+  <!-- ============ Celular/tablet: navegação inferior ============ -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-line"
+       style="padding-bottom: env(safe-area-inset-bottom, 0px)" aria-label="Principal">
+    <div class="grid grid-cols-4 h-16 max-w-xl mx-auto">
+      <a routerLink="/carros" routerLinkActive="is-on" class="tab-link">
+        <fa-icon [icon]="['fas', 'car']" class="text-lg"></fa-icon><span>Carros</span>
+      </a>
+      <a routerLink="/maquinas" routerLinkActive="is-on" class="tab-link">
+        <fa-icon [icon]="['fas', 'tractor']" class="text-lg"></fa-icon><span>Máquinas</span>
+      </a>
+      <button type="button" class="tab-link" [class.is-on]="lancarAberto" (click)="toggleLancar()" [attr.aria-expanded]="lancarAberto">
+        <span class="w-11 h-8 -mb-0.5 rounded-full grid place-items-center bg-signal text-ink">
+          <fa-icon [icon]="['fas', 'plus']" class="text-lg"></fa-icon>
+        </span>
+        <span>Lançar</span>
+      </button>
+      <button type="button" class="tab-link" [class.is-on]="menuAberto" (click)="toggleMenu()" [attr.aria-expanded]="menuAberto">
+        <fa-icon [icon]="['fas', 'bars']" class="text-lg"></fa-icon><span>Menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Folha "Lançar" -->
+  <div *ngIf="lancarAberto" class="lg:hidden overlay !z-[45]" (click)="lancarAberto = false">
+    <div class="sheet mb-16" (click)="$event.stopPropagation()" role="dialog" aria-label="Lançar">
+      <div class="sheet-head">
+        <h2 class="sheet-title">O que você vai lançar?</h2>
+        <button class="icon-btn -mr-2" (click)="lancarAberto = false" aria-label="Fechar"><fa-icon [icon]="['fas', 'times']"></fa-icon></button>
+      </div>
+      <div class="p-3 grid gap-1">
+        <a *ngFor="let i of lancamentos" [routerLink]="i.link" class="flex items-center gap-4 rounded-lg px-3 py-3.5 hover:bg-paper active:bg-paper-2">
+          <span class="w-11 h-11 rounded-lg bg-signal-soft text-ink grid place-items-center"><fa-icon [icon]="['fas', i.icon]"></fa-icon></span>
+          <span class="font-semibold text-[17px]">{{ i.label }}</span>
+          <fa-icon [icon]="['fas', 'chevron-right']" class="ml-auto text-ink-faint"></fa-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu completo (celular/tablet) -->
+  <div *ngIf="menuAberto" class="lg:hidden overlay !z-[45] !items-stretch !justify-end !p-0" (click)="menuAberto = false">
+    <div class="w-[86%] max-w-sm h-full bg-ink text-white flex flex-col animate-pop-in" (click)="$event.stopPropagation()"
+         style="padding-top: env(safe-area-inset-top, 0px)" role="dialog" aria-label="Menu">
+      <div class="flex items-center justify-between h-14 px-4 shrink-0">
+        <span class="font-cond text-xl font-semibold">Menu</span>
+        <button class="w-10 h-10 rounded-md text-white/70 hover:bg-white/10" (click)="menuAberto = false" aria-label="Fechar"><fa-icon [icon]="['fas', 'times']"></fa-icon></button>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-3 pb-4">
+        <div *ngFor="let g of gruposVisiveis" class="mt-4 first:mt-0">
+          <p class="px-3 mb-1 text-[13px] font-medium text-white/45">{{ g.titulo }}</p>
+          <a *ngFor="let i of g.itens" [routerLink]="i.link" routerLinkActive="is-on" class="nav-link !h-12">
+            <fa-icon [icon]="['fas', i.icon]" class="w-5 text-center text-white/55" [fixedWidth]="true"></fa-icon>
+            <span>{{ i.label }}</span>
+          </a>
         </div>
-
-        <!-- Revisão -->
-        <div class="relative group">
-          <span class="cursor-pointer hover:text-blue-200 peer">Revisão</span>
-          <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
-           opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-           transition-opacity duration-200 z-50">
-            <a routerLink="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
-            <a routerLink="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
-          </div>
-        </div>
-
-        <ng-container *ngIf="isSuper">
-        <div class="relative group">
-          <a routerLink="/dashboard"><span class="cursor-pointer hover:text-blue-200 peer">Dashboard</span></a>
-        </div>
-        </ng-container>
-
-
-        <!-- Botão Logout -->
-        <ng-container *ngIf="logado">
-          <button (click)="logout()"
-            class="ml-6 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white font-semibold transition-colors duration-200">
-            Logout
-          </button>
-        </ng-container>
-
       </nav>
-
-      <!-- Botão Hamburguer Mobile -->
-      <div class="md:hidden flex items-center">
-        <button (click)="toggleMenu()" class="text-white focus:outline-none">
-          <svg *ngIf="!menuAberto" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg *ngIf="menuAberto" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+      <div class="border-t border-white/10 p-4 flex items-center gap-3" style="padding-bottom: calc(1rem + 4rem + env(safe-area-inset-bottom, 0px))">
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold truncate">{{ nome || 'Usuário' }}</p>
+          <p class="text-[13px] text-white/50">{{ isSuper ? 'Administrador' : 'Operador' }}</p>
+        </div>
+        <button (click)="logout()" class="btn btn-sm bg-white/10 text-white hover:bg-white/20">
+          <fa-icon [icon]="['fas', 'right-from-bracket']"></fa-icon> Sair
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Menu Mobile -->
-  <div class="md:hidden bg-blue-500 overflow-hidden transition-all duration-300 ease-in-out"
-    [ngClass]="{ 'max-h-96 opacity-100': menuAberto, 'max-h-0 opacity-0': !menuAberto }">
+</ng-container>
 
-    <nav class="flex flex-col py-4 px-4 space-y-2 text-white">
-
-      <!-- Carro -->
-      <div>
-        <div (click)="toggleSubmenu('carro')" class="font-semibold cursor-pointer flex justify-between items-center">
-          Carro
-          <span class="text-lg">{{ carroAberto ? '−' : '+' }}</span>
-        </div>
-        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
-             'max-h-40 opacity-100 mt-2': carroAberto,
-             'max-h-0 opacity-0': !carroAberto
-           }">
-          <a routerLink="/carro" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
-        </div>
-      </div>
-
-      <!-- Abastecimento -->
-      <div>
-        <div (click)="toggleSubmenu('abastecimento')"
-          class="font-semibold cursor-pointer flex justify-between items-center">
-          Abastecimento
-          <span class="text-lg">{{ abastecimentoAberto ? '−' : '+' }}</span>
-        </div>
-        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
-             'max-h-40 opacity-100 mt-2': abastecimentoAberto,
-             'max-h-0 opacity-0': !abastecimentoAberto
-           }">
-          <a routerLink="/abast" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
-          <a routerLink="/abastecimento/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
-        </div>
-      </div>
-
-      <!-- Revisão -->
-      <div>
-        <div (click)="toggleSubmenu('revisao')" class="font-semibold cursor-pointer flex justify-between items-center">
-          Revisão
-          <span class="text-lg">{{ revisaoAberto ? '−' : '+' }}</span>
-        </div>
-        <div class="overflow-hidden transition-all duration-300 ease-in-out" [ngClass]="{
-             'max-h-40 opacity-100 mt-2': revisaoAberto,
-             'max-h-0 opacity-0': !revisaoAberto
-           }">
-          <a routerLink="/revisao/cadastrar" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
-          <a routerLink="/revisao/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
-        </div>
-      </div>
-
-      <div>
-        <div class="font-semibold cursor-pointer flex justify-between items-center">
-          <a routerLink="/dashboard">Dashboard</a>
-        </div>
-      </div>
-
-      <!-- Logout Mobile -->
-      <button (click)="logout()"
-        class="mt-4 w-full bg-red-600 hover:bg-red-700 py-2 rounded text-white font-semibold transition-colors duration-200">
-        Logout
-      </button>
-
-    </nav>
-  </div>
-</header>
+<ng-template #marca>
+  <svg viewBox="0 0 32 32" class="w-8 h-8 shrink-0" aria-hidden="true">
+    <rect x="1" y="1" width="30" height="30" rx="6" fill="#F5B800" />
+    <path d="M16 6.5a9.5 9.5 0 1 0 9.5 9.5" fill="none" stroke="#22302B" stroke-width="2.6" stroke-linecap="round" />
+    <path d="M16 16l6.2-5.2" stroke="#22302B" stroke-width="2.6" stroke-linecap="round" />
+    <circle cx="16" cy="16" r="2.3" fill="#22302B" />
+  </svg>
+  <span class="leading-none">
+    <span class="block font-cond font-bold text-[1.35rem] tracking-wide">Frota</span>
+    <span class="block text-[12px] text-white/55 -mt-0.5">revisão e consumo</span>
+  </span>
+</ng-template>

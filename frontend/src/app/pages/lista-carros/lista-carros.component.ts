@@ -1,14 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin, of, catchError } from 'rxjs';
 import { Carro } from '../../core/models/carro.model';
 import { CarroService } from '../../core/services/carro.service';
-import { Router } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../core/services/toast.service';
 import { ProximaRevisao } from '../../core/models/proxima.revisao.model';
 import { RevisaoService } from '../../core/services/revisao.service';
 import { CarroStatus } from '../../core/models/carro-status.enum';
+import {
+  SITUACAO_INFO, SituacaoPreventiva, diasAte, kmRestantes, textoPrazo, nomeVeiculo, progressoRevisaoCarro, situacaoCarro
+} from '../../core/utils/situacao.utils';
+
+type Filtro = 'TODOS' | CarroStatus | 'REVISAO';
+
+interface LinhaCarro {
+  carro: Carro;
+  nome: string;
+  km: number;
+  prox?: ProximaRevisao;
+  situacao: SituacaoPreventiva;
+  progresso: number;
+  restante: number | null;
+  dias: number | null;
+}
+
+const ORDEM: Record<SituacaoPreventiva, number> = { 'vencida': 0, 'proxima': 1, 'ok': 2, 'sem-dados': 3 };
 
 @Component({
   standalone: false,
@@ -16,149 +31,91 @@ import { CarroStatus } from '../../core/models/carro-status.enum';
   templateUrl: './lista-carros.component.html'
 })
 export class ListaCarrosComponent implements OnInit {
-  carros: Carro[] = [];
-  loading: boolean = false;
-  revisoes: ProximaRevisao[] = [];
-
-  statusFilter: CarroStatus | 'TODOS' = 'TODOS';
-
-  carroDisponivel: CarroStatus= CarroStatus.DISPONIVEL;
-
-  carroManutencao: CarroStatus= CarroStatus.MANUTENCAO
-
-
-
+  linhas: LinhaCarro[] = [];
+  loading = false;
+  erro = false;
+  filtro: Filtro = 'TODOS';
   search = '';
-  skeletons = Array.from({ length: 6 });
+  skeletons = Array.from({ length: 5 });
+
+  readonly SIT = SITUACAO_INFO;
+  readonly DISPONIVEL = CarroStatus.DISPONIVEL;
+  readonly MANUTENCAO = CarroStatus.MANUTENCAO;
 
   constructor(
     private carroService: CarroService,
-    private router: Router,
     private toastService: ToastService,
     private revisaoService: RevisaoService
   ) { }
 
   ngOnInit() {
-    this.carregarCarros();
-    this.calcularRevisao();
+    this.carregar();
   }
 
-  carregarCarros() {
+  carregar() {
     this.loading = true;
-    this.carroService.getList<Carro>().subscribe({
-      next: (data) => {
-        this.carros = data;
-        this.getKm();
+    this.erro = false;
+    forkJoin({
+      carros: this.carroService.getList<Carro>(),
+      proximas: this.revisaoService.calcularRevisao().pipe(catchError(() => of([] as ProximaRevisao[]))),
+    }).subscribe({
+      next: ({ carros, proximas }) => {
+        const porCarro = new Map(proximas.map(p => [p.carroId, p]));
+        this.linhas = carros.map(c => {
+          const prox = porCarro.get(c.id);
+          const km = prox?.kmAtual ?? c.kmAdicionado ?? 0;
+          return {
+            carro: c,
+            nome: nomeVeiculo(c.marca?.marca, c.modelo?.modelo),
+            km,
+            prox,
+            situacao: situacaoCarro(c, prox, km),
+            progresso: progressoRevisaoCarro(c, prox, km),
+            restante: kmRestantes(prox, km),
+            dias: diasAte(prox?.proximaRevisaoEstimada),
+          };
+        }).sort((a, b) => ORDEM[a.situacao] - ORDEM[b.situacao] || a.carro.placa.localeCompare(b.carro.placa));
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Erro ao carregar carros:', err);
+      error: () => {
         this.loading = false;
-        this.toastService.showError('Erro ao listar carros!');
+        this.erro = true;
+        this.toastService.showError('Não foi possível carregar os carros.');
       }
     });
   }
 
-  getKm() {
-    this.carros.map((car) => {
-      this.carroService.getKmRecente(car.id).subscribe({
-        next: (res) => { car.kmAdicionado = res; }
-      });
+  private precisaRevisao(l: LinhaCarro) {
+    return l.situacao === 'vencida' || l.situacao === 'proxima';
+  }
+
+  get filtradas(): LinhaCarro[] {
+    const q = this.search.trim().toLowerCase();
+    return this.linhas.filter(l => {
+      const passaFiltro =
+        this.filtro === 'TODOS' ? true :
+        this.filtro === 'REVISAO' ? this.precisaRevisao(l) :
+        l.carro.status === this.filtro;
+      const passaBusca = !q || l.nome.toLowerCase().includes(q) || (l.carro.placa ?? '').toLowerCase().includes(q);
+      return passaFiltro && passaBusca;
     });
   }
 
-  irParaCarro(id: number) {
-    this.router.navigate(['/carros/unico', id]);
+  contar(f: Filtro): number {
+    if (f === 'TODOS') return this.linhas.length;
+    if (f === 'REVISAO') return this.linhas.filter(l => this.precisaRevisao(l)).length;
+    return this.linhas.filter(l => l.carro.status === f).length;
   }
 
-get carrosFiltrados(): Carro[] {
-  const q = (this.search ?? '').trim().toLowerCase();
-
-  return (this.carros ?? []).filter(carro => {
-
-    const matchStatus =
-      this.statusFilter === 'TODOS' ? true : carro.status === this.statusFilter;
-
-
-    const matchSearch =
-      !q ||
-      (carro.marca?.marca ?? '').toLowerCase().includes(q) ||
-      (carro.modelo?.modelo ?? '').toLowerCase().includes(q) ||
-      (carro.placa ?? '').toLowerCase().includes(q);
-
-    return matchStatus && matchSearch;
-  });
-  }
-
-  // NOVO
-  clearSearch() {
+  limparFiltros() {
     this.search = '';
+    this.filtro = 'TODOS';
   }
 
-  // NOVO
-  trackByCarro(index: number, item: Carro) {
-    return item.id ?? index;
+  trackBy(_: number, l: LinhaCarro) {
+    return l.carro.id;
   }
 
-  calcularRevisao() {
-    this.revisaoService.calcularRevisao().subscribe((res) => {
-      this.revisoes = res;
-    })
-  }
-
-  getProximaRevisaoByCarroId(carroId: number): ProximaRevisao | undefined {
-    return this.revisoes.find(r => r.carroId === carroId);
-  }
-  getProgressPercent(carro: Carro): number {
-    const atual = carro?.kmAdicionado ?? 0;
-
-    // alvo absoluto (odômetro) para a próxima revisão
-    const r = this.getProximaRevisaoByCarroId(carro.id);
-    if (!r || r.kmRevisaoEstimado == null) return 0;
-
-    const alvo = Number(r.kmRevisaoEstimado);
-
-    // se tiver intervalo configurado no carro, calcule progresso dentro do ciclo
-    const intervalo = carro?.alarmeRevisaoKm ?? 0;
-
-    if (intervalo > 0) {
-      const inicioCiclo = alvo - intervalo;               // odômetro na revisão anterior
-      const progressoKm = atual - inicioCiclo;            // km percorridos no ciclo atual
-      const percent = (progressoKm / intervalo) * 100;
-      return Math.max(0, Math.min(100, percent));
-    }
-
-    // Fallback (sem intervalo): quanto falta até o alvo absoluto
-    // Se já passou do alvo, 100%
-    if (alvo <= 0) return 0;
-    const percentAbs = (atual / alvo) * 100;
-    return Math.max(0, Math.min(100, percentAbs));
-  }
-
-  get totalDisponiveis(): number {
-    return this.carros.filter(c => c.status === CarroStatus.DISPONIVEL).length;
-  }
-
-  get totalManutencao(): number {
-    return this.carros.filter(c => c.status === CarroStatus.MANUTENCAO).length;
-  }
-
-  get mediaKm(): number {
-    if (!this.carros.length) return 0;
-    return this.carros.reduce((t, c) => t + (c.kmAdicionado ?? 0), 0) / this.carros.length;
-  }
-
-  /** Carros com revisão a 90%+ do intervalo de km ou com data estimada já vencida. */
-  get totalRevisaoAtencao(): number {
-    const hoje = new Date().toISOString().slice(0, 10);
-    return this.carros.filter(c => {
-      const r = this.getProximaRevisaoByCarroId(c.id);
-      const vencidaPorData = !!r?.proximaRevisaoEstimada && String(r.proximaRevisaoEstimada).slice(0, 10) <= hoje;
-      return vencidaPorData || this.getProgressPercent(c) >= 90;
-    }).length;
-  }
-
-  updateStatusFilter(status: CarroStatus | 'TODOS'){
-     this.statusFilter = status;
-  }
+  abs(n: number) { return Math.abs(n); }
+  prazo(l: { restante: number | null; dias: number | null }) { return textoPrazo(l.restante, l.dias, 'km', 'Revisão'); }
 }
