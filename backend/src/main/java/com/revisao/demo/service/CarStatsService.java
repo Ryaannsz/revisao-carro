@@ -20,6 +20,11 @@ public class CarStatsService {
     private final CarroService carroService; // <-- para getKmRecente(idCarro)
 
     public CarStatsResponseDTO getCarStats(List<Integer> carIds, Integer months, String mode, Integer empresaId) {
+        if (carIds == null || carIds.isEmpty()) {
+            return new CarStatsResponseDTO(List.of(), List.of(),
+                    new SeriesBlockDTO(List.of(), Map.of()), new SeriesBlockDTO(List.of(), Map.of()),
+                    new SeriesBlockDTO(List.of(), Map.of()), (mode == null || mode.isBlank()) ? "compare" : mode);
+        }
         Date start = null, end = null;
         if (months != null && months > 0) {
             YearMonth ymEnd = YearMonth.now().plusMonths(1); // exclusivo
@@ -53,7 +58,7 @@ public class CarStatsService {
         var eficSum      = efficiencyWeighted(labels, agg); // Σkm / Σlitros
 
         // cars + kmAtual (via CarroService)
-        var optionsRaw = repo.carOptions(carIds);
+        var optionsRaw = repo.carOptions(carIds, empresaId);
         var cars = new ArrayList<CarOptionDTO>(optionsRaw.size());
         for (Object[] r : optionsRaw) {
             Integer id = ((Number) r[0]).intValue();

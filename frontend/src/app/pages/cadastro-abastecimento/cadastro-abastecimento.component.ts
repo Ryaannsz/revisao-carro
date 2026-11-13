@@ -41,7 +41,6 @@ export class CadastroAbastecimentoComponent implements OnInit {
       litroComb: ['', [Validators.required, Validators.min(0.1)]],
       valorComb: ['', [Validators.required, Validators.min(0.1)]],
       kmAtual: ['', [Validators.required, Validators.min(1)]],
-      idUser: [this.authService.getUserInfo().idUser],
       dtAbast: [''],
       carro: ['', Validators.required]
     });
@@ -83,27 +82,33 @@ export class CadastroAbastecimentoComponent implements OnInit {
     })
   }
 
+  /** Preço por litro calculado a partir do total pago, só para conferência na tela. */
+  get precoPorLitro(): number | null {
+    const l = Number(this.abastForm.value.litroComb);
+    const v = Number(this.abastForm.value.valorComb);
+    return l > 0 && v > 0 ? v / l : null;
+  }
+
   cadastrarAbastecimento() {
-    this.loading = true;
-    if (this.abastForm.valid) {
-      this.abastService.post(this.abastForm.value).subscribe({
-        next: () => {
-          this.toastService.showSuccess('Abastecimento registrado com sucesso!');
-          this.abastForm.reset();
-          this.selectedCar = null;
-
-        },
-        error: (err) => {
-          this.toastService.showError('Erro ao registrar abastecimento:');
-
-          console.log(err)
-          console.log(this.abastForm.value)
-        }
-      });
-    } else {
+    if (this.abastForm.invalid) {
+      this.abastForm.markAllAsTouched();
       this.toastService.showWarning('Por favor, preencha todos os campos corretamente.');
-
+      return;
     }
-    this.loading = false;
+    this.loading = true;
+    // o usuário responsável é definido pelo backend a partir do token
+    this.abastService.post(this.abastForm.value).subscribe({
+      next: () => {
+        this.loading = false;
+        this.toastService.showSuccess('Abastecimento registrado com sucesso!');
+        this.abastForm.reset();
+        this.selectedCar = null;
+        this.kmPuxado = 0;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toastService.showError(typeof err?.error === 'string' && err.error ? err.error : 'Erro ao registrar abastecimento.');
+      }
+    });
   }
 }

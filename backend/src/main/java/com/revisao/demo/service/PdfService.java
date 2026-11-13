@@ -42,7 +42,7 @@ public class PdfService {
     public ByteArrayOutputStream mountPdf(List<Integer> carIds, Integer months, String mode, Integer empresaId) throws Exception {
         var stats = carStatsService.getCarStats(carIds, months, mode, empresaId);
         List<String> placas = stats.getCars().stream().map(CarOptionDTO::getLabel).toList();
-        List<ProximaRevisaoDTO> proximas = revisaoService.calcularProxRevisao();
+        List<ProximaRevisaoDTO> proximas = revisaoService.calcularProxRevisao(empresaId);
 
         proximas = proximas.stream().filter( p -> placas.contains(p.getPlaca())).toList();
 

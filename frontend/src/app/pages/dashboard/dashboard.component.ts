@@ -41,7 +41,8 @@ export class DashboardComponent implements OnInit {
     gasto:    { border: '#2563eb', background: 'rgba(37, 99, 235, 0.10)' }, // blue-600
     litros:   { border: '#059669', background: 'rgba(5, 150, 105, 0.10)' }, // emerald-600
     efic:     { border: '#9333ea', background: 'rgba(147, 51, 234, 0.10)' }, // purple-600
-    revisoes: { border: '#f59e0b', background: 'rgba(245, 158, 11, 0.10)' }  // amber-500
+    revisoes: { border: '#f59e0b', background: 'rgba(245, 158, 11, 0.10)' }, // amber-500
+    manutencao: { border: '#dc2626', background: 'rgba(220, 38, 38, 0.08)' } // red-600
   };
 
   // Opções de gráfico (normais e ampliadas)
@@ -79,7 +80,13 @@ export class DashboardComponent implements OnInit {
         const eficArr: MesValor[]      = r.eficienciaMensal ?? [];
         const revisoesArr: MesValor[]  = r.revisoesPorMes   ?? [];
 
-        const gasto      = this.makeChartVM(gastoArr,     'Gasto',     this.colors.gasto,    cutoff);
+        const manutArr: MesValor[]     = r.custoManutencaoMensal ?? [];
+
+        // Gasto = combustível + manutenção, alinhados pelo mesmo eixo de meses
+        const gasto      = this.makeMultiChartVM([
+          { arr: gastoArr, label: 'Combustível', color: this.colors.gasto },
+          { arr: manutArr, label: 'Manutenção',  color: this.colors.manutencao },
+        ], cutoff);
         const litros     = this.makeChartVM(litrosArr,    'Litros',    this.colors.litros,   cutoff);
         const eficiencia = this.makeChartVM(eficArr,      'km/L',      this.colors.efic,     cutoff);
         const revisoes   = this.makeChartVM(revisoesArr,  'Revisões',  this.colors.revisoes, cutoff);
@@ -128,6 +135,34 @@ export class DashboardComponent implements OnInit {
     };
   }
 
+  /** Várias séries mensais no mesmo gráfico; meses ausentes em uma série viram 0. */
+  private makeMultiChartVM(
+    series: { arr: MesValor[]; label: string; color: { border: string; background: string } }[],
+    cutoff: number | typeof Infinity
+  ): ChartVM {
+    const meses = Array.from(new Set(series.flatMap(s => s.arr.map(x => x.mes)))).sort();
+    const allLabels = meses.map(m => this.formatMes(m));
+    const datasetsColored = series
+      .filter(s => s.arr.length > 0)
+      .map(s => {
+        const byMes = new Map(s.arr.map(x => [x.mes, x.valor]));
+        const data = meses.map(m => byMes.get(m) ?? 0);
+        const { dataFiltered } = this.sliceByMonths<number | null>(allLabels, data, cutoff);
+        return {
+          label: s.label,
+          data: dataFiltered,
+          borderColor: s.color.border,
+          backgroundColor: s.color.background,
+          pointRadius: 3,
+          tension: 0.3,
+          fill: true,
+          spanGaps: false
+        };
+      });
+    const { labelsFiltered } = this.sliceByMonths(allLabels, allLabels, cutoff);
+    return { labels: allLabels, data: [], labelsFiltered, datasetsColored };
+  }
+
   private sliceByMonths<T>(labels: string[], data: T[], cutoff: number | typeof Infinity) {
     if (cutoff === Infinity || labels.length <= cutoff) {
       return { labelsFiltered: labels, dataFiltered: data };
@@ -139,13 +174,15 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  private daysFromToday(dateLike: string | Date): number {
+  private daysFromToday(dateLike: string | Date | null): number {
+    if (!dateLike) return Number.POSITIVE_INFINITY;
     const target = new Date(dateLike).getTime();
     const today  = new Date().setHours(0, 0, 0, 0);
     return Math.round((target - today) / 86400000);
   }
 
   private statusFromDays(days: number) {
+    if (!Number.isFinite(days)) return { text: 'Sem dados', klass: 'bg-gray-100 text-gray-600' };
     if (days < 0)  return { text: `Vencida há ${Math.abs(days)}d`, klass: 'bg-red-100 text-red-700' };
     if (days === 0) return { text: 'Vence hoje', klass: 'bg-amber-100 text-amber-700' };
     if (days <= 30) return { text: `Em ${days}d`, klass: 'bg-amber-100 text-amber-700' };
@@ -160,7 +197,7 @@ export class DashboardComponent implements OnInit {
   }
   get fullscreenTitle(): string {
     switch (this.fullscreenKey) {
-      case 'gasto': return 'Gasto mensal (R$) – Ampliado';
+      case 'gasto': return 'Gasto mensal: combustível + manutenção (R$) – Ampliado';
       case 'litros': return 'Litros por mês (L) – Ampliado';
       case 'eficiencia': return 'Eficiência (km/L) – Ampliado';
       case 'revisoes': return 'Revisões por mês – Ampliado';

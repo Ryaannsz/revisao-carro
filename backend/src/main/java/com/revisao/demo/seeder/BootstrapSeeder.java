@@ -5,16 +5,14 @@ import com.revisao.demo.enums.CarroStatus;
 import com.revisao.demo.enums.UserRoles;
 import com.revisao.demo.models.*;
 import com.revisao.demo.repository.*;
-import com.revisao.demo.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import com.revisao.demo.models.*;
-import com.revisao.demo.repository.*;
 
 
 import java.sql.Timestamp;
@@ -28,6 +26,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class BootstrapSeeder implements CommandLineRunner {
@@ -59,67 +58,61 @@ public class BootstrapSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        // 1) Garantir Empresa id=1
+        // 1) Sempre: garante a empresa principal e o ADMIN inicial (idempotente).
+        //    Sem isso não há como fazer o primeiro login numa base vazia.
         Empresa empresa = ensureEmpresaId1();
+        User user = ensureUserId(empresa, 1, bootstrapProperties.getCpf(), bootstrapProperties.getNomeUser());
 
+        // 2) Dados de demonstração: só com bootstrap.demo-data=true e só se a empresa ainda
+        //    não tiver abastecimentos. Antes rodava a cada restart e duplicava tudo.
+        if (!bootstrapProperties.isDemoData()) return;
+        if (abastRepository.existsByCarro_Empresa_Id(empresa.getId())) {
+            log.info("Seeder: dados de demonstração já existem, nada a fazer.");
+            return;
+        }
+        log.info("Seeder: gerando dados de demonstração...");
 
-        User user = ensureUserId(empresa,1, bootstrapProperties.getCpf(), bootstrapProperties.getNomeUser());
-
-        //teste empresa 2
-        Empresa empresa2 = new Empresa();
-        empresa2.setNome("Empresa 2");
-        empresa2.setCnpj("awdfawd");
-        empresa2.setAtivo(true);
-        empresaRepository.save(empresa2);
-
-        //teste user2
-        User user2 = ensureUserId(empresa2, 2, "09876543210", "User 2");
-
-        // 3) Marca & Modelo (sem grande diversidade)
-        Marca marca = marcaRepository.findByMarca("Volkswagen").orElseGet(() -> {
-            Marca m = new Marca();
-            m.setMarca("Volkswagen");
-            m.setEmpresa(empresa);
-            return marcaRepository.save(m);
+        // empresa 2 para testar o isolamento entre empresas
+        Empresa empresa2 = empresaRepository.findById(2).orElseGet(() -> {
+            Empresa e = new Empresa();
+            e.setNome("Empresa 2");
+            e.setCnpj("00000000000002");
+            e.setAtivo(true);
+            return empresaRepository.save(e);
         });
+        ensureUserId(empresa2, 2, "09876543210", "User 2");
 
-        Marca marca2 = marcaRepository.findByMarca("Ford").orElseGet(() -> {
-            Marca m = new Marca();
-            m.setMarca("Ford");
-            m.setEmpresa(empresa);
-            return marcaRepository.save(m);
-        });
+        Marca marca = ensureMarca("volkswagen", empresa);
+        Marca marca2 = ensureMarca("ford", empresa);
+        Modelo modelo = ensureModelo("gol 1.6", empresa);
+        Modelo modelo2 = ensureModelo("ranger", empresa);
 
-        Modelo modelo = modeloRepository.findByModelo("Gol 1.6").orElseGet(() -> {
-            Modelo md = new Modelo();
-            md.setModelo("Gol 1.6");
-            md.setEmpresa(empresa);
-            return modeloRepository.save(md);
-        });
+        Carro carro1 = ensureCarro("abc-1a23", empresa, marca, modelo, 42000);
+        Carro carro2 = ensureCarro("def-4b56", empresa, marca, modelo, 15800);
+        Carro carro3 = ensureCarro("pla-8k72", empresa, marca2, modelo2, 6391);
+        Carro carro4 = ensureCarro("iak-9b73", empresa, marca2, modelo2, 23521);
 
-        Modelo modelo2 = modeloRepository.findByModelo("Ranger").orElseGet(() -> {
-            Modelo md = new Modelo();
-            md.setModelo("Ranger");
-            md.setEmpresa(empresa);
-            return modeloRepository.save(md);
-        });
-
-        // 4) Dois carros da empresa 1
-        Carro carro1 = ensureCarro("ABC-1A23", empresa, marca, modelo, 42000);
-        Carro carro2 = ensureCarro("DEF-4B56", empresa, marca, modelo, 15800);
-
-        Carro carro3 = ensureCarro("PLA-8K72", empresa, marca2, modelo2, 6391);
-        Carro carro4 = ensureCarro("IAK-9B73", empresa, marca2, modelo2, 23521);
-
-        // 5) Gerar Abastecimentos & Revisões diversificados
         gerarDadosDiversificados(user, empresa, Arrays.asList(carro1, carro2, carro3, carro4));
+    }
+
+    private Marca ensureMarca(String nome, Empresa empresa) {
+        return marcaRepository.findAllByEmpresaIdOrderByMarcaAsc(empresa.getId()).stream()
+                .filter(m -> m.getMarca().equalsIgnoreCase(nome)).findFirst()
+                .orElseGet(() -> marcaRepository.save(new Marca(null, nome, empresa)));
+    }
+
+    private Modelo ensureModelo(String nome, Empresa empresa) {
+        return modeloRepository.findAllByEmpresaIdOrderByModeloAsc(empresa.getId()).stream()
+                .filter(m -> m.getModelo().equalsIgnoreCase(nome)).findFirst()
+                .orElseGet(() -> modeloRepository.save(new Modelo(null, nome, empresa)));
     }
 
     private Empresa ensureEmpresaId1() {
         return empresaRepository.findById(1).orElseGet(() -> {
             // força id=1 via insert nativo se necessário
-            em.createNativeQuery("INSERT INTO tb_empresa (id, nome) VALUES (1, ?1)")
-                    .setParameter(1, "Empresa Demo")
+            em.createNativeQuery("INSERT INTO tb_empresa (id, nome, cnpj, ativo) VALUES (1, ?1, ?2, true)")
+                    .setParameter(1, bootstrapProperties.getNomeEmpresa())
+                    .setParameter(2, bootstrapProperties.getCnpjEmpresa())
                     .executeUpdate();
 
             return empresaRepository.findById(1).orElseThrow();
@@ -191,6 +184,7 @@ public class BootstrapSeeder implements CommandLineRunner {
 
                     // data randômica no mês
                     LocalDate diaAbast = randomDayInMonth(r, cursor);
+                    if (diaAbast.isAfter(hoje.minusDays(10))) continue; // nada no futuro
                     Date dtAbast = date(diaAbast);
 
                     // Persistir Abast
@@ -227,6 +221,8 @@ public class BootstrapSeeder implements CommandLineRunner {
                         rev.setUser(user);
                         rev.setDtRevisao(date(diaAbast.plusDays(r.nextInt(10))));
                         rev.setKmAtual(round0(kmAtualCarro + randDelta(r, 150)));
+                        rev.setValor(round2(450 + r.nextDouble() * 900));
+                        rev.setDescricao("Revisão periódica: troca de óleo e filtros");
                         revisaoRepository.save(rev);
                     }
                 }

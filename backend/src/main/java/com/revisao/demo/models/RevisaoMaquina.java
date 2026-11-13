@@ -2,8 +2,7 @@ package com.revisao.demo.models;
 
 import java.sql.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,10 +25,14 @@ public class RevisaoMaquina {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "America/Sao_Paulo")
     private Date dtRevisao;
 
     private Double horasAtual;
+
+    private Double valor;
+
+    @Column(length = 1000)
+    private String descricao;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

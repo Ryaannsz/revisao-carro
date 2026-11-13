@@ -1,6 +1,7 @@
 package com.revisao.demo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.revisao.demo.dto.dashboards.MesValorDTO;
 import com.revisao.demo.models.Abast;
@@ -9,6 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 public interface AbastRepository extends BaseRepository<Abast, Integer> {
 
     List<Abast> findByCarro_id(Integer carroId);
+
+    List<Abast> findByCarro_IdOrderByDtAbastDescIdDesc(Integer carroId);
+
+    List<Abast> findByCarro_Empresa_IdOrderByDtAbastDescIdDesc(Integer empresaId);
+
+    Optional<Abast> findByIdAndCarro_Empresa_Id(Integer id, Integer empresaId);
+
+    boolean existsByCarro_Empresa_Id(Integer empresaId);
 
     void deleteByCarro_id(Integer carroId);
 

@@ -177,12 +177,32 @@ export class CarroUnicoComponent implements OnInit {
     this.loading = false;
   }
 
-  private deleteAbastecimento(id: number): void {
+  get isAdmin(): boolean {
+    return this.authService.getUserRole();
+  }
 
+  private deleteAbastecimento(id: number): void {
+    this.abastService.delete(id).subscribe({
+      next: () => {
+        this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
+        if (this.currentPageAbast > this.totalPagesAbast) this.currentPageAbast = Math.max(1, this.totalPagesAbast);
+        this.getKm();
+        this.toastService.showSuccess('Abastecimento excluído!');
+      },
+      error: () => this.toastService.showError('Erro ao excluir abastecimento.')
+    });
   }
 
   private deleteRevisao(id: number): void {
-
+    this.revisaoService.delete(id).subscribe({
+      next: () => {
+        this.revisoes = this.revisoes.filter(r => r.id !== id);
+        if (this.currentPageRevisoes > this.totalPagesRevisoes) this.currentPageRevisoes = Math.max(1, this.totalPagesRevisoes);
+        this.getKm();
+        this.toastService.showSuccess('Revisão excluída!');
+      },
+      error: () => this.toastService.showError('Erro ao excluir revisão.')
+    });
   }
 
   get totalPagesAbast(): number {
@@ -193,15 +213,38 @@ export class CarroUnicoComponent implements OnInit {
     return Math.ceil(this.revisoes.length / this.itemsPerPage);
   }
 
-  // Métodos para calcular totais (opcional)
+  /** valorComb já é o TOTAL pago no abastecimento. */
   get totalGastoAbastecimentos(): number {
-    return this.abastecimentos.reduce((total, a) => total + (a.litroComb * a.valorComb), 0);
+    return this.abastecimentos.reduce((total, a) => total + (a.valorComb ?? 0), 0);
   }
 
+  get totalGastoRevisoes(): number {
+    return this.revisoes.reduce((total, r) => total + (r.valor ?? 0), 0);
+  }
+
+  precoPorLitro(a: Abast): number | null {
+    return a.litroComb > 0 ? a.valorComb / a.litroComb : null;
+  }
+
+  /**
+   * Média km/L pelo método "tanque a tanque": km rodado entre o primeiro e o último
+   * abastecimento dividido pelos litros abastecidos DEPOIS do primeiro
+   * (o combustível do 1º abastecimento foi gasto antes do período medido).
+   */
   get mediaKmPorLitro(): number {
     if (this.abastecimentos.length < 2) return 0;
-    // Cálculo simplificado - implemente sua lógica real aqui
-    return 10; // Exemplo
+    const ordenados = [...this.abastecimentos].sort((a, b) => a.kmAtual - b.kmAtual);
+    const km = ordenados[ordenados.length - 1].kmAtual - ordenados[0].kmAtual;
+    const litros = ordenados.slice(1).reduce((t, a) => t + (a.litroComb ?? 0), 0);
+    return litros > 0 ? km / litros : 0;
+  }
+
+  /** Custo por km rodado considerando combustível + manutenção. */
+  get custoPorKm(): number {
+    if (this.abastecimentos.length < 2) return 0;
+    const kms = this.abastecimentos.map(a => a.kmAtual);
+    const rodado = Math.max(...kms) - Math.min(...kms);
+    return rodado > 0 ? (this.totalGastoAbastecimentos + this.totalGastoRevisoes) / rodado : 0;
   }
 
   toggleEditar(): void {

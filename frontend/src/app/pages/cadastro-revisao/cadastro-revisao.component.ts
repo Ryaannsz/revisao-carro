@@ -31,8 +31,9 @@ export class CadastroRevisaoComponent {
   ) {
     this.revisaoForm = this.fb.group({
       kmAtual: ['', [Validators.required, Validators.min(1)]],
-      idUser: [this.authService.getUserInfo().idUser],
       dtRevisao: [''],
+      valor: [null, [Validators.min(0)]],
+      descricao: ['', [Validators.maxLength(1000)]],
       carro: ['', Validators.required]
     });
   }
@@ -72,24 +73,25 @@ export class CadastroRevisaoComponent {
   }
 
   cadastrarRevisao() {
-    this.loading = true;
-    if (this.revisaoForm.valid) {
-      this.revisaoService.post(this.revisaoForm.value).subscribe({
-        next: () => {
-          this.toastService.showSuccess('Revisão registrada com sucesso!');
-          this.revisaoForm.reset();
-          this.selectedCar = null;
-
-        },
-        error: (err) => {
-          this.toastService.showError('Erro ao registrar revisão!');
-
-
-        }
-      });
-    } else {
+    if (this.revisaoForm.invalid) {
+      this.revisaoForm.markAllAsTouched();
       this.toastService.showWarning('Por favor, preencha todos os campos corretamente.');
+      return;
     }
-    this.loading = false;
+    this.loading = true;
+    // o usuário responsável é definido pelo backend a partir do token
+    this.revisaoService.post(this.revisaoForm.value).subscribe({
+      next: () => {
+        this.loading = false;
+        this.toastService.showSuccess('Revisão registrada com sucesso!');
+        this.revisaoForm.reset();
+        this.selectedCar = null;
+        this.kmPuxado = 0;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toastService.showError(typeof err?.error === 'string' && err.error ? err.error : 'Erro ao registrar revisão!');
+      }
+    });
   }
 }

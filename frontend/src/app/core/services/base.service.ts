@@ -28,8 +28,10 @@ export class BaseService {
   }
 
 
-  delete<T>(endpoint: string = ''): Observable<T> {
-    return this.http.delete<T>(`${this.path}/${endpoint}`);
+  /** Aceita "5" ou "/5" (antes "/5" gerava "//5" e o Spring Security barrava). */
+  delete<T>(endpoint: string | number = ''): Observable<T> {
+    const e = String(endpoint).replace(/^\/+/, '');
+    return this.http.delete<T>(`${this.path}/${e}`);
   }
 
   getWithId<T>(id: number, endpoint: string = ''): Observable<T> {

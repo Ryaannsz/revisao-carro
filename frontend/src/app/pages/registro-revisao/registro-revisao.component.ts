@@ -38,9 +38,10 @@ export class RegistroRevisaoComponent {
       return;
     }
     this.filteredRevisoes = this.revisoes.filter(r =>
-      r.carro.marca.marca.toLowerCase().includes(q) ||
-      r.carro.modelo.modelo.toLowerCase().includes(q) ||
-      r.carro.placa.toLowerCase().includes(q)
+      (r.carro.marca?.marca ?? '').toLowerCase().includes(q) ||
+      (r.carro.modelo?.modelo ?? '').toLowerCase().includes(q) ||
+      (r.carro.placa ?? '').toLowerCase().includes(q) ||
+      (r.descricao ?? '').toLowerCase().includes(q)
     );
   }
 
@@ -58,15 +59,20 @@ export class RegistroRevisaoComponent {
       'Tem certeza?',
       'Você deseja realmente excluir este item?'
     ).subscribe(result => {
-      this.loading = true;
       if (!result) return;
-      this.revisaoService.delete(`/${id}`).subscribe(() => {
-        this.loading = false;
-        this.revisoes = this.revisoes.filter(r => r.id !== id);
-        this.onSearch();
-        this.closeModal();
-        this.toastService.showSuccess("Revisão removida com sucesso!")
-        this.loading = false;
+      this.loading = true;
+      this.revisaoService.delete(id).subscribe({
+        next: () => {
+          this.loading = false;
+          this.revisoes = this.revisoes.filter(r => r.id !== id);
+          this.onSearch();
+          this.closeModal();
+          this.toastService.showSuccess("Revisão removida com sucesso!");
+        },
+        error: () => {
+          this.loading = false;
+          this.toastService.showError("Erro ao remover revisão.");
+        }
       });
     })
   }

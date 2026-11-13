@@ -2,6 +2,7 @@ package com.revisao.demo.models;
 
 import java.sql.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,13 @@ public class Revisao {
     private Date dtRevisao;
 
     private Double kmAtual;
+
+    /** Custo total da revisão/manutenção (peças + mão de obra). */
+    private Double valor;
+
+    /** O que foi feito: troca de óleo, filtros, pastilhas, etc. */
+    @Column(length = 1000)
+    private String descricao;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

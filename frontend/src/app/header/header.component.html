@@ -4,7 +4,7 @@
 
       <!-- Logo -->
       <div class="flex-shrink-0 text-white font-bold text-2xl">
-        <a href="/carros">CarrosApp</a>
+        <a routerLink="/carros">CarrosApp</a>
       </div>
 
       <!-- Menu Desktop -->
@@ -16,11 +16,11 @@
           <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
            opacity-0 invisible group-hover:opacity-100 group-hover:visible 
            transition-opacity duration-200 z-50">
-            <a href="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+            <a routerLink="/carro" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
           </div>
         </div>
 
-        <span><a href="/usuario/cadastrados">Usuários</a></span>
+        <span *ngIf="isSuper"><a routerLink="/usuario/cadastrados">Usuários</a></span>
 
         <!-- Abastecimento -->
         <div class="relative group">
@@ -28,8 +28,8 @@
           <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
            opacity-0 invisible group-hover:opacity-100 group-hover:visible 
            transition-opacity duration-200 z-50">
-            <a href="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
-            <a href="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
+            <a routerLink="/abast" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+            <a routerLink="/abastecimento/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
         </div>
 
@@ -39,14 +39,14 @@
           <div class="absolute top-full left-0 w-40 bg-white rounded shadow-lg 
            opacity-0 invisible group-hover:opacity-100 group-hover:visible 
            transition-opacity duration-200 z-50">
-            <a href="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
-            <a href="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
+            <a routerLink="/revisao/cadastrar" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Cadastrar</a>
+            <a routerLink="/revisao/registros" class="block px-4 py-2 text-gray-700 hover:bg-blue-100">Registros</a>
           </div>
         </div>
 
         <ng-container *ngIf="isSuper">
         <div class="relative group">
-          <a href="/dashboard"><span class="cursor-pointer hover:text-blue-200 peer">Dashboard</span></a>
+          <a routerLink="/dashboard"><span class="cursor-pointer hover:text-blue-200 peer">Dashboard</span></a>
         </div>
         </ng-container>
 
@@ -91,7 +91,7 @@
              'max-h-40 opacity-100 mt-2': carroAberto,
              'max-h-0 opacity-0': !carroAberto
            }">
-          <a href="/carro" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+          <a routerLink="/carro" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
         </div>
       </div>
 
@@ -106,8 +106,8 @@
              'max-h-40 opacity-100 mt-2': abastecimentoAberto,
              'max-h-0 opacity-0': !abastecimentoAberto
            }">
-          <a href="/abast" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
-          <a href="/abastecimento/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
+          <a routerLink="/abast" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+          <a routerLink="/abastecimento/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
         </div>
       </div>
 
@@ -121,14 +121,14 @@
              'max-h-40 opacity-100 mt-2': revisaoAberto,
              'max-h-0 opacity-0': !revisaoAberto
            }">
-          <a href="/revisao/cadastrar" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
-          <a href="/revisao/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
+          <a routerLink="/revisao/cadastrar" class="block pl-4 py-1 hover:text-blue-200">Cadastrar</a>
+          <a routerLink="/revisao/registros" class="block pl-4 py-1 hover:text-blue-200">Registros</a>
         </div>
       </div>
 
       <div>
         <div class="font-semibold cursor-pointer flex justify-between items-center">
-          <a href="/dashboard">Dashboard</a>
+          <a routerLink="/dashboard">Dashboard</a>
         </div>
       </div>
 

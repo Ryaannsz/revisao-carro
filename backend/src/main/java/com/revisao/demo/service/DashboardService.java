@@ -25,7 +25,6 @@ public class DashboardService {
 
     private final RevisaoService revisaoService;
 
-    private final CarroService carroService;
 
     public DashboardResumoDTO resumoDaEmpresa(Integer empresaId) {
         var gasto = abastRepository.gastoMensal(empresaId);
@@ -38,13 +37,14 @@ public class DashboardService {
                         (String) row[0],
                         row[1] != null ? ((Number) row[1]).doubleValue() : null
                 ))
-                .toList();;
+                .toList();
         var revisoes = revisaoRepository.revisoesPorMes(empresaId);
 
 
         var eficiencia = calcularEficiencia(km, litros);
 
-        var proximas = revisaoService.calcularProxRevisao();
+        var proximas = revisaoService.calcularProxRevisao(empresaId);
+        var custoManutencao = revisaoRepository.custoManutencaoMensal(empresaId);
 
 
         var dto = new DashboardResumoDTO();
@@ -55,6 +55,7 @@ public class DashboardService {
         dto.setEficienciaMensal(eficiencia);
         dto.setRevisoesPorMes(revisoes);
         dto.setProximasRevisoes(proximas);
+        dto.setCustoManutencaoMensal(custoManutencao);
         return dto;
     }
 
@@ -67,31 +68,7 @@ public class DashboardService {
         }).toList();
     }
 
-    /*public List<ProximaRevisaoDTO> estimarProximasRevisoes(List<Revisao> ultimas) {
-        // Exemplo: próxima revisão = última revisão + 10.000 km (ajuste para sua regra real)
 
-        return ultimas.stream().map(r -> {
-            var kmRevisaoEstimado = carroService.getKmRecente((r.getCarro().getId()));
-            var carro = r.getCarro();
-            var placa = carro.getPlaca();
-            var prox = plusDaysDate(r.getDtRevisao(), 180);
-            java.sql.Date sqlDate = new java.sql.Date(prox.getTime());
-            var kmAtual = carroService.getKmRecente((r.getCarro().getId()));
-
-            return new ProximaRevisaoDTO(carro.getId(), placa, r.getDtRevisao(), kmRevisaoEstimado, kmAtual, sqlDate);
-        }).toList();
-    }*/
-
-    public static java.util.Date plusDaysDate(java.util.Date in, long days) {
-        Objects.requireNonNull(in, "Data não pode ser nula");
-
-        if (in instanceof java.sql.Date sqlDate) {
-            LocalDate base = sqlDate.toLocalDate().plusDays(days);
-            return java.util.Date.from(base.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        } else {
-            return java.util.Date.from(in.toInstant().plusSeconds(days * 24 * 60 * 60));
-        }
-    }
 
 
 

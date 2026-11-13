@@ -18,10 +18,11 @@
 
         <div class="form-group animate-fade-in-up delay-200">
           <label class="block text-gray-600 mb-2 font-medium">
-            <fa-icon [icon]="['fas', 'coins']" class="mr-2 text-green-500"></fa-icon>Valor Combustível (R$)
+            <fa-icon [icon]="['fas', 'coins']" class="mr-2 text-green-500"></fa-icon>Valor total pago (R$)
           </label>
-          <input type="number" formControlName="valorComb"
+          <input type="number" formControlName="valorComb" step="0.01"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+          <span *ngIf="precoPorLitro" class="text-sm text-gray-500">≈ {{ precoPorLitro | currency:'BRL' }} por litro</span>
         </div>
 
         <div class="form-group animate-fade-in-up delay-300">

@@ -1,5 +1,7 @@
 package com.revisao.demo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.revisao.demo.enums.UserRoles;
 
 import com.revisao.demo.models.Empresa;
@@ -20,6 +22,7 @@ public class UserDTO {
     @NotNull
     private String nome;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     private EmpresaDTO empresa;

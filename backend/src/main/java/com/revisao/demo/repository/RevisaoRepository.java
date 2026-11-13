@@ -13,6 +13,12 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
 
     List<Revisao> findByCarro_id(Integer idCarro);
 
+    List<Revisao> findByCarro_IdOrderByDtRevisaoDescIdDesc(Integer carroId);
+
+    List<Revisao> findByCarro_Empresa_IdOrderByDtRevisaoDescIdDesc(Integer empresaId);
+
+    Optional<Revisao> findByIdAndCarro_Empresa_Id(Integer id, Integer empresaId);
+
     void deleteByCarro_id(Integer idCarro);
 
     // a partir daqui, dashboard
@@ -29,6 +35,19 @@ public interface RevisaoRepository extends BaseRepository<Revisao, Integer> {
       order by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
     """)
     List<MesValorDTO> revisoesPorMes(Integer empresaId);
+
+    @Query("""
+      select new com.revisao.demo.dto.dashboards.MesValorDTO(
+        concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m')),
+        coalesce(sum(r.valor), 0d)
+      )
+      from Revisao r
+      join r.carro c
+      where c.empresa.id = :empresaId
+      group by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
+      order by concat('', function('DATE_FORMAT', r.dtRevisao, '%Y-%m'))
+    """)
+    List<MesValorDTO> custoManutencaoMensal(Integer empresaId);
 
     @Query("""
   select r from Revisao r

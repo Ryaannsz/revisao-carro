@@ -18,5 +18,6 @@ public class DashboardResumoDTO {
     private List<MesValorDTO> eficienciaMensal;
     private List<MesValorDTO> revisoesPorMes;
     private List<ProximaRevisaoDTO> proximasRevisoes;
+    private List<MesValorDTO> custoManutencaoMensal;
 
 }

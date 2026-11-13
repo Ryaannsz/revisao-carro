@@ -2,11 +2,8 @@ package com.revisao.demo.controller;
 
 import java.util.List;
 
-
-import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,12 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revisao.demo.dto.RevisaoDTO;
+import com.revisao.demo.dto.dashboards.ProximaRevisaoDTO;
 import com.revisao.demo.service.RevisaoService;
+import com.revisao.demo.utils.AuthUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("revisao")
 @RequiredArgsConstructor
@@ -31,41 +29,38 @@ public class RevisaoController {
 
 	@GetMapping
 	public List<RevisaoDTO> getAllRevisao() {
-		return revisaoService.findAll();
+		return revisaoService.findAllByEmpresa(AuthUtils.getEmpresaId());
 	}
 
 	@PostMapping
 	public ResponseEntity<Void> postRevisao(@Valid @RequestBody RevisaoDTO revisao) {
-		revisaoService.saveRevisao(revisao);
+		revisaoService.saveRevisao(revisao, AuthUtils.getUser(), AuthUtils.getEmpresaId());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-	
-	@GetMapping("/{idRevisao}")
-	public ResponseEntity<RevisaoDTO> getSpecRevisao(@PathVariable Integer idRevisao) {
-	    return revisaoService.findById(idRevisao)
-	            .map(ResponseEntity::ok)
-	            .orElseGet(() -> ResponseEntity.notFound().build());
-	}
-	
-	@GetMapping("/carro/{idRevisao}")
-	public List<RevisaoDTO> getRevisaoByCarroId(@PathVariable Integer idRevisao){
-		return revisaoService.listRevisaoByCarroId(idRevisao);
-	}
-	
-	@DeleteMapping("/{idRevisao}")
-	public ResponseEntity<Void> deleteRevisao(@PathVariable Integer idRevisao){
-		revisaoService.delete(idRevisao);
-		return ResponseEntity.status(HttpStatus.OK).build();
+
+	@GetMapping("/{idRevisao:\\d+}")
+	public RevisaoDTO getSpecRevisao(@PathVariable Integer idRevisao) {
+		return revisaoService.findByIdDaEmpresa(idRevisao, AuthUtils.getEmpresaId());
 	}
 
-    @GetMapping("/alarme")
-    public List<ProximaRevisaoDTO> alarmeRevisao(){
-        return revisaoService.calcularProxRevisao();
-    }
+	@GetMapping("/carro/{idCarro}")
+	public List<RevisaoDTO> getRevisaoByCarroId(@PathVariable Integer idCarro) {
+		return revisaoService.listRevisaoByCarroId(idCarro, AuthUtils.getEmpresaId());
+	}
 
-    @GetMapping("/alarme/{carroId}")
-    public ProximaRevisaoDTO alarmeRevisaoPorCarro(@PathVariable Integer carroId){
-        return revisaoService.calcularProxRevisao(carroId);
-    }
+	@DeleteMapping("/{idRevisao:\\d+}")
+	public ResponseEntity<Void> deleteRevisao(@PathVariable Integer idRevisao) {
+		revisaoService.deleteDaEmpresa(idRevisao, AuthUtils.getEmpresaId());
+		return ResponseEntity.ok().build();
+	}
 
+	@GetMapping("/alarme")
+	public List<ProximaRevisaoDTO> alarmeRevisao() {
+		return revisaoService.calcularProxRevisao(AuthUtils.getEmpresaId());
+	}
+
+	@GetMapping("/alarme/{carroId}")
+	public ProximaRevisaoDTO alarmeRevisaoPorCarro(@PathVariable Integer carroId) {
+		return revisaoService.calcularProxRevisao(carroId, AuthUtils.getEmpresaId());
+	}
 }

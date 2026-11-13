@@ -24,6 +24,23 @@
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
         </div>
 
+        <div class="form-group animate-fade-in-up delay-300">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <fa-icon [icon]="['fas', 'coins']" class="mr-2 text-green-500"></fa-icon>Custo total (R$)
+          </label>
+          <input type="number" formControlName="valor" step="0.01" min="0" placeholder="Peças + mão de obra"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+        </div>
+
+        <div class="form-group animate-fade-in-up delay-300">
+          <label class="block text-gray-600 mb-2 font-medium">
+            <fa-icon [icon]="['fas', 'wrench']" class="mr-2 text-green-500"></fa-icon>O que foi feito
+          </label>
+          <textarea formControlName="descricao" rows="3" maxlength="1000"
+            placeholder="Ex.: troca de óleo e filtros, pastilhas de freio, alinhamento..."
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"></textarea>
+        </div>
+
         <div class="form-group animate-fade-in-up delay-400">
           <label class="block text-gray-600 mb-2 font-medium">
             <fa-icon [icon]="['fas', 'car']" class="mr-2 text-green-500"></fa-icon>Carro

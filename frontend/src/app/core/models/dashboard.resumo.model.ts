@@ -9,4 +9,5 @@ export interface DashboardResumo {
   eficienciaMensal: MesValor[];
   revisoesPorMes: MesValor[];
   proximasRevisoes: ProximaRevisao[];
+  custoManutencaoMensal?: MesValor[];
 }

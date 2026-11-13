@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/car-stats")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CarStatsController {
 
     private final CarStatsService service;
@@ -34,10 +33,10 @@ public class CarStatsController {
 
         return service.getCarStats(carIds, months, mode, AuthUtils.getEmpresaId());
     }
-@GetMapping("/carros")
-public List<CarOptionDTO> getCarrosByEmpresa(Integer empresaId) {
+    @GetMapping("/carros")
+    public List<CarOptionDTO> getCarrosByEmpresa() {
         return carroService.getCarOptions(AuthUtils.getEmpresaId());
-}
+    }
 
 
 }

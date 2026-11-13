@@ -51,7 +51,8 @@ order by carroId, mes
     select c.id as carroId, c.placa as placa
     from tb_carro c
     where c.id in (:carIds)
+      and c.empresa_id = :empresaId
     order by c.id
     """, nativeQuery = true)
-    List<Object[]> carOptions(@Param("carIds") List<Integer> carIds);
+    List<Object[]> carOptions(@Param("carIds") List<Integer> carIds, @Param("empresaId") Integer empresaId);
 }

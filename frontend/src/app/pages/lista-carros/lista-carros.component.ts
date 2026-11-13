@@ -50,7 +50,6 @@ export class ListaCarrosComponent implements OnInit {
         this.carros = data;
         this.getKm();
         this.loading = false;
-        this.toastService.showSuccess('Carros listados com sucesso!');
       },
       error: (err) => {
         console.error('Erro ao carregar carros:', err);
@@ -134,6 +133,29 @@ get carrosFiltrados(): Carro[] {
     if (alvo <= 0) return 0;
     const percentAbs = (atual / alvo) * 100;
     return Math.max(0, Math.min(100, percentAbs));
+  }
+
+  get totalDisponiveis(): number {
+    return this.carros.filter(c => c.status === CarroStatus.DISPONIVEL).length;
+  }
+
+  get totalManutencao(): number {
+    return this.carros.filter(c => c.status === CarroStatus.MANUTENCAO).length;
+  }
+
+  get mediaKm(): number {
+    if (!this.carros.length) return 0;
+    return this.carros.reduce((t, c) => t + (c.kmAdicionado ?? 0), 0) / this.carros.length;
+  }
+
+  /** Carros com revisão a 90%+ do intervalo de km ou com data estimada já vencida. */
+  get totalRevisaoAtencao(): number {
+    const hoje = new Date().toISOString().slice(0, 10);
+    return this.carros.filter(c => {
+      const r = this.getProximaRevisaoByCarroId(c.id);
+      const vencidaPorData = !!r?.proximaRevisaoEstimada && String(r.proximaRevisaoEstimada).slice(0, 10) <= hoje;
+      return vencidaPorData || this.getProgressPercent(c) >= 90;
+    }).length;
   }
 
   updateStatusFilter(status: CarroStatus | 'TODOS'){

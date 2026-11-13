@@ -22,4 +22,7 @@ public class BootstrapProperties {
     @Value("${bootstrap.user.cpf}")
     private String cpf;
 
+    @Value("${bootstrap.demo-data:false}")
+    private boolean demoData;
+
 }

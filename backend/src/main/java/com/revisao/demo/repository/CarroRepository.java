@@ -31,6 +31,10 @@ public interface CarroRepository extends BaseRepository<Carro, Integer> {
 
     List<Carro> findByEmpresaId(@Param("empresaId") Integer empresaId);
 
+    List<Carro> findByEmpresaIdOrderByPlacaAsc(Integer empresaId);
+
+    Optional<Carro> findByIdAndEmpresaId(Integer id, Integer empresaId);
+
     Optional<Carro> findByPlaca(String placa);
 
 }

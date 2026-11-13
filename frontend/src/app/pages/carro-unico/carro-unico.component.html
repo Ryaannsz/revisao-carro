@@ -103,7 +103,7 @@
               <fa-icon [icon]="['fas', 'calendar-alt']" class="text-purple-600 text-sm sm:text-base"></fa-icon>
             </div>
           </div>
-          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado }}</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ carro?.dtAdicionado | date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
 
@@ -173,7 +173,7 @@
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
             <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Abastecimentos</h3>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Total gasto: {{ totalGastoAbastecimentos | currency:'BRL' }}</p>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Total gasto: {{ totalGastoAbastecimentos | currency:'BRL' }}<span *ngIf="custoPorKm"> · {{ custoPorKm | currency:'BRL' }}/km (comb. + manutenção)</span></p>
           </div>
           <a href="/abast" class="w-full sm:w-auto">
             <button
@@ -209,11 +209,11 @@
                     {{ a.litroComb | number:'1.2-2' }} L
                   </td>
                   <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
-                    {{ a.valorComb | currency:'BRL' }}
+                    {{ precoPorLitro(a) | currency:'BRL' }}
                   </td>
                   <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <span class="text-sm font-semibold text-gray-900">
-                      {{ a.litroComb * a.valorComb | currency:'BRL' }}
+                      {{ a.valorComb | currency:'BRL' }}
                     </span>
                   </td>
                   <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
@@ -225,10 +225,8 @@
                         class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
                         <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
                       </button>
-                      <button class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'edit']"></fa-icon>
-                      </button>
-                      <button class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
+                      <button *ngIf="isAdmin" (click)="confirmDeleteAbastecimento(a.id)" title="Excluir"
+                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
                         <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
                       </button>
                     </div>
@@ -241,14 +239,14 @@
                         <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
                         <div>
                           <p class="text-xs font-medium text-gray-500">Responsável</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ a.user.nome }}</p>
+                          <p class="text-sm font-semibold text-gray-900">{{ a.user?.nome || '—' }}</p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
                         <fa-icon [icon]="['fas', 'id-badge']" class="text-gray-400"></fa-icon>
                         <div>
                           <p class="text-xs font-medium text-gray-500">ID do Usuário</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ a.user.id }}</p>
+                          <p class="text-sm font-semibold text-gray-900">{{ a.user?.id || '—' }}</p>
                         </div>
                       </div>
                     </div>
@@ -290,7 +288,7 @@
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
             <h3 class="text-lg sm:text-xl font-bold text-gray-900">Histórico de Revisões</h3>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Manutenções realizadas no veículo</p>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Manutenções realizadas no veículo<span *ngIf="totalGastoRevisoes"> · Total gasto: {{ totalGastoRevisoes | currency:'BRL' }}</span></p>
           </div>
           <a href="/revisao/cadastrar" class="w-full sm:w-auto">
             <button
@@ -307,7 +305,8 @@
               <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
                 <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
                 <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">KM no Momento</th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Tipo</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Serviço</th>
+                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Custo</th>
                 <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-[11px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
@@ -324,9 +323,13 @@
                     {{ r.kmAtual | number }} km
                   </td>
                   <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <span class="px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
-                      Revisão periódica
+                    <span class="px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full inline-block max-w-[16rem] truncate align-middle"
+                      [title]="r.descricao || 'Revisão periódica'">
+                      {{ r.descricao || 'Revisão periódica' }}
                     </span>
+                  </td>
+                  <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700">
+                    {{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}
                   </td>
                   <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
                     <div class="flex justify-end gap-1">
@@ -334,30 +337,28 @@
                         class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
                         <fa-icon [icon]="['fas', 'info-circle']"></fa-icon>
                       </button>
-                      <button class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors">
-                        <fa-icon [icon]="['fas', 'edit']"></fa-icon>
-                      </button>
-                      <button class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
+                      <button *ngIf="isAdmin" (click)="confirmDeleteRevisao(r.id)" title="Excluir"
+                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
                         <fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>
                       </button>
                     </div>
                   </td>
                 </tr>
                 <tr *ngIf="expRevisaoId === r.id" class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50">
-                  <td colspan="4" class="px-4 sm:px-6 py-4">
+                  <td colspan="5" class="px-4 sm:px-6 py-4">
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
                       <div class="flex items-center gap-2">
                         <fa-icon [icon]="['fas', 'user-circle']" class="text-gray-400"></fa-icon>
                         <div>
                           <p class="text-xs font-medium text-gray-500">Responsável</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ r.user.nome }}</p>
+                          <p class="text-sm font-semibold text-gray-900">{{ r.user?.nome || '—' }}</p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
                         <fa-icon [icon]="['fas', 'id-badge']" class="text-gray-400"></fa-icon>
                         <div>
                           <p class="text-xs font-medium text-gray-500">ID do Usuário</p>
-                          <p class="text-sm font-semibold text-gray-900">{{ r.user.id }}</p>
+                          <p class="text-sm font-semibold text-gray-900">{{ r.user?.id || '—' }}</p>
                         </div>
                       </div>
                     </div>

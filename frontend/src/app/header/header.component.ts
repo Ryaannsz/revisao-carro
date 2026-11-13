@@ -28,10 +28,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription = this.authService.isLoggedIn$.subscribe(status => {
       this.logado = status;
+      this.isSuper = this.authService.getUserRole();
     });
-    if(this.authService.getUserRole()){
-      this.isSuper=true;
-    }
   }
 
   ngOnDestroy(): void {

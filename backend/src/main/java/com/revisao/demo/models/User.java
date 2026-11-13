@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.revisao.demo.enums.UserRoles;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "tb_user")
+// Nunca serializar hash de senha nem os campos do UserDetails quando o User vai embutido em DTOs
+@JsonIgnoreProperties(value = {"senha", "password", "authorities", "username", "accountNonExpired",
+	"accountNonLocked", "credentialsNonExpired", "enabled", "hibernateLazyInitializer", "handler"}, allowSetters = true)
 public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;

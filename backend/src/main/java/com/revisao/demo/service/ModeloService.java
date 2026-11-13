@@ -26,9 +26,12 @@ public class ModeloService extends BaseServiceImpl<ModeloDTO, Modelo, Integer>{
 	}
 	
 	public ModeloDTO salvarModelo(ModeloDTO modelo, Integer empresaId) {
-		if (modeloRepository.existsByModelo(modelo.getModelo().toLowerCase()))
+		String nome = modelo.getModelo().trim().toLowerCase();
+		if (nome.isEmpty()) throw new IllegalArgumentException("Informe o nome do modelo.");
+		if (modeloRepository.existsByModeloIgnoreCaseAndEmpresaId(nome, empresaId))
 			throw new IllegalArgumentException("Modelo já adicionado!");
-		modelo.setModelo(modelo.getModelo().toLowerCase());
+		modelo.setId(null);
+		modelo.setModelo(nome);
         modelo.setEmpresa(empresaService.setEmpresaDTO(empresaId));
 		return modeloMapper.toDTO(modeloRepository.saveAndFlush(modeloMapper.toEntity(modelo)));
 	}

@@ -4,8 +4,10 @@ import { User } from "./user.model";
 export interface Revisao {
     id: number,
     kmAtual: number,
-    user: User,
+    /** custo total (peças + mão de obra) */
+    valor?: number | null,
+    descricao?: string | null,
+    user: User | null,
     carro: Carro,
     dtRevisao: Date
-
 }

@@ -1,10 +1,10 @@
 export interface ProximaRevisao {
     carroId: number;
     placa: string;
-    ultimaRevisao: string;
+    ultimaRevisao: string | null;
     kmRevisaoEstimado: number | null;
     kmAtual: number,
-    proximaRevisaoEstimada: String
+    proximaRevisaoEstimada: string | null;
 
 
 }

@@ -35,9 +35,12 @@ public class MarcaService extends BaseServiceImpl<MarcaDTO, Marca, Integer>{
     }
 	
 	public MarcaDTO salvarMarca(MarcaDTO marca, Integer empresaId) {
-		if (marcaRepository.existsByMarca(marca.getMarca().toLowerCase()))
+		String nome = marca.getMarca().trim().toLowerCase();
+		if (nome.isEmpty()) throw new IllegalArgumentException("Informe o nome da marca.");
+		if (marcaRepository.existsByMarcaIgnoreCaseAndEmpresaId(nome, empresaId))
 			throw new IllegalArgumentException("Marca já adicionada!");
-		marca.setMarca(marca.getMarca().toLowerCase());
+		marca.setId(null);
+		marca.setMarca(nome);
         marca.setEmpresa(empresaService.setEmpresaDTO(empresaId));
 		return marcaMapper.toDTO(marcaRepository.saveAndFlush(marcaMapper.toEntity(marca)));
 		}

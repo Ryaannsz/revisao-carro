@@ -13,4 +13,8 @@ public interface MarcaRepository extends BaseRepository<Marca, Integer>{
 
     List<Marca> findAllByEmpresaIdOrderByMarcaAsc(Integer empresaId);
 
+    Optional<Marca> findByIdAndEmpresaId(Integer id, Integer empresaId);
+
+    boolean existsByMarcaIgnoreCaseAndEmpresaId(String marca, Integer empresaId);
+
 }

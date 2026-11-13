@@ -42,17 +42,17 @@ export class AuthService {
     return token ? this.jwtHelper.decodeToken(token) : null;
   }
 
-  getUserRole(): any {
-    const user = this.getUserInfo();
-    if (user.role === "USER")
-      return false;
-    else
-      return true;
+  /** true se o usuário logado é ADMIN. Seguro para chamar deslogado (retorna false). */
+  getUserRole(): boolean {
+    return this.getUserInfo()?.role === Role.ADMIN;
   }
 
-  getEmpresaId(): string | null{
-    const user = this.getUserInfo();
-    return user.empresaId;
+  isAdmin(): boolean {
+    return this.getUserRole();
+  }
+
+  getEmpresaId(): number | null {
+    return this.getUserInfo()?.empresaId ?? null;
   }
 
 }

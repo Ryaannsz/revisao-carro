@@ -12,6 +12,7 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">KM Atual</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Custo</th>
           <th class="px-6 py-3"></th>
         </tr>
       </thead>
@@ -20,8 +21,9 @@
           <td class="px-6 py-4 whitespace-nowrap">
             {{ r.carro.marca.marca | uppercase}} {{ r.carro.modelo.modelo | uppercase}} — {{ r.carro.placa | uppercase}}
           </td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ r.dtRevisao | date:'short' }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ r.kmAtual }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ r.dtRevisao | date:'dd/MM/yyyy' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ r.kmAtual | number }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ r.valor != null ? (r.valor | currency:'BRL') : '—' }}</td>
           <td class="px-6 py-4 whitespace-nowrap text-right">
             <button (click)="openModal(r)" class="text-blue-600 hover:text-blue-900">
               Detalhes
@@ -42,8 +44,11 @@
       <h2 class="text-2xl font-bold mb-4">Detalhes da Revisão</h2>
       <p><strong>Carro:</strong> {{ selectedRevisao.carro.marca.marca | uppercase}}
         {{ selectedRevisao.carro.modelo.modelo | uppercase}} — {{ selectedRevisao.carro.placa | uppercase}}</p>
-      <p><strong>Data:</strong> {{ selectedRevisao.dtRevisao | date:'medium' }}</p>
-      <p><strong>KM Atual:</strong> {{ selectedRevisao.kmAtual }}</p>
+      <p><strong>Data:</strong> {{ selectedRevisao.dtRevisao | date:'dd/MM/yyyy' }}</p>
+      <p><strong>KM Atual:</strong> {{ selectedRevisao.kmAtual | number }}</p>
+      <p><strong>Custo:</strong> {{ selectedRevisao.valor != null ? (selectedRevisao.valor | currency:'BRL') : '—' }}</p>
+      <p *ngIf="selectedRevisao.descricao"><strong>Serviço:</strong> {{ selectedRevisao.descricao }}</p>
+      <p><strong>Registrado por:</strong> {{ selectedRevisao.user?.nome || '—' }}</p>
       <div class="mt-6 flex justify-end space-x-2">
         <button (click)="removeRevisao(selectedRevisao.id)"
           class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Remover</button>

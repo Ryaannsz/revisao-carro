@@ -1,25 +1,31 @@
 package com.revisao.demo.utils;
 
+import com.revisao.demo.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * Principal autenticado. Guarda o usuário carregado do banco para que
+ * empresa e id venham da fonte de verdade, e não de claims do token.
+ */
 public class CustomUserPrincipal implements UserDetails {
-    private final UserDetails delegate;
-    private final String empresaId;
+    private final User user;
 
-    public CustomUserPrincipal(UserDetails delegate, String empresaId) {
-        this.delegate = delegate;
-        this.empresaId = empresaId;
+    public CustomUserPrincipal(User user) {
+        this.user = user;
     }
-    public String getEmpresaId() { return empresaId; }
 
-    @Override public Collection<? extends GrantedAuthority> getAuthorities(){ return delegate.getAuthorities(); }
-    @Override public String getPassword(){ return delegate.getPassword(); }
-    @Override public String getUsername(){ return delegate.getUsername(); }
-    @Override public boolean isAccountNonExpired(){ return delegate.isAccountNonExpired(); }
-    @Override public boolean isAccountNonLocked(){ return delegate.isAccountNonLocked(); }
-    @Override public boolean isCredentialsNonExpired(){ return delegate.isCredentialsNonExpired(); }
-    @Override public boolean isEnabled(){ return delegate.isEnabled(); }
+    public User getUser() { return user; }
+    public Integer getUserId() { return user.getId(); }
+    public Integer getEmpresaId() { return user.getEmpresa() != null ? user.getEmpresa().getId() : null; }
+
+    @Override public Collection<? extends GrantedAuthority> getAuthorities(){ return user.getAuthorities(); }
+    @Override public String getPassword(){ return user.getPassword(); }
+    @Override public String getUsername(){ return user.getUsername(); }
+    @Override public boolean isAccountNonExpired(){ return user.isAccountNonExpired(); }
+    @Override public boolean isAccountNonLocked(){ return user.isAccountNonLocked(); }
+    @Override public boolean isCredentialsNonExpired(){ return user.isCredentialsNonExpired(); }
+    @Override public boolean isEnabled(){ return user.isEnabled(); }
 }

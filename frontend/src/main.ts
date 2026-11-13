@@ -1,7 +1,6 @@
 import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 import { environment } from './app/enviroment/enviroment';
-import { worker } from './mocks/browser';
 
 function setupMocks() {
   if (environment.useMocks) {

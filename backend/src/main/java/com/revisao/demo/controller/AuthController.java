@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revisao.demo.dto.AuthResponseDTO;
 import com.revisao.demo.dto.AuthenticatorDTO;
-import com.revisao.demo.dto.RegisterDTO;
 import com.revisao.demo.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,8 @@ public class AuthController {
 	return ResponseEntity.ok(authService.authUser(data));
     }
 
-    @PostMapping("/registro")
-    public ResponseEntity<?> register(@RequestBody RegisterDTO data) {
-	authService.registerUser(data);
-	return ResponseEntity.ok().build();
-
-    }
+    // O antigo POST /auth/registro foi removido: ele aceitava "roles" e "empresa" vindos do
+    // cliente (qualquer um poderia se criar ADMIN em qualquer empresa). Usuários agora são
+    // criados apenas por um ADMIN via POST /user.
 
 }

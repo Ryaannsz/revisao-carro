@@ -58,15 +58,20 @@ export class RegistroAbastecimentoComponent {
     ).subscribe(result => {
       if (!result) return;
       this.loading = true;
-      this.abastService.delete(`/${id}`).subscribe(() => {
-        this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
-        this.onSearch();
-        this.closeModal();
-        this.toastService.showSuccess("Abastecimento removido com sucesso!");
-        this.loading = false;
+      this.abastService.delete(id).subscribe({
+        next: () => {
+          this.abastecimentos = this.abastecimentos.filter(a => a.id !== id);
+          this.onSearch();
+          this.closeModal();
+          this.toastService.showSuccess("Abastecimento removido com sucesso!");
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+          this.toastService.showError("Erro ao remover abastecimento.");
+        }
       });
     })
-    this.loading = false;
   }
 
   editAbast(id: number): void {
@@ -89,8 +94,6 @@ export class RegistroAbastecimentoComponent {
         this.loading = false;
         this.toastService.showError('Erro ao buscar lista!');
       }
-
     });
-    this.loading = false;
   }
 }

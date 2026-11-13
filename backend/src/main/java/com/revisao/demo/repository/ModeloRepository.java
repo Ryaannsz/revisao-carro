@@ -13,4 +13,8 @@ public interface ModeloRepository extends BaseRepository<Modelo, Integer>{
     Optional<Modelo> findByModelo(String modelo);
 
     List<Modelo> findAllByEmpresaIdOrderByModeloAsc(Integer empresaId);
+
+    Optional<Modelo> findByIdAndEmpresaId(Integer id, Integer empresaId);
+
+    boolean existsByModeloIgnoreCaseAndEmpresaId(String modelo, Integer empresaId);
 }

@@ -1,11 +1,12 @@
-import { Marca } from "./marca.model";
-import { Modelo } from "./modelo.model";
+import { Maquina } from "./maquina.model";
+import { User } from "./user.model";
 
 export interface RevisaoMaquina {
     id: number,
-    dtAdicionado: Date,
-    horas: number,
-    marca: Marca,
-    modelo: Modelo,
-    chassi: string
+    dtRevisao: string,
+    horasAtual: number,
+    valor?: number | null,
+    descricao?: string | null,
+    user: User | null,
+    maquina: Maquina
 }
